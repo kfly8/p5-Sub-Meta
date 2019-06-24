@@ -82,9 +82,37 @@ subtest 'has sub' => sub {
         is $meta->attribute, [], 'attribute';
         is $meta->apply_attribute('lvalue'), $meta, 'apply_attribute';
         is $meta->attribute, ['lvalue'], 'attribute';
-        is $meta->apply_attribute(['method']), $meta, 'apply_attribute';
-        is $meta->attribute, ['lvalue', 'method'], 'attribute';
+        is $meta->apply_attribute('method'), $meta, 'apply_attribute';
+        is $meta->attribute, ['lvalue', 'method'], 'attribute/added';
+
+        like dies { $meta->apply_attribute('foo') }, qr/Invalid CODE attribute: foo/, 'invalid attribute';
+
+        like dies { Sub::Meta->new->apply_subname('hello') }, qr/apply_subname requires subroutine reference/, 'apply_subname requires subroutine reference';
+
+        like dies { Sub::Meta->new->apply_prototype('$$') }, qr/apply_prototype requires subroutine reference/, 'apply_prototype requires subroutine reference';
+
+        like dies { Sub::Meta->new->apply_attribute('lvalue') }, qr/apply_attribute requires subroutine reference/, 'apply_attribute requires subroutine reference';
     };
 };
+
+subtest 'new' => sub {
+    sub test_new { }
+    is(Sub::Meta->new({ sub => \&test_new})->sub, \&test_new, 'args hashref');
+};
+
+subtest 'constant' => sub {
+    {
+        use constant PI => 4 * atan2(1, 1);
+        my $m = Sub::Meta->new(sub => \&PI);
+        is $m->is_constant, 1;
+    }
+
+    {
+        sub one() { 1 }
+        my $m = Sub::Meta->new(sub => \&one);
+        is $m->is_constant, 1;
+    }
+};
+
 
 done_testing;
