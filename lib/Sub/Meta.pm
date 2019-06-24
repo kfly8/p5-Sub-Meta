@@ -131,57 +131,131 @@ C<Sub::Meta> provides methods to handle subroutine meta information. In addition
 
 =head1 METHODS
 
-=head2 new
+=head2 Constructor
+
+=head3 new
 
 Constructor of C<Sub::Meta>.
 
-=head2 sub
+=head2 GETTER
+
+=head3 sub
 
 A subroutine reference
 
-=head2 subname
+=head3 subname
 
 A subroutine name, e.g. C<hello>
 
-=head2 fullname
+=head3 fullname
 
 A subroutine full name, e.g. C<main::hello>
 
-=head2 stashname
+=head3 stashname
 
 A subroutine stash name, e.g. C<main>
 
-=head2 file
+=head3 file
 
 A filename where subroutine is defined, e.g. C<path/to/main.pl>.
 
-=head2 line
+=head3 line
 
 A line where the definition of subroutine started.
 
-=head2 is_constant
+=head3 is_constant
 
 A boolean value indicating whether the subroutine is a constant or not.
 
-=head2 prototype
+=head3 prototype
 
 A prototype of subroutine reference.
 
-=head2 attribute
+=head3 attribute
 
 A attribute of subroutine reference.
 
-=head2 is_method
+=head3 is_method
 
 A boolean value indicating whether the subroutine is a method or not.
 
-=head2 parameters
+=head3 parameters
 
 Parameters object of L<Sub::Meta::Parameters>.
 
-=head2 returns
+=head3 returns
 
 Returns object of L<Sub::Meta::Returns>.
+
+=head2 SETTER
+
+You can set meta information of subroutine. C<set_xxx> sets C<xxx> and does not affect subroutine reference. On the other hands, C<apply_xxx> sets C<xxx> and apply C<xxx> to subroutine reference.
+
+Setter methods of C<Sub::Meta> returns meta object. So you can chain setting: 
+
+    $meta->set_subname('foo')
+         ->set_stashname('Some')
+
+=head3 set_xxx
+
+=head4 set_sub($)
+
+=head4 set_subname($)
+
+=head4 set_fullname($)
+
+=head4 set_stashname($)
+
+=head4 set_file($)
+
+=head4 set_line($)
+
+=head4 set_is_constant($)
+
+=head4 set_prototype($)
+
+=head4 set_attribute($)
+
+=head4 set_is_method($)
+
+=head4 set_parameters($)
+
+Sets the parameters object of L<Sub::Meta::Parameters> or any object:
+
+    my $meta = Sub::Meta->new;
+    $meta->set_parameters({ type => 'Type'});
+    $meta->parameters; # => Sub::Meta::Parameters->new({type => 'Type'});
+
+    # or
+    $meta->set_parameters(Sub::Meta::Parameters->new(type => 'Foo'));
+    $meta->set_parameters(MyParamters->new)
+
+=head4 set_returns($)
+
+Sets the returns object of L<Sub::Meta::Returns> or any object.
+
+    my $meta = Sub::Meta->new;
+    $meta->set_returns({ type => 'Type'});
+    $meta->returns; # => Sub::Meta::Returns->new({type => 'Type'});
+
+    # or
+    $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
+    $meta->set_returns(MyReturns->new)
+
+=head3 apply_xxx
+
+=head4 apply_subname($)
+
+=head4 apply_prototype($)
+
+=head4 apply_attribute(@)
+
+=head1 NOTE
+
+=head2 Pure-Perl version
+
+By default C<Sub::Meta> tries to load an XS implementation for speed.
+If that fails, or if the environment variable C<PERL_SUB_META_PP> is defined to a true value, it will fall back to a pure perl implementation.
 
 =head1 SEE ALSO
 
