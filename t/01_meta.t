@@ -114,5 +114,16 @@ subtest 'constant' => sub {
     }
 };
 
+subtest 'set_parameters/returns' => sub {
+    my $meta = Sub::Meta->new;
+
+    my $obj = bless {}, 'Some::Object';
+    $meta->set_parameters($obj);
+    is $meta->parameters, $obj, 'parameters can set any object';
+
+    $meta->set_returns($obj);
+    is $meta->returns, $obj, 'return can set any object';
+};
+
 
 done_testing;

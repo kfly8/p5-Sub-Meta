@@ -6,6 +6,7 @@ use warnings;
 our $VERSION = "0.01";
 
 use Carp ();
+use Scalar::Util ();
 use Sub::Identify ();
 use Sub::Util ();
 use attributes ();
@@ -49,8 +50,18 @@ sub set_is_constant($) { $_[0]{is_constant} = $_[1]; $_[0] }
 sub set_prototype($)   { $_[0]{prototype}   = $_[1]; $_[0] }
 sub set_attribute($)   { $_[0]{attribute}   = $_[1]; $_[0] }
 sub set_is_method($)   { $_[0]{is_method}   = $_[1]; $_[0] }
-sub set_parameters($)  { my $self = shift; $self->{parameters} = Sub::Meta::Parameters->new(@_); $self }
-sub set_returns($)     { my $self = shift; $self->{returns}    = Sub::Meta::Returns->new(@_); $self }
+
+sub set_parameters($) {
+    my $self = shift;
+    $self->{parameters} = Scalar::Util::blessed($_[0]) ? $_[0] : Sub::Meta::Parameters->new(@_);
+    $self
+}
+
+sub set_returns($) {
+    my $self = shift;
+    $self->{returns} =  Scalar::Util::blessed($_[0]) ? $_[0] : Sub::Meta::Returns->new(@_);
+    $self
+}
 
 sub _build_subname()     { $_[0]->sub ? Sub::Identify::sub_name($_[0]->sub) : '' }
 sub _build_fullname()    { $_[0]->sub ? Sub::Identify::sub_fullname($_[0]->sub) : '' }
