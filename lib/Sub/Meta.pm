@@ -5,6 +5,7 @@ use warnings;
 
 our $VERSION = "0.01";
 
+use Carp ();
 use Sub::Identify ();
 use Sub::Util ();
 use attributes ();
@@ -16,6 +17,8 @@ BEGIN {
     # for Pure Perl
     $ENV{PERL_SUB_IDENTIFY_PP} = $ENV{PERL_SUB_META_PP};
 }
+
+sub croak { require Carp; Carp::croak(@_) }
 
 sub new {
     my $class = shift;
@@ -60,7 +63,7 @@ sub _build_attribute()   { $_[0]->sub ? [ attributes::get($_[0]->sub) ] : undef 
 
 sub apply_subname($) {
     my ($self, $subname) = @_;
-    return unless $self->sub;
+    croak 'apply_subname requires subroutine reference' unless $self->sub;
     Sub::Util::set_subname($subname, $self->sub);
     $self->set_subname($subname);
     return $self;
@@ -68,16 +71,15 @@ sub apply_subname($) {
 
 sub apply_prototype($) {
     my ($self, $prototype) = @_;
-    return unless $self->sub;
+    croak 'apply_prototype requires subroutine reference' unless $self->sub;
     Sub::Util::set_prototype($prototype, $self->sub);
     $self->set_prototype($prototype);
     return $self;
 }
 
-sub apply_attribute {
-    my $self = shift;
-    my @attribute = @_ == 1 && ref $_[0] ? @{$_[0]} : @_;
-    return unless $self->sub;
+sub apply_attribute(@) {
+    my ($self, @attribute) = @_;
+    croak 'apply_attribute requires subroutine reference' unless $self->sub;
     {
         no warnings qw(misc);
         attributes->import($self->stashname, $self->sub, @attribute);
