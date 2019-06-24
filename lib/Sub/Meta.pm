@@ -54,13 +54,13 @@ sub set_is_method($)   { $_[0]{is_method}   = $_[1]; $_[0] }
 sub set_parameters($) {
     my $self = shift;
     $self->{parameters} = Scalar::Util::blessed($_[0]) ? $_[0] : Sub::Meta::Parameters->new(@_);
-    $self
+    return $self
 }
 
 sub set_returns($) {
     my $self = shift;
     $self->{returns} =  Scalar::Util::blessed($_[0]) ? $_[0] : Sub::Meta::Returns->new(@_);
-    $self
+    return $self
 }
 
 sub _build_subname()     { $_[0]->sub ? Sub::Identify::sub_name($_[0]->sub) : '' }
