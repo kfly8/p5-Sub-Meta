@@ -93,15 +93,86 @@ __END__
 
 =head1 NAME
 
-Sub::Meta - It's new $module
+Sub::Meta - handle subroutine meta information
 
 =head1 SYNOPSIS
 
     use Sub::Meta;
 
+    sub hello { }
+    my $meta = Sub::Meta->new(\&hello);
+    $meta->subname; # => hello
+    $meta->apply_subname('world'); # rename subroutine name
+
+    # specify parameters types ( without validation )
+    $meta->set_parameters( Sub::Meta::Parameters->new(args => [ { type => 'Str' }]) );
+    $meta->parameters->args; # => Sub::Meta::Param->new({ type => 'Str' })
+
+    # specify returns types ( without validation )
+    $meta->set_returns( Sub::Meta::Returns->new('Str') );
+    $meta->returns->scalar; # => 'Str'
+
 =head1 DESCRIPTION
 
-Sub::Meta is ...
+C<Sub::Meta> provides methods to handle subroutine meta information. In addition to information that can be obtained from subroutines using module L<B> etc., subroutines can have meta information such as arguments and return values.
+
+=head1 METHODS
+
+=head2 new
+
+Constructor of C<Sub::Meta>.
+
+=head2 sub
+
+A subroutine reference
+
+=head2 subname
+
+A subroutine name, e.g. C<hello>
+
+=head2 fullname
+
+A subroutine full name, e.g. C<main::hello>
+
+=head2 stashname
+
+A subroutine stash name, e.g. C<main>
+
+=head2 file
+
+A filename where subroutine is defined, e.g. C<path/to/main.pl>.
+
+=head2 line
+
+A line where the definition of subroutine started.
+
+=head2 is_constant
+
+A boolean value indicating whether the subroutine is a constant or not.
+
+=head2 prototype
+
+A prototype of subroutine reference.
+
+=head2 attribute
+
+A attribute of subroutine reference.
+
+=head2 is_method
+
+A boolean value indicating whether the subroutine is a method or not.
+
+=head2 parameters
+
+Parameters object of L<Sub::Meta::Parameters>.
+
+=head2 returns
+
+Returns object of L<Sub::Meta::Returns>.
+
+=head1 SEE ALSO
+
+L<Sub::Identify>, L<Sub::Util>, L<Sub::Info>, L<Function::Paramters::Info>, L<Function::Return::Info>
 
 =head1 LICENSE
 
