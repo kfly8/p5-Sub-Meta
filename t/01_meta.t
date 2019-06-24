@@ -73,11 +73,11 @@ subtest 'has sub' => sub {
         my $meta = Sub::Meta->new(sub => \&hello3);
         is $meta->apply_subname('HELLO'), $meta, 'apply_subname';
         is $meta->subname, 'HELLO', 'subname';
-        is $meta->build_subname, 'HELLO', 'build_subname';
+        is $meta->_build_subname, 'HELLO', 'build_subname';
 
         is $meta->apply_prototype('$'), $meta, 'apply_prototype';
         is $meta->prototype, '$', 'prototype';
-        is $meta->build_prototype, '$', 'build_prototype';
+        is $meta->_build_prototype, '$', 'build_prototype';
 
         is $meta->attribute, [], 'attribute';
         is $meta->apply_attribute('lvalue'), $meta, 'apply_attribute';
