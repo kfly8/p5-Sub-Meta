@@ -52,6 +52,17 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/p5-Sub-Meta/issues"
+      },
+      "homepage" : "https://github.com/kfly8/p5-Sub-Meta",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kfly8/p5-Sub-Meta.git",
+         "web" : "https://github.com/kfly8/p5-Sub-Meta"
+      }
+   },
    "version" : "0.01",
    "x_authority" : "cpan:KFLY",
    "x_serialization_backend" : "JSON::PP version 2.97001",
