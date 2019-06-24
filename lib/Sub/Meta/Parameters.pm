@@ -10,13 +10,13 @@ use Scalar::Util ();
 
 use Sub::Meta::Param;
 
-sub croak { require Carp; Carp::croak(@_) }
+sub _croak { require Carp; Carp::croak(@_) }
 
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
 
-    croak 'parameters reqruires args' unless exists $args{args};
+    _croak 'parameters reqruires args' unless exists $args{args};
 
     $args{nshift} = 0 unless exists $args{nshift};
     $args{slurpy} = 0 unless exists $args{slurpy};
@@ -49,7 +49,7 @@ sub _normalize_args {
 sub _assert_nshift {
     my $self = shift;
     if (@{$self->all_positional_required} < $self->nshift) {
-        croak 'required positional parameters need more than nshift';
+        _croak 'required positional parameters need more than nshift';
     }
 }
 
@@ -83,7 +83,7 @@ sub invocant() {
     my $nshift = $self->nshift;
     return undef if $nshift == 0;
     return $self->all_positional_required->[0] if $nshift == 1;
-    croak "Can't return a single invocant; this function has $nshift";
+    _croak "Can't return a single invocant; this function has $nshift";
 }
 
 sub invocants() {
