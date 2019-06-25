@@ -22,8 +22,8 @@ sub set_scalar($)    { $_[0]{scalar} = $_[1]; $_[0] }
 sub set_list($)      { $_[0]{list}   = $_[1]; $_[0] }
 sub set_void($)      { $_[0]{void}   = $_[1]; $_[0] }
 
-sub coerce()      { $_[0]{coerce} }
-sub set_coerce($) { $_[0]{coerce} = $_[1]; $_[0] }
+sub coerce()      { !!$_[0]{coerce} }
+sub set_coerce($) { $_[0]{coerce} = defined $_[1] ? $_[1] : 1; $_[0] }
 
 1;
 __END__
