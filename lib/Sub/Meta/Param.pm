@@ -10,11 +10,15 @@ use overload
     '""'     => sub { $_[0]->name || '' },
 ;
 
+my %DEFAULT = ( named => 0, optional => 0 );
+
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? ref $_[0] && (ref $_[0] eq 'HASH') ? %{$_[0]}
-                       : ( type => $_[0], named => 0, optional => 0 )
+                       : ( type => $_[0] )
              : @_;
+
+    %args = (%DEFAULT, %args);
 
     bless \%args => $class;
 }
