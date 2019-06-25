@@ -117,7 +117,7 @@ __END__
 
 =head1 NAME
 
-Sub::Meta::Parameters - parameters meta information
+Sub::Meta::Parameters - meta information about parameters
 
 =head1 SYNOPSIS
 

@@ -32,15 +32,42 @@ __END__
 
 =head1 NAME
 
-Sub::Meta::Returns - It's new $module
+Sub::Meta::Returns - meta information about return values
 
 =head1 SYNOPSIS
 
-    use Sub::Meta;
+    use Sub::Meta::Returns;
 
-=head1 DESCRIPTION
+    my $r = Sub::Meta::Returns->new;
 
-Sub::Meta is ...
+=head1 METHODS
+
+=head2 new
+
+Constructor of C<Sub::Meta::Returns>.
+
+    my $r = Sub::Meta::Returns->new(
+        scalar  => 'Str', # optional
+        list    => 'Str', # optional
+        void    => 'Str', # optional
+        coerce  => 1,     # optional
+    );
+
+=head2 scalar
+
+=head2 set_scalar
+
+=head2 list
+
+=head2 set_list
+
+=head2 void
+
+=head2 set_void
+
+=head2 coerce
+
+=head2 set_coerce
 
 =head1 LICENSE
 
