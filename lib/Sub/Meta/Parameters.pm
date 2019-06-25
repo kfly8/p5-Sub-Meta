@@ -117,15 +117,98 @@ __END__
 
 =head1 NAME
 
-Sub::Meta::Parameters - It's new $module
+Sub::Meta::Parameters - parameters meta information
 
 =head1 SYNOPSIS
 
-    use Sub::Meta;
+    use Sub::Meta::Parameters;
 
-=head1 DESCRIPTION
+    my $p1 = Sub::Meta::Parameters->new(
+        args => ['Str']
+    );
+    $p1->invocant;            # => undef;
+    $p1->invocants;           # => [];
+    $p1->positional;          # => [Sub::Meta::Param->new('Str')]
+    $p1->positional_required; # => [Sub::Meta::Param->new('Str')]
+    $p1->positional_optional; # => []
+    $p1->named;               # => []
+    $p1->named_required;      # => []
+    $p1->named_optional;      # => []
+    $p1->nshift;              # => 0
+    $p1->slurpy;              # => 0
+    $p1->args_min;            # => 1
+    $p1->args_max;            # => 1
 
-Sub::Meta is ...
+
+    my $x = Sub::Meta::Param->new({ type => 'Int', name => '$x', named => 1 });
+    my $y = Sub::Meta::Param->new({ type => 'Int', name => '$y', named => 1 });
+
+    my $p2 = Sub::Meta::Parameters->new(
+        nshift => 1,
+        args => [
+            'ClassName', $x, $y
+        ]
+    );
+
+    $p2->invocant;            # => Sub::Meta::Param->new('ClassName');
+    $p2->invocants;           # => [Sub::Meta::Param->new('ClassName')];
+    $p2->positional;          # => []
+    $p2->positional_required; # => []
+    $p2->positional_optional; # => []
+    $p2->named;               # => [$x, $y]
+    $p2->named_required;      # => [$x, $y]
+    $p2->named_optional;      # => []
+    $p2->nshift;              # => 1
+    $p2->slurpy;              # => 0
+    $p2->args_min;            # => 5
+    $p2->args_max;            # => 0+'Inf'
+
+=head1 METHODS
+
+=head2 new
+
+Constructor of C<Sub::Meta::Parameters>.
+
+    my $p = Sub::Meta::Parameters->new(
+        args   => ['Str'], # required. arguments
+        nshift => 0,       # optional. number of shift arguments
+        slurpy => 0,       # optional. whether get all rest arguments
+    );
+
+
+=head2 nshift
+
+=head2 set_nshift
+
+=head2 slurpy
+
+=head2 set_slurpy
+
+=head2 args
+
+=head2 set_args
+
+=head2 all_positional_required
+
+=head2 positional
+
+=head2 positional_required
+
+=head2 positional_optional
+
+=head2 named
+
+=head2 named_required
+
+=head2 named_optional
+
+=head2 invocant
+
+=head2 invocants
+
+=head2 args_min
+
+=head2 args_max
 
 =head1 LICENSE
 
