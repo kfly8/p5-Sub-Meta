@@ -137,7 +137,7 @@ C<Sub::Meta> provides methods to handle subroutine meta information. In addition
 
 Constructor of C<Sub::Meta>.
 
-=head2 GETTER
+=head2 Getter
 
 =head3 sub
 
@@ -187,7 +187,7 @@ Parameters object of L<Sub::Meta::Parameters>.
 
 Returns object of L<Sub::Meta::Returns>.
 
-=head2 SETTER
+=head2 Setter
 
 You can set meta information of subroutine. C<set_xxx> sets C<xxx> and does not affect subroutine reference. On the other hands, C<apply_xxx> sets C<xxx> and apply C<xxx> to subroutine reference.
 
