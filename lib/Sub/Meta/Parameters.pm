@@ -31,8 +31,8 @@ sub nshift()   { $_[0]{nshift} }
 sub slurpy()   { !!$_[0]{slurpy} }
 sub args()     { $_[0]{args} }
 
-sub set_nshit($) { $_[0]{nshift} = $_[1]; $_[0]->_assert_nshift; $_[0] }
-sub set_slurpy() { $_[0]{slurpy} = !!$_[0]; $_[0] }
+sub set_nshift($) { $_[0]{nshift} = $_[1]; $_[0]->_assert_nshift; $_[0] }
+sub set_slurpy() { $_[0]{slurpy} = !!(defined $_[1] ? $_[1] : 1); $_[0] }
 
 sub set_args {
     my $self = shift;

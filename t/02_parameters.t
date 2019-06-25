@@ -229,4 +229,22 @@ while (my ($parameters, $expect) = splice @TEST, 0, 2) {
     };
 }
 
+subtest 'setter' => sub {
+    my $parameters = Sub::Meta::Parameters->new(args => [p()]);
+
+    is $parameters->nshift, 0, 'nshift';
+    is $parameters->set_nshift(1), $parameters, 'set_nshift';
+    is $parameters->nshift, 1, 'nshift';
+
+    ok !$parameters->slurpy, 'slurpy';
+    is $parameters->set_slurpy, $parameters, 'set_slurpy';
+    ok $parameters->slurpy, 'slurpy';
+    is $parameters->set_slurpy(0), $parameters, 'set_slurpy';
+    ok !$parameters->slurpy, 'slurpy';
+
+    is $parameters->args, [p()], 'args';
+    is $parameters->set_args([p(type => 'Foo')]), $parameters, 'set_args';
+    is $parameters->args, [p(type => 'Foo')], 'args';
+};
+
 done_testing;
