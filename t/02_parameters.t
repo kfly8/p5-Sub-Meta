@@ -247,4 +247,20 @@ subtest 'setter' => sub {
     is $parameters->args, [p(type => 'Foo')], 'args';
 };
 
+subtest '_normalize_args' => sub {
+    my $blessed_args = [bless {}, 'Some'];
+    is(Sub::Meta::Parameters->_normalize_args($blessed_args), $blessed_args, 'blessed_args');
+    is(Sub::Meta::Parameters->_normalize_args(['Foo', 'Bar']), [p('Foo'), p('Bar')], 'arrayref');
+    is(Sub::Meta::Parameters->_normalize_args('Foo', 'Bar'), [p('Foo'), p('Bar')], 'array');
+};
+
+subtest 'invocant' => sub {
+    my $parameters = Sub::Meta::Parameters->new(args => [p('Foo'), p('Bar')]);
+    is $parameters->invocant, undef;
+    is $parameters->set_nshift(1), $parameters;
+    is $parameters->invocant, p('Foo');
+    is $parameters->set_nshift(2), $parameters;
+    dies { $parameters->invocant }, qr/Can't return a single invocant; this function has $parameters->nshift/;
+};
+
 done_testing;
