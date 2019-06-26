@@ -5,6 +5,6 @@ requires 'Carp';
 requires 'Scalar::Util';
 
 on 'test' => sub {
-    requires 'Test::More', '0.98';
+    requires 'Test2::V0';
     requires 'JSON::PP';
 };
