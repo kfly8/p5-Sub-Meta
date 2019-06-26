@@ -48,12 +48,12 @@ sub _normalize_args {
 
 sub _assert_nshift {
     my $self = shift;
-    if (@{$self->all_positional_required} < $self->nshift) {
+    if (@{$self->_all_positional_required} < $self->nshift) {
         _croak 'required positional parameters need more than nshift';
     }
 }
 
-sub all_positional_required() {
+sub _all_positional_required() {
     [ grep { $_->positional && $_->required } @{$_[0]->args} ];
 }
 
@@ -66,7 +66,7 @@ sub positional() {
 
 sub positional_required() {
     my $self = shift;
-    my @p = @{$self->all_positional_required};
+    my @p = @{$self->_all_positional_required};
     splice @p, 0, $self->nshift;
     [ @p ];
 }
@@ -82,13 +82,13 @@ sub invocant() {
     my $self = shift;
     my $nshift = $self->nshift;
     return undef if $nshift == 0;
-    return $self->all_positional_required->[0] if $nshift == 1;
+    return $self->_all_positional_required->[0] if $nshift == 1;
     _croak "Can't return a single invocant; this function has $nshift";
 }
 
 sub invocants() {
     my $self = shift;
-    my @p = @{$self->all_positional_required};
+    my @p = @{$self->_all_positional_required};
     splice @p, $self->nshift;
     [ @p ]
 }
@@ -96,7 +96,7 @@ sub invocants() {
 sub args_min() {
     my $self = shift;
     my $r = 0;
-    $r += @{$self->all_positional_required};
+    $r += @{$self->_all_positional_required};
     $r += @{$self->named_required} * 2;
     $r
 }
@@ -105,7 +105,7 @@ sub args_max() {
     my $self = shift;
     return 0 + 'Inf' if $self->slurpy || @{$self->named};
     my $r = 0;
-    $r += @{$self->all_positional_required};
+    $r += @{$self->_all_positional_required};
     $r += @{$self->positional_optional};
     $r
 }
