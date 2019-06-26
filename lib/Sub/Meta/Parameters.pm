@@ -175,40 +175,81 @@ Constructor of C<Sub::Meta::Parameters>.
         slurpy => 0,       # optional. whether get all rest arguments
     );
 
+=head2 args -> ArrayRef
 
-=head2 nshift
+Subroutine arguments.
 
-=head2 set_nshift
+=head2 set_args(LIST|ArrayRef)
 
-=head2 slurpy
+Setter for subroutine arguments.
+An element can be an argument of C<Sub::Meta::Param> or any object which has C<positional>,C<named>,C<required> and C<optional> methods.
 
-=head2 set_slurpy
+=head2 nshift -> NonNegativeInt
 
-=head2 args
+Number of shift arguments.
 
-=head2 set_args
+=head2 set_nshift(NonNegativeInt)
 
-=head2 all_positional_required
+Setter for nshift.
+For example, it is assumed that 1 is specified in the case of methods, and 0 is specified in the case of normal functions.
 
-=head2 positional
+=head2 slurpy -> Bool
 
-=head2 positional_required
+A boolean whether get all rest arguments.
 
-=head2 positional_optional
+=head2 set_slurpy(Bool)
+
+Setter for slurpy.
+
+=head2 positional -> ArrayRef.
+
+Returns an arrayref of parameter objects for the positional arguments.
+
+=head2 positional_required -> ArrayRef
+
+Returns an arrayref of parameter objects for the required positional arguments.
+
+=head2 positional_optional -> ArrayRef
+
+Returns an arrayref of parameter objects for the optional positional arguments.
 
 =head2 named
 
+Returns an arrayref of parameter objects for the named arguments.
+
 =head2 named_required
+
+Returns an arrayref of parameter objects for the required named arguments.
 
 =head2 named_optional
 
+Returns an arrayref of parameter objects for the optional named arguments.
+
 =head2 invocant
 
-=head2 invocants
+First element of invocants.
 
-=head2 args_min
+=head2 invocants -> ArrayRef
 
-=head2 args_max
+Returns an arrayref of parameter objects for the variables into which initial arguments are shifted automatically. This will usually return () for normal functions and ('$self') for methods.
+
+=head2 args_min -> NonNegativeInt
+
+Returns the minimum number of required arguments.
+
+This is computed as follows:
+  Invocants and required positional parameters count 1 each.
+  Optional parameters don't count.
+  Required named parameters count 2 each (key + value).
+  Slurpy parameters don't count either because they accept empty lists.
+
+=head2 args_max -> NonNegativeInt|Inf
+
+Returns the maximum number of arguments.
+
+This is computed as follows:
+  If there are any named or slurpy parameters, the result is Inf.
+  Otherwise the result is the number of all invocants and positional parameters.
 
 =head1 LICENSE
 
