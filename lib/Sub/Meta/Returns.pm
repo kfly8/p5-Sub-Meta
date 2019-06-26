@@ -53,21 +53,39 @@ Constructor of C<Sub::Meta::Returns>.
         coerce  => 1,     # optional
     );
 
+
+
 =head2 scalar
 
-=head2 set_scalar
+A type for value when called in scalar context.
+
+=head2 set_scalar(Any)
+
+Setter of scalar.
 
 =head2 list
 
-=head2 set_list
+A type for value when called in list context.
+
+=head2 set_list(Any)
+
+Setter of list.
 
 =head2 void
 
-=head2 set_void
+A type for value when called in void context.
+
+=head2 set_void(Any)
+
+Setter of void.
 
 =head2 coerce
 
-=head2 set_coerce
+A boolean whether with coercions.
+
+=head2 set_coerce(Bool)
+
+Setter of coerce.
 
 =head1 LICENSE
 
