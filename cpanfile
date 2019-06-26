@@ -1,4 +1,4 @@
-requires 'perl', '5.008001';
+requires 'perl', '5.010';
 requires 'Sub::Identify', '0.14';
 requires 'Sub::Util', '1.50';
 requires 'Carp';

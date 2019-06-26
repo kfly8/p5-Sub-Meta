@@ -46,13 +46,13 @@
             "Scalar::Util" : "0",
             "Sub::Identify" : "0.14",
             "Sub::Util" : "1.50",
-            "perl" : "5.008001"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
             "JSON::PP" : "0",
-            "Test::More" : "0.98"
+            "Test2::V0" : "0"
          }
       }
    },

@@ -1,5 +1,5 @@
 package Sub::Meta::Param;
-use 5.008001;
+use 5.010;
 use strict;
 use warnings;
 
