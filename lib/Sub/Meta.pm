@@ -131,96 +131,119 @@ C<Sub::Meta> provides methods to handle subroutine meta information. In addition
 
 =head1 METHODS
 
-=head2 Constructor
-
-=head3 new
+=head2 new
 
 Constructor of C<Sub::Meta>.
 
-=head2 Getter
+=head2 sub
 
-=head3 sub
+A subroutine reference.
 
-A subroutine reference
+=head2 set_sub
 
-=head3 subname
+Setter for subroutine reference.
+
+=head2 subname
 
 A subroutine name, e.g. C<hello>
 
-=head3 fullname
+=head2 set_subname($subname)
+
+Setter for subroutine name.
+
+    $meta->subname; # hello
+    $meta->set_subname('world');
+    $meta->subname; # world
+    Sub::Util::subname($meta->sub); # hello (NOT apply to sub)
+
+=head2 apply_subname($subname)
+
+Sets subroutine name and apply to the subroutine reference.
+
+    $meta->subname; # hello
+    $meta->apply_subname('world');
+    $meta->subname; # world
+    Sub::Util::subname($meta->sub); # world
+
+=head2 fullname
 
 A subroutine full name, e.g. C<main::hello>
 
-=head3 stashname
+=head2 set_fullname($fullname)
+
+Setter for subroutine full name.
+
+=head2 stashname
 
 A subroutine stash name, e.g. C<main>
 
-=head3 file
+=head2 set_stashname($stashname)
+
+Setter for subroutine stash name.
+
+=head2 file
 
 A filename where subroutine is defined, e.g. C<path/to/main.pl>.
 
-=head3 line
+=head2 set_file($filepath)
 
-A line where the definition of subroutine started.
+Setter for C<file>.
 
-=head3 is_constant
+=head2 line
+
+A line where the definition of subroutine started, e.g. C<5>
+
+=head2 set_line($line)
+
+Setter for C<line>.
+
+=head2 is_constant
 
 A boolean value indicating whether the subroutine is a constant or not.
 
-=head3 prototype
+=head2 set_is_constant($bool)
 
-A prototype of subroutine reference.
+Setter for C<is_constant>.
 
-=head3 attribute
+=head2 prototype
 
-A attribute of subroutine reference.
+A prototype of subroutine reference, e.g. C<$@>
 
-=head3 is_method
+=head2 set_prototype($prototype)
+
+Setter for C<prototype>.
+
+=head2 apply_prototype($prototype)
+
+Sets subroutine prototype and apply to the subroutine reference.
+
+=head2 attribute
+
+A attribute of subroutine reference, e.g. C<undef>, C<['method']>
+
+=head2 set_attribute($attribute)
+
+Setter for C<attribute>.
+
+=head2 apply_attribute(@attribute)
+
+Sets subroutine attributes and apply to the subroutine reference.
+
+=head2 is_method
 
 A boolean value indicating whether the subroutine is a method or not.
 
-=head3 parameters
+=head2 set_is_method($bool)
+
+Setter for C<is_method>.
+
+=head2 parameters
 
 Parameters object of L<Sub::Meta::Parameters>.
 
-=head3 returns
+=head2 set_parameters($parameters)
 
-Returns object of L<Sub::Meta::Returns>.
-
-=head2 Setter
-
-You can set meta information of subroutine. C<set_xxx> sets C<xxx> and does not affect subroutine reference. On the other hands, C<apply_xxx> sets C<xxx> and apply C<xxx> to subroutine reference.
-
-Setter methods of C<Sub::Meta> returns meta object. So you can chain setting: 
-
-    $meta->set_subname('foo')
-         ->set_stashname('Some')
-
-=head3 set_xxx
-
-=head4 set_sub($)
-
-=head4 set_subname($)
-
-=head4 set_fullname($)
-
-=head4 set_stashname($)
-
-=head4 set_file($)
-
-=head4 set_line($)
-
-=head4 set_is_constant($)
-
-=head4 set_prototype($)
-
-=head4 set_attribute($)
-
-=head4 set_is_method($)
-
-=head4 set_parameters($)
-
-Sets the parameters object of L<Sub::Meta::Parameters> or any object:
+Sets the parameters object of L<Sub::Meta::Parameters> or any object which has C<positional>,C<named>,C<required> and C<optional> methods.
 
     my $meta = Sub::Meta->new;
     $meta->set_parameters({ type => 'Type'});
@@ -230,7 +253,11 @@ Sets the parameters object of L<Sub::Meta::Parameters> or any object:
     $meta->set_parameters(Sub::Meta::Parameters->new(type => 'Foo'));
     $meta->set_parameters(MyParamters->new)
 
-=head4 set_returns($)
+=head2 returns
+
+Returns object of L<Sub::Meta::Returns>.
+
+=head2 set_returns($returns)
 
 Sets the returns object of L<Sub::Meta::Returns> or any object.
 
@@ -242,15 +269,16 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
     $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
     $meta->set_returns(MyReturns->new)
 
-=head3 apply_xxx
-
-=head4 apply_subname($)
-
-=head4 apply_prototype($)
-
-=head4 apply_attribute(@)
-
 =head1 NOTE
+
+=head2 setter
+
+You can set meta information of subroutine. C<set_xxx> sets C<xxx> and does not affect subroutine reference. On the other hands, C<apply_xxx> sets C<xxx> and apply C<xxx> to subroutine reference.
+
+Setter methods of C<Sub::Meta> returns meta object. So you can chain setting:
+
+    $meta->set_subname('foo')
+         ->set_stashname('Some')
 
 =head2 Pure-Perl version
 
