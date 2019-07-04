@@ -82,6 +82,14 @@ A subroutine stash name, e.g. `main`
 
 Setter for subroutine stash name.
 
+## subinfo
+
+A subroutine information, e.g. `['main', 'hello']`
+
+## set\_subinfo(\[$stashname, $subname\])
+
+Setter for subroutine information.
+
 ## file
 
 A filename where subroutine is defined, e.g. `path/to/main.pl`.
