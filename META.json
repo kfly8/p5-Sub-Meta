@@ -52,7 +52,7 @@
       "test" : {
          "requires" : {
             "JSON::PP" : "0",
-            "Test2::V0" : "0"
+            "Test2::V0" : "0.000111"
          }
       }
    },
