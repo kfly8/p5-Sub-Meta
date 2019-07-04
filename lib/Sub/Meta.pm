@@ -28,9 +28,10 @@ sub new {
 }
 
 sub sub()         { $_[0]{sub} }
-sub subname()     { $_[0]{subname}     ||= $_[0]->_build_subname }
-sub fullname()    { $_[0]{fullname}    ||= $_[0]->_build_fullname  }
-sub stashname()   { $_[0]{stashname}   ||= $_[0]->_build_stashname }
+sub subname()     { $_[0]->subinfo->[1] || '' }
+sub stashname()   { $_[0]->subinfo->[0] || '' }
+sub fullname()    { join '::', @{$_[0]->subinfo} }
+sub subinfo()     { $_[0]{subinfo}     ||= $_[0]->_build_subinfo }
 sub file()        { $_[0]{file}        ||= $_[0]->_build_file }
 sub line()        { $_[0]{line}        ||= $_[0]->_build_line }
 sub is_constant() { $_[0]{is_constant} ||= $_[0]->_build_is_constant }
@@ -40,10 +41,23 @@ sub is_method()   { $_[0]{is_method} }
 sub parameters()  { $_[0]{parameters} }
 sub returns()     { $_[0]{returns} }
 
-sub set_sub($)         { $_[0]{sub}         = $_[1]; $_[0] }
-sub set_subname($)     { $_[0]{subname}     = $_[1]; $_[0] }
-sub set_fullname($)    { $_[0]{fullname}    = $_[1]; $_[0] }
-sub set_stashname($)   { $_[0]{stashname}   = $_[1]; $_[0] }
+sub set_sub($)    {
+    $_[0]{sub} = $_[1];
+    $_[0]->subinfo; # rebuild subinfo
+    $_[0];
+}
+
+sub set_subname($)     { $_[0]{subinfo}[1]  = $_[1]; $_[0] }
+sub set_stashname($)   { $_[0]{subinfo}[0]  = $_[1]; $_[0] }
+sub set_fullname($)    {
+    $_[0]{subinfo} = $_[1] =~ m!^(.+)::([^:]+)$! ? [$1, $2] : [];
+    $_[0];
+}
+sub set_subinfo($)     {
+    $_[0]{subinfo} = @_ > 2 ? [ $_[1], $_[2] ] : $_[1];
+    $_[0];
+}
+
 sub set_file($)        { $_[0]{file}        = $_[1]; $_[0] }
 sub set_line($)        { $_[0]{line}        = $_[1]; $_[0] }
 sub set_is_constant($) { $_[0]{is_constant} = $_[1]; $_[0] }
@@ -63,9 +77,7 @@ sub set_returns($) {
     return $self
 }
 
-sub _build_subname()     { $_[0]->sub ? Sub::Identify::sub_name($_[0]->sub) : '' }
-sub _build_fullname()    { $_[0]->sub ? Sub::Identify::sub_fullname($_[0]->sub) : '' }
-sub _build_stashname()   { $_[0]->sub ? Sub::Identify::stash_name($_[0]->sub) : '' }
+sub _build_subinfo()     { $_[0]->sub ? [ Sub::Identify::get_code_info($_[0]->sub) ] : [] }
 sub _build_file()        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[0] : '' }
 sub _build_line()        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[1] : undef }
 sub _build_is_constant() { $_[0]->sub ? Sub::Identify::is_sub_constant($_[0]->sub) : undef }
@@ -75,8 +87,8 @@ sub _build_attribute()   { $_[0]->sub ? [ attributes::get($_[0]->sub) ] : undef 
 sub apply_subname($) {
     my ($self, $subname) = @_;
     _croak 'apply_subname requires subroutine reference' unless $self->sub;
-    Sub::Util::set_subname($subname, $self->sub);
     $self->set_subname($subname);
+    Sub::Util::set_subname($self->fullname, $self->sub);
     return $self;
 }
 
@@ -180,6 +192,14 @@ A subroutine stash name, e.g. C<main>
 =head2 set_stashname($stashname)
 
 Setter for subroutine stash name.
+
+=head2 subinfo
+
+A subroutine information, e.g. C<['main', 'hello']>
+
+=head2 set_subinfo([$stashname, $subname])
+
+Setter for subroutine information.
 
 =head2 file
 
