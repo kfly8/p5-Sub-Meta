@@ -124,18 +124,41 @@ Sub::Meta - handle subroutine meta information
 
     use Sub::Meta;
 
-    sub hello { }
+    sub hello($) :mehtod { }
     my $meta = Sub::Meta->new(\&hello);
     $meta->subname; # => hello
-    $meta->apply_subname('world'); # rename subroutine name
 
-    # specify parameters types ( without validation )
+    $meta->sub;        # \&hello
+    $meta->subname;    # hello
+    $meta->fullname    # main::hello
+    $meta->stashname   # main
+    $meta->file        # path/to/file.pl
+    $meta->line        # 5
+    $meta->is_constant # !!0
+    $meta->prototype   # $
+    $meta->attribute   # ['method']
+    $meta->is_method   # undef
+    $meta->parameters  # undef
+    $meta->returns     # undef
+
+    # setter
+    $meta->set_subname('world');
+    $meta->subname; # world
+    $meta->fullname; # main::world
+
+    # apply to sub
+    $meta->apply_prototype('$@');
+    $meta->prototype; # $@
+    Sub::Util::prototype($meta->sub); # $@
+
+And you can hold meta information of parameter type and return type. See also L<Sub::Meta::Parameters> and L<Sub::Meta::Returns>.
+
     $meta->set_parameters( Sub::Meta::Parameters->new(args => [ { type => 'Str' }]) );
-    $meta->parameters->args; # => Sub::Meta::Param->new({ type => 'Str' })
+    $meta->parameters->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
 
-    # specify returns types ( without validation )
     $meta->set_returns( Sub::Meta::Returns->new('Str') );
-    $meta->returns->scalar; # => 'Str'
+    $meta->returns->scalar; # 'Str'
+
 
 =head1 DESCRIPTION
 
