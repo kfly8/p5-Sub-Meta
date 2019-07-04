@@ -30,7 +30,7 @@ sub new {
 sub sub()         { $_[0]{sub} }
 sub subname()     { $_[0]->subinfo->[1] || '' }
 sub stashname()   { $_[0]->subinfo->[0] || '' }
-sub fullname()    { join '::', @{$_[0]->subinfo} }
+sub fullname()    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname, $_[0]->subname) : '' }
 sub subinfo()     { $_[0]{subinfo}     ||= $_[0]->_build_subinfo }
 sub file()        { $_[0]{file}        ||= $_[0]->_build_file }
 sub line()        { $_[0]{line}        ||= $_[0]->_build_line }
