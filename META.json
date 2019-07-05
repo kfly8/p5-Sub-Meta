@@ -68,7 +68,7 @@
          "web" : "https://github.com/kfly8/p5-Sub-Meta"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:KFLY",
    "x_contributors" : [
       "Kenta Kobayashi <kentafly88@gmail.com>"
