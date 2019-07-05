@@ -19,6 +19,11 @@ BEGIN {
     $ENV{PERL_SUB_IDENTIFY_PP} = $ENV{PERL_SUB_META_PP};
 }
 
+use overload
+    fallback => 1,
+    eq => \&equal
+    ;
+
 sub _croak { require Carp; Carp::croak(@_) }
 
 sub new {
@@ -123,6 +128,24 @@ sub apply_attribute(@) {
     }
     $self->set_attribute($self->_build_attribute);
     return $self;
+}
+
+sub equal {
+    my ($self, $other) = @_;
+
+    return unless $self->subname eq $other->subname;
+
+    if ($self->parameters) {
+        return unless $other->parameters;
+        return unless $self->parameters eq $other->parameters;
+    }
+
+    if ($self->returns) {
+        return unless $other->returns;
+        return unless $self->returns eq $other->returns;
+    }
+
+    return 1;
 }
 
 1;

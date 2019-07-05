@@ -10,6 +10,11 @@ use Scalar::Util ();
 
 use Sub::Meta::Param;
 
+use overload
+    fallback => 1,
+    eq => \&equal
+    ;
+
 sub _croak { require Carp; Carp::croak(@_) }
 
 sub new {
@@ -108,6 +113,16 @@ sub args_max() {
     $r += @{$self->_all_positional_required};
     $r += @{$self->positional_optional};
     $r
+}
+
+sub equal {
+    my ($self, $other) = @_;
+
+    return unless @{$self->args} == @{$other->args};
+    for (my $i = 0; $i < @{$self->args}; $i++) {
+        return unless $self->args->[$i] eq $other->args->[$i];
+    }
+    return 1;
 }
 
 1;

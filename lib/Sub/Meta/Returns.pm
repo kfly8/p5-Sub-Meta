@@ -5,6 +5,11 @@ use warnings;
 
 our $VERSION = "0.03";
 
+use overload
+    fallback => 1,
+    eq => \&equal
+    ;
+
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? ref $_[0] && ref $_[0] eq 'HASH' ? %{$_[0]}
@@ -24,6 +29,39 @@ sub set_void($)      { $_[0]{void}   = $_[1]; $_[0] }
 
 sub coerce()      { !!$_[0]{coerce} }
 sub set_coerce($) { $_[0]{coerce} = defined $_[1] ? $_[1] : 1; $_[0] }
+
+sub equal {
+    my ($self, $other) = @_;
+
+    if (defined $self->scalar) {
+        return unless _eq($self->scalar, $other->scalar);
+    }
+
+    if (defined $self->list) {
+        return unless _eq($self->list, $other->list);
+    }
+
+    if (defined $self->void) {
+        return unless _eq($self->void, $other->void);
+    }
+
+    return 1;
+}
+
+sub _eq {
+    my ($type, $other) = @_;
+
+    if (ref $type && ref $type eq "ARRAY") {
+        return unless @$type == @$other;
+        for (my $i = 0; $i < @$type; $i++) {
+            return unless $type->[$i] eq $other->[$i];
+        }
+    }
+    else {
+        return unless $type eq $other;
+    }
+    return 1;
+}
 
 1;
 __END__
