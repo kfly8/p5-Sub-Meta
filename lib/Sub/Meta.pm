@@ -136,7 +136,7 @@ Sub::Meta - handle subroutine meta information
     use Sub::Meta;
 
     sub hello($) :mehtod { }
-    my $meta = Sub::Meta->new(\&hello);
+    my $meta = Sub::Meta->new(sub => \&hello);
     $meta->subname; # => hello
 
     $meta->sub;        # \&hello
@@ -180,6 +180,16 @@ C<Sub::Meta> provides methods to handle subroutine meta information. In addition
 =head2 new
 
 Constructor of C<Sub::Meta>.
+
+    Sub::Meta->new(
+        fullname    => 'Greeting::hello',
+        is_constant => 0,
+        prototype   => '$',
+        attribute   => ['method'],
+        is_method   => 1,
+        parameters  => Sub::Meta::Parameters->new(args => [{ type => 'Str' }]),
+        returns     => Sub::Meta::Returns->new('Str'),
+    );
 
 =head2 sub
 
