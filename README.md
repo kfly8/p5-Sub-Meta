@@ -9,7 +9,7 @@ Sub::Meta - handle subroutine meta information
 use Sub::Meta;
 
 sub hello($) :mehtod { }
-my $meta = Sub::Meta->new(\&hello);
+my $meta = Sub::Meta->new(sub => \&hello);
 $meta->subname; # => hello
 
 $meta->sub;        # \&hello
@@ -55,6 +55,18 @@ $meta->returns->scalar; # 'Str'
 ## new
 
 Constructor of `Sub::Meta`.
+
+```perl
+Sub::Meta->new(
+    fullname    => 'Greeting::hello',
+    is_constant => 0,
+    prototype   => '$',
+    attribute   => ['method'],
+    is_method   => 1,
+    parameters  => Sub::Meta::Parameters->new(args => [{ type => 'Str' }]),
+    returns     => Sub::Meta::Returns->new('Str'),
+);
+```
 
 ## sub
 
