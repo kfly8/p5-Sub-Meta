@@ -24,7 +24,14 @@ sub _croak { require Carp; Carp::croak(@_) }
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
-    bless \%args => $class;
+
+    my $self = bless \%args => $class;
+
+    $self->set_subname(delete $args{subname})     if exists $args{subname};
+    $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
+    $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
+
+    return $self;
 }
 
 sub sub()         { $_[0]{sub} }
