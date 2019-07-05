@@ -31,6 +31,9 @@ sub new {
     $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
 
+    $self->set_parameters($args{parameters}) if exists $args{parameters};
+    $self->set_returns($args{returns})       if exists $args{returns};
+
     return $self;
 }
 
