@@ -31,7 +31,11 @@ sub sub()         { $_[0]{sub} }
 sub subname()     { $_[0]->subinfo->[1] || '' }
 sub stashname()   { $_[0]->subinfo->[0] || '' }
 sub fullname()    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname, $_[0]->subname) : '' }
-sub subinfo()     { $_[0]{subinfo}     ||= $_[0]->_build_subinfo }
+sub subinfo()     {
+    return $_[0]{subinfo} if $_[0]{subinfo};
+    $_[0]{subinfo} = $_[0]->_build_subinfo
+}
+
 sub file()        { $_[0]{file}        ||= $_[0]->_build_file }
 sub line()        { $_[0]{line}        ||= $_[0]->_build_line }
 sub is_constant() { $_[0]{is_constant} ||= $_[0]->_build_is_constant }

@@ -64,6 +64,12 @@ subtest 'has sub' => sub {
         is $meta->stashname, 'test', 'stashname';
         is $meta->subinfo, ['test', 'baz'], 'subinfo';
 
+        is $meta->set_subinfo(['hoge', 'fuga']), $meta, 'set_subinfo';
+        is $meta->subname, 'fuga', 'subname';
+        is $meta->fullname, 'hoge::fuga', 'fullname';
+        is $meta->stashname, 'hoge', 'stashname';
+        is $meta->subinfo, ['hoge', 'fuga'], 'subinfo';
+
         is $meta->set_file('test/file.t'), $meta, 'set_file';
         is $meta->file, 'test/file.t', 'file';
         is $meta->set_line(999), $meta, 'set_line';
@@ -137,6 +143,25 @@ subtest 'set_parameters/returns' => sub {
 
     $meta->set_returns($obj);
     is $meta->returns, $obj, 'return can set any object';
+};
+
+subtest 'set invalid fullname' => sub {
+    my $meta = Sub::Meta->new;
+
+    is $meta->set_fullname('invalid'), $meta, 'set_fullname';
+    is $meta->subinfo, [], 'subinfo';
+};
+
+subtest 'set_subinfo' => sub {
+    my $meta = Sub::Meta->new;
+
+    is $meta->subinfo, [], 'subinfo';
+
+    is $meta->set_subinfo(['foo', 'bar']), $meta, 'set_subinfo';
+    is $meta->subinfo, ['foo','bar'], 'subinfo';
+
+    is $meta->set_subinfo('hoge', 'fuga'), $meta, 'set_subinfo';
+    is $meta->subinfo, ['hoge','fuga'], 'subinfo';
 };
 
 
