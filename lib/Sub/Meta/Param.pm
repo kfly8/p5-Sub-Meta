@@ -18,6 +18,9 @@ sub new {
                        : ( type => $_[0] )
              : @_;
 
+    $args{optional} = !delete $args{required} if exists $args{required};
+    $args{named}    = !delete $args{positional} if exists $args{positional};
+
     %args = (%DEFAULT, %args);
 
     bless \%args => $class;
@@ -60,8 +63,8 @@ Sub::Meta::Param - element of Sub::Meta::Parameters
         name     => '$msg',
         default  => 'world',
         coerce   => 0,
-        optional => 0,
-        named    => 0,
+        optional => 0, # default
+        named    => 0, # default
     );
 
     $param->type; # => 'Str'
@@ -77,6 +80,14 @@ Sub::Meta::Param - element of Sub::Meta::Parameters
 =head2 new
 
 Constructor of C<Sub::Meta::Param>.
+
+    use Types::Standard -types;
+
+    Sub::Meta::Param->new({
+        type       => ArrayRef[Int],
+        required   => 1,
+        positional => 1,
+    })
 
 =head2 name
 
