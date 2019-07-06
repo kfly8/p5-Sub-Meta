@@ -266,6 +266,12 @@ This is computed as follows:
   If there are any named or slurpy parameters, the result is Inf.
   Otherwise the result is the number of all invocants and positional parameters.
 
+=head1 SEE ALSO
+
+L<Function::Parameters::Info>.
+
+The methods in this module are almost copied from the C<Function::Parameters::Info> methods.
+
 =head1 LICENSE
 
 Copyright (C) kfly8.
