@@ -18,6 +18,9 @@ sub new {
                        : ( type => $_[0] )
              : @_;
 
+    $args{optional} = !delete $args{required} if exists $args{required};
+    $args{named}    = !delete $args{positional} if exists $args{positional};
+
     %args = (%DEFAULT, %args);
 
     bless \%args => $class;
