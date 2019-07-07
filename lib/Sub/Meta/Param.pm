@@ -51,9 +51,15 @@ sub equal {
     if (defined $self->name) {
         return unless $self->name eq $other->name;
     }
+    else {
+        return if defined $other->name;
+    }
 
     if (defined $self->type) {
         return unless $self->type eq $other->type;
+    }
+    else {
+        return if defined $other->type;
     }
 
     return unless $self->optional eq $other->optional;
