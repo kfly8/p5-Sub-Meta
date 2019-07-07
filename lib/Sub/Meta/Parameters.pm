@@ -118,10 +118,20 @@ sub args_max() {
 sub equal {
     my ($self, $other) = @_;
 
+    return unless $self->slurpy eq $other->slurpy;
+
     return unless @{$self->args} == @{$other->args};
     for (my $i = 0; $i < @{$self->args}; $i++) {
-        return unless $self->args->[$i] eq $other->args->[$i];
+        return unless $self->args->[$i]->equal($other->args->[$i]);
     }
+
+    if (defined $self->nshift) {
+        return unless $self->nshift == $other->nshift;
+    }
+    else {
+        return if $other->nshift;
+    }
+
     return 1;
 }
 
