@@ -1,3 +1,15 @@
+package DummyType;
+
+use overload
+    fallback => 1,
+    eq => \&equal
+    ;
+
+sub new { bless {}, $_[0] }
+sub equal { ref $_[0] eq $_[1] }
+sub TO_JSON { ref $_[0] }
+
+package main;
 use Test2::V0;
 
 use Sub::Meta::Returns;
@@ -49,6 +61,15 @@ my @TEST = (
     { scalar => [ 'Str', 'Str' ], list => undef, void => undef }, 'valid',
     ]},
 
+    # ref but not array
+    { scalar => DummyType->new, list => undef, void => undef } => {
+    NG => [
+    { scalar => "Foo", list => undef, void => undef }, 'invalid scalar',
+    ],
+    OK => [
+    { scalar => DummyType->new, list => undef, void => undef }, 'valid',
+    { scalar => "DummyType", list => undef, void => undef }, 'valid',
+    ]},
 );
 
 use JSON::PP;
