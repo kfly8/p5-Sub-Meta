@@ -129,7 +129,7 @@ sub equal {
         return unless $self->nshift == $other->nshift;
     }
     else {
-        return if $other->nshift;
+        return if defined $other->nshift;
     }
 
     return 1;

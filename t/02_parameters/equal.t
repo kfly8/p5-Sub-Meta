@@ -16,6 +16,16 @@ my @TEST = (
     { args => [], slurpy => 0, nshift => 0 }, 'valid',
     ]},
 
+    # nshift undef
+    { args => [$p1], nshift => undef } => {
+    NG => [
+    { args => [$p1], nshift => 1 }, 'invalid nshift/1',
+    { args => [$p1], nshift => 0 }, 'invalid nshift/0',
+    ],
+    OK => [
+    { args => [$p1], nshift => undef }, 'valid',
+    ]},
+
     # one args
     { args => [$p1], slurpy => 0, nshift => 0 } => {
     NG => [
@@ -71,6 +81,8 @@ my @TEST = (
     OK => [
     { args => [$p1], slurpy => 1, nshift => 1 }, 'valid',
     ]},
+
+
 );
 
 use JSON::PP;
