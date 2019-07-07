@@ -34,15 +34,24 @@ sub equal {
     my ($self, $other) = @_;
 
     if (defined $self->scalar) {
-        return unless _eq($self->scalar, $other->scalar);
+        return if !_eq($self->scalar, $other->scalar);
+    }
+    else {
+        return if defined $other->scalar;
     }
 
     if (defined $self->list) {
-        return unless _eq($self->list, $other->list);
+        return if !_eq($self->list, $other->list);
+    }
+    else {
+        return if defined $other->list;
     }
 
     if (defined $self->void) {
-        return unless _eq($self->void, $other->void);
+        return if !_eq($self->void, $other->void);
+    }
+    else {
+        return if defined $other->void;
     }
 
     return 1;
@@ -52,6 +61,7 @@ sub _eq {
     my ($type, $other) = @_;
 
     if (ref $type && ref $type eq "ARRAY") {
+        return unless ref $other eq "ARRAY";
         return unless @$type == @$other;
         for (my $i = 0; $i < @$type; $i++) {
             return unless $type->[$i] eq $other->[$i];
