@@ -169,4 +169,17 @@ subtest 'set_subinfo' => sub {
 };
 
 
+subtest 'set_sub' => sub {
+    my $meta = Sub::Meta->new;
+
+    is $meta->subinfo, [], 'subinfo 1';
+
+    $meta->set_sub(\&hello);
+    is $meta->subinfo, ['main', 'hello'], 'subinfo 2';
+
+    $meta->set_sub(\&hello2);
+    is $meta->subinfo, ['main', 'hello2'], 'subinfo 3';
+};
+
+
 done_testing;

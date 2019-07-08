@@ -62,7 +62,10 @@ sub returns()     { $_[0]{returns} }
 
 sub set_sub($)    {
     $_[0]{sub} = $_[1];
-    $_[0]->subinfo; # rebuild subinfo
+
+    # rebuild subinfo
+    delete $_[0]{subinfo};
+    $_[0]->subinfo;
     $_[0];
 }
 
