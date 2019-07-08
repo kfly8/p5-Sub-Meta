@@ -53,6 +53,7 @@ sub _normalize_args {
 
 sub _assert_nshift {
     my $self = shift;
+    return unless $self->nshift;
     if (@{$self->_all_positional_required} < $self->nshift) {
         _croak 'required positional parameters need more than nshift';
     }
