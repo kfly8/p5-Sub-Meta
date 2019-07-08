@@ -181,6 +181,11 @@ This boolean is the opposite of C<positional>.
 
 Setter for C<positional>.
 
+=head2 is_same_interface($other_meta)
+
+A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
+Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal.
+
 =head1 SEE ALSO
 
 L<Sub::Meta::Parameters>

@@ -276,6 +276,11 @@ This is computed as follows:
   If there are any named or slurpy parameters, the result is Inf.
   Otherwise the result is the number of all invocants and positional parameters.
 
+=head2 is_same_interface($other_meta)
+
+A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
+Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
+
 =head1 SEE ALSO
 
 L<Function::Parameters::Info>.

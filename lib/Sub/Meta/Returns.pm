@@ -136,6 +136,11 @@ A boolean whether with coercions.
 
 Setter for C<coerce>.
 
+=head2 is_same_interface($other_meta)
+
+A boolean value indicating whether C<Sub::Meta::Returns> object is same or not.
+Specifically, check whether C<scalar>, C<list> and C<void> are equal.
+
 =head1 LICENSE
 
 Copyright (C) kfly8.

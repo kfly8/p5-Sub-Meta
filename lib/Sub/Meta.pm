@@ -207,6 +207,11 @@ And you can hold meta information of parameter type and return type. See also L<
     $meta->set_returns( Sub::Meta::Returns->new('Str') );
     $meta->returns->scalar; # 'Str'
 
+And you can compare meta informations:
+
+    my $other = Sub::Meta->new(subname => 'hello');
+    $meta->is_same_interface($other); # 1
+    $meta eq $other; # 1
 
 =head1 DESCRIPTION
 
@@ -369,6 +374,11 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
     # or
     $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
     $meta->set_returns(MyReturns->new)
+
+=head2 is_same_interface($other_meta)
+
+A boolean value indicating whether the subroutine's interface is same or not.
+Specifically, check whether C<subname>, C<parameters> and C<returns> are equal.
 
 =head1 NOTE
 
