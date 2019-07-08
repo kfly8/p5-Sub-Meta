@@ -46,6 +46,14 @@ $meta->set_returns( Sub::Meta::Returns->new('Str') );
 $meta->returns->scalar; # 'Str'
 ```
 
+And you can compare meta informations:
+
+```perl
+my $other = Sub::Meta->new(subname => 'hello');
+$meta->is_same_interface($other); # 1
+$meta eq $other; # 1
+```
+
 # DESCRIPTION
 
 `Sub::Meta` provides methods to handle subroutine meta information. In addition to information that can be obtained from subroutines using module [B](https://metacpan.org/pod/B) etc., subroutines can have meta information such as arguments and return values.
@@ -217,6 +225,11 @@ $meta->returns; # => Sub::Meta::Returns->new({type => 'Type'});
 $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
 $meta->set_returns(MyReturns->new)
 ```
+
+## is\_same\_interface($other\_meta)
+
+A boolean value indicating whether the subroutine's interface is same or not.
+Specifically, check whether `subname`, `parameters` and `returns` are equal.
 
 # NOTE
 
