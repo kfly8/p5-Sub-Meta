@@ -133,16 +133,27 @@ sub apply_attribute(@) {
 sub equal {
     my ($self, $other) = @_;
 
-    return unless $self->subname eq $other->subname;
+    if ($self->subname) {
+        return unless $self->subname eq $other->subname;
+    }
+    else {
+        return if $other->subname;
+    }
 
     if ($self->parameters) {
-        return unless $other->parameters;
+        return unless defined $other->parameters;
         return unless $self->parameters eq $other->parameters;
+    }
+    else {
+        return if $other->parameters;
     }
 
     if ($self->returns) {
         return unless $other->returns;
         return unless $self->returns eq $other->returns;
+    }
+    else {
+        return if $other->returns;
     }
 
     return 1;
