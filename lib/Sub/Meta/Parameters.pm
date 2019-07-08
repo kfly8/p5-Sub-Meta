@@ -12,7 +12,7 @@ use Sub::Meta::Param;
 
 use overload
     fallback => 1,
-    eq => \&equal
+    eq => \&is_same_interface
     ;
 
 sub _croak { require Carp; Carp::croak(@_) }
@@ -115,14 +115,14 @@ sub args_max() {
     $r
 }
 
-sub equal {
+sub is_same_interface {
     my ($self, $other) = @_;
 
     return unless $self->slurpy eq $other->slurpy;
 
     return unless @{$self->args} == @{$other->args};
     for (my $i = 0; $i < @{$self->args}; $i++) {
-        return unless $self->args->[$i]->equal($other->args->[$i]);
+        return unless $self->args->[$i]->is_same_interface($other->args->[$i]);
     }
 
     if (defined $self->nshift) {

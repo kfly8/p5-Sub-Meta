@@ -2,11 +2,11 @@ package DummyType;
 
 use overload
     fallback => 1,
-    eq => \&equal
+    eq => \&is_same_interface
     ;
 
 sub new { bless {}, $_[0] }
-sub equal { ref $_[0] eq $_[1] }
+sub is_same_interface { ref $_[0] eq $_[1] }
 sub TO_JSON { ref $_[0] }
 
 package main;
@@ -83,14 +83,14 @@ while (my ($args, $cases) = splice @TEST, 0, 2) {
         subtest 'NG cases' => sub {
             while (my ($other_args, $test_message) = splice @{$cases->{NG}}, 0, 2) {
                 my $other = Sub::Meta::Returns->new($other_args);
-                ok !$meta->equal($other), $test_message;
+                ok !$meta->is_same_interface($other), $test_message;
             }
         };
 
         subtest 'OK cases' => sub {
             while (my ($other_args, $test_message) = splice @{$cases->{OK}}, 0, 2) {
                 my $other = Sub::Meta::Returns->new($other_args);
-                ok $meta->equal($other), $test_message;
+                ok $meta->is_same_interface($other), $test_message;
             }
         };
     };

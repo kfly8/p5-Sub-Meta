@@ -92,14 +92,14 @@ while (my ($args, $cases) = splice @TEST, 0, 2) {
         subtest 'NG cases' => sub {
             while (my ($other_args, $test_message) = splice @{$cases->{NG}}, 0, 2) {
                 my $other = Sub::Meta->new($other_args);
-                ok !$meta->equal($other), $test_message;
+                ok !$meta->is_same_interface($other), $test_message;
             }
         };
 
         subtest 'OK cases' => sub {
             while (my ($other_args, $test_message) = splice @{$cases->{OK}}, 0, 2) {
                 my $other = Sub::Meta->new($other_args);
-                ok $meta->equal($other), $test_message;
+                ok $meta->is_same_interface($other), $test_message;
             }
         };
     };

@@ -7,7 +7,7 @@ our $VERSION = "0.03";
 
 use overload
     fallback => 1,
-    eq => \&equal
+    eq => \&is_same_interface
     ;
 
 sub new {
@@ -30,7 +30,7 @@ sub set_void($)      { $_[0]{void}   = $_[1]; $_[0] }
 sub coerce()      { !!$_[0]{coerce} }
 sub set_coerce($) { $_[0]{coerce} = defined $_[1] ? $_[1] : 1; $_[0] }
 
-sub equal {
+sub is_same_interface {
     my ($self, $other) = @_;
 
     if (defined $self->scalar) {

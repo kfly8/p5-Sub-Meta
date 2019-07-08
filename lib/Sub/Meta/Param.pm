@@ -8,7 +8,7 @@ our $VERSION = "0.03";
 use overload
     fallback => 1,
     '""'     => sub { $_[0]->name || '' },
-    eq       =>  \&equal,
+    eq       =>  \&is_same_interface,
 ;
 
 my %DEFAULT = ( named => 0, optional => 0 );
@@ -45,7 +45,7 @@ sub set_required($;)   { $_[0]{optional} =  !(defined $_[1] ? $_[1] : 1); $_[0] 
 sub set_named($;)      { $_[0]{named}    = !!(defined $_[1] ? $_[1] : 1); $_[0] }
 sub set_positional($;) { $_[0]{named}    =  !(defined $_[1] ? $_[1] : 1); $_[0] }
 
-sub equal {
+sub is_same_interface {
     my ($self, $other) = @_;
 
     if (defined $self->name) {

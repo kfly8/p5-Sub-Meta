@@ -21,7 +21,7 @@ BEGIN {
 
 use overload
     fallback => 1,
-    eq => \&equal
+    eq => \&is_same_interface
     ;
 
 sub _croak { require Carp; Carp::croak(@_) }
@@ -130,7 +130,7 @@ sub apply_attribute(@) {
     return $self;
 }
 
-sub equal {
+sub is_same_interface {
     my ($self, $other) = @_;
 
     if ($self->subname) {
@@ -142,7 +142,7 @@ sub equal {
 
     if ($self->parameters) {
         return unless defined $other->parameters;
-        return unless $self->parameters eq $other->parameters;
+        return unless $self->parameters->is_same_interface($other->parameters);
     }
     else {
         return if $other->parameters;
@@ -150,7 +150,7 @@ sub equal {
 
     if ($self->returns) {
         return unless $other->returns;
-        return unless $self->returns eq $other->returns;
+        return unless $self->returns->is_same_interface($other->returns);
     }
     else {
         return if $other->returns;
