@@ -141,7 +141,7 @@ sub is_same_interface {
     }
 
     if ($self->parameters) {
-        return unless defined $other->parameters;
+        return unless $other->parameters;
         return unless $self->parameters->is_same_interface($other->parameters);
     }
     else {
