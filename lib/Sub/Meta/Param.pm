@@ -8,6 +8,7 @@ our $VERSION = "0.03";
 use overload
     fallback => 1,
     '""'     => sub { $_[0]->name || '' },
+    eq       =>  \&is_same_interface,
 ;
 
 my %DEFAULT = ( named => 0, optional => 0 );
@@ -43,6 +44,29 @@ sub set_optional($;)   { $_[0]{optional} = !!(defined $_[1] ? $_[1] : 1); $_[0] 
 sub set_required($;)   { $_[0]{optional} =  !(defined $_[1] ? $_[1] : 1); $_[0] }
 sub set_named($;)      { $_[0]{named}    = !!(defined $_[1] ? $_[1] : 1); $_[0] }
 sub set_positional($;) { $_[0]{named}    =  !(defined $_[1] ? $_[1] : 1); $_[0] }
+
+sub is_same_interface {
+    my ($self, $other) = @_;
+
+    if (defined $self->name) {
+        return unless $self->name eq $other->name;
+    }
+    else {
+        return if defined $other->name;
+    }
+
+    if (defined $self->type) {
+        return unless $self->type eq $other->type;
+    }
+    else {
+        return if defined $other->type;
+    }
+
+    return unless $self->optional eq $other->optional;
+    return unless $self->named eq $other->named;
+
+    return 1;
+}
 
 1;
 __END__
@@ -156,6 +180,11 @@ This boolean is the opposite of C<positional>.
 =head2 set_positional($bool=true)
 
 Setter for C<positional>.
+
+=head2 is_same_interface($other_meta)
+
+A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
+Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal.
 
 =head1 SEE ALSO
 

@@ -10,6 +10,11 @@ use Scalar::Util ();
 
 use Sub::Meta::Param;
 
+use overload
+    fallback => 1,
+    eq => \&is_same_interface
+    ;
+
 sub _croak { require Carp; Carp::croak(@_) }
 
 sub new {
@@ -48,6 +53,7 @@ sub _normalize_args {
 
 sub _assert_nshift {
     my $self = shift;
+    return unless $self->nshift;
     if (@{$self->_all_positional_required} < $self->nshift) {
         _croak 'required positional parameters need more than nshift';
     }
@@ -108,6 +114,26 @@ sub args_max() {
     $r += @{$self->_all_positional_required};
     $r += @{$self->positional_optional};
     $r
+}
+
+sub is_same_interface {
+    my ($self, $other) = @_;
+
+    return unless $self->slurpy eq $other->slurpy;
+
+    return unless @{$self->args} == @{$other->args};
+    for (my $i = 0; $i < @{$self->args}; $i++) {
+        return unless $self->args->[$i]->is_same_interface($other->args->[$i]);
+    }
+
+    if (defined $self->nshift) {
+        return unless $self->nshift == $other->nshift;
+    }
+    else {
+        return if defined $other->nshift;
+    }
+
+    return 1;
 }
 
 1;
@@ -250,6 +276,11 @@ Returns the maximum number of arguments.
 This is computed as follows:
   If there are any named or slurpy parameters, the result is Inf.
   Otherwise the result is the number of all invocants and positional parameters.
+
+=head2 is_same_interface($other_meta)
+
+A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
+Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
 
 =head1 SEE ALSO
 
