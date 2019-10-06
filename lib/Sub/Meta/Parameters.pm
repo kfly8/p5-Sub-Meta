@@ -136,6 +136,27 @@ sub is_same_interface {
     return 1;
 }
 
+sub inline_is_same_interface {
+    my ($self, $v) = @_;
+
+    my @src;
+    push @src => sprintf('"%s" eq %s->slurpy', $self->slurpy, $v);
+
+    push @src => sprintf('%d == @{%s->args}', scalar @{$self->args}, $v);
+    for (my $i = 0; $i < @{$self->args}; $i++) {
+        push @src => $self->args->[$i]->inline_is_same_interface(sprintf('%s->args->[%d]', $v, $i))
+    }
+
+    if (defined $self->nshift) {
+        push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
+    }
+    else {
+        push @src => sprintf('!defined %s->nshift', $v);
+    }
+
+    return join "\n && ", @src;
+}
+
 1;
 __END__
 

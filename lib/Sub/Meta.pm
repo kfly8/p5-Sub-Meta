@@ -162,6 +162,37 @@ sub is_same_interface {
     return 1;
 }
 
+sub inline_is_same_interface {
+    my ($self, $v) = @_;
+
+    my @src;
+    if ($self->subname) {
+        push @src => sprintf('"%s" eq %s->subname', $self->subname, $v);
+    }
+    else {
+        push @src => sprintf('!%s->subname', $v);
+    }
+
+    if ($self->parameters) {
+        push @src => sprintf('%s->parameters', $v);
+        push @src => $self->parameters->inline_is_same_interface(sprintf('%s->parameters', $v));
+    }
+    else {
+        push @src => sprintf('!%s->parameters', $v);
+    }
+
+    if ($self->returns) {
+        push @src => sprintf('%s->returns', $v);
+        push @src => $self->returns->inline_is_same_interface(sprintf('%s->returns', $v));
+    }
+    else {
+        push @src => sprintf('!%s->returns', $v);
+    }
+
+    return join "\n && ", @src;
+}
+
+
 1;
 __END__
 

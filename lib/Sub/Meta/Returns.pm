@@ -73,6 +73,53 @@ sub _eq {
     return 1;
 }
 
+sub inline_is_same_interface {
+    my ($self, $v) = @_;
+
+    my @src;
+    if (defined $self->scalar) {
+        push @src => _inline_eq($self->scalar, sprintf('%s->scalar', $v));
+    }
+    else {
+        push @src => sprintf('!defined %s->scalar', $v);
+    }
+
+    if (defined $self->list) {
+        push @src => _inline_eq($self->list, sprintf('%s->list', $v));
+    }
+    else {
+        push @src => sprintf('!defined %s->list', $v);
+    }
+
+    if (defined $self->void) {
+        push @src => _inline_eq($self->void, sprintf('%s->void', $v));
+    }
+    else {
+        push @src => sprintf('!defined %s->void', $v);
+    }
+
+    return join "\n && ", @src;
+}
+
+sub _inline_eq {
+    my ($type, $v) = @_;
+
+    my @src;
+    if (ref $type && ref $type eq "ARRAY") {
+        push @src => sprintf('ref %s eq "ARRAY"', $v);
+        push @src => sprintf('%d == @{%s}', scalar @$type, $v);
+        for (my $i = 0; $i < @$type; $i++) {
+            push @src => sprintf('"%s" eq %s->[%d]', $type->[$i], $v, $i);
+        }
+    }
+    else {
+        push @src => sprintf('"%s" eq %s', $type, $v);
+    }
+
+    return join "\n && ", @src;
+}
+
+
 1;
 __END__
 

@@ -68,6 +68,31 @@ sub is_same_interface {
     return 1;
 }
 
+sub inline_is_same_interface {
+    my ($self, $v) = @_;
+
+    my @src;
+    if (defined $self->name) {
+        push @src => sprintf('"%s" eq %s->name', $self->name, $v);
+    }
+    else {
+        push @src => sprintf('!defined %s->name', $v);
+    }
+
+    if (defined $self->type) {
+        push @src => sprintf('"%s" eq %s->type', $self->type, $v);
+    }
+    else {
+        push @src => sprintf('!defined %s->type', $v);
+    }
+
+    push @src => sprintf('"%s" eq %s->optional', $self->optional, $v);
+    push @src => sprintf('"%s" eq %s->named', $self->named, $v);
+
+    return join "\n && ", @src;
+}
+
+
 1;
 __END__
 
