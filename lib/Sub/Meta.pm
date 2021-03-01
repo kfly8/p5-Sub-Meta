@@ -107,8 +107,13 @@ sub set_is_method($)   { $_[0]{is_method}   = $_[1]; $_[0] }
 sub set_parameters {
     my $self = shift;
     my $v = $_[0];
-    if (Scalar::Util::blessed($v) && $v->isa('Sub::Meta::Parameters')) {
-        $self->{parameters} = $v
+    if (Scalar::Util::blessed($v)) {
+        if ($v->isa('Sub::Meta::Parameters')) {
+            $self->{parameters} = $v
+        }
+        else {
+            _croak('object must be Sub::Meta::Parameters');
+        }
     }
     else {
         $self->{parameters} = Sub::Meta::Parameters->new(@_);

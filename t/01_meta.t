@@ -146,14 +146,28 @@ subtest 'constant' => sub {
 
 subtest 'set_parameters/args/returns' => sub {
     my $meta = Sub::Meta->new;
-
     my $obj = bless {}, 'Some::Object';
+    my $parameters = Sub::Meta::Parameters->new(args => [{ type => $obj }]);
+
     $meta->set_parameters(args => [$obj]);
-    is $meta->parameters, Sub::Meta::Parameters->new(args => [{ type => $obj }]),
+    is $meta->parameters, $parameters,
         'if $obj is not Sub::Meta::Parameters, $obj will be treated as type';
 
     $meta->set_args([$obj]);
-    is $meta->args, Sub::Meta::Parameters->new(args => [{ type => $obj }])->args, 'set_args';
+    is $meta->args, $parameters->args, 'set_args';
+
+    {
+        my $meta = Sub::Meta->new;
+        is $meta->parameters, undef;
+        $meta->set_args([$obj]);
+        is $meta->args, $parameters->args, 'set_args when no parameters';
+    }
+
+    {
+        my $meta = Sub::Meta->new;
+        like dies { $meta->set_parameters($obj) },
+        qr/object must be Sub::Meta::Parameters/, 'invalid parameters';
+    }
 
     $meta->set_returns($obj);
     is $meta->returns, Sub::Meta::Returns->new($obj),
@@ -192,5 +206,17 @@ subtest 'set_sub' => sub {
     is $meta->subinfo, ['main', 'hello2'], 'subinfo 3';
 };
 
+subtest 'set_nshift' => sub {
+    my $meta = Sub::Meta->new(args => ['Str']);
+    $meta->set_nshift(1);
+    is $meta->nshift, 1;
+
+    $meta->set_is_method(1);
+    $meta->set_nshift(1);
+    is $meta->nshift, 1;
+
+    like dies { $meta->set_nshift(0) },
+    qr/nshift of method cannot be zero/, 'invalid nshift';
+};
 
 done_testing;

@@ -269,6 +269,11 @@ subtest '_normalize_args' => sub {
     is(Sub::Meta::Parameters->_normalize_args(
         { a => { isa => 'Foo' }, b => { isa => 'Bar' } }),
         [p(type => 'Foo', name => 'a', named => 1), p(type => 'Bar', name => 'b', named => 1)], 'hashref');
+
+    my $foo = sub { 'Foo' };
+    is(Sub::Meta::Parameters->_normalize_args(
+        { a => $foo }),
+        [p(type => $foo, name => 'a', named => 1)], 'hashref');
 };
 
 subtest 'invocant' => sub {
