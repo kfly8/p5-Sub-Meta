@@ -262,27 +262,27 @@ $meta->set_args(['Str']);
 
 ## args
 
-The alias of `parameters-`args>.
+The alias of `parameters.args`.
 
 ## set\_args($args)
 
-The alias of `parameters-`set\_args>.
+The alias of `parameters.set_args`.
 
 ## nshift
 
-The alias of `parameters-`nshift>.
+The alias of `parameters.nshift`.
 
 ## set\_nshift($nshift)
 
-The alias of `parameters-`set\_nshift>.
+The alias of `parameters.set_nshift`.
 
 ## slurpy
 
-The alias of `parameters-`slurpy>.
+The alias of `parameters.slurpy`.
 
 ## set\_slurpy($slurpy)
 
-The alias of `parameters-`set\_slurpy>.
+The alias of `parameters.set_slurpy`.
 
 ## returns
 

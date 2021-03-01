@@ -469,27 +469,27 @@ Sets the parameters object of L<Sub::Meta::Parameters>.
 
 =head2 args
 
-The alias of C<parameters->args>.
+The alias of C<parameters.args>.
 
 =head2 set_args($args)
 
-The alias of C<parameters->set_args>.
+The alias of C<parameters.set_args>.
 
 =head2 nshift
 
-The alias of C<parameters->nshift>.
+The alias of C<parameters.nshift>.
 
 =head2 set_nshift($nshift)
 
-The alias of C<parameters->set_nshift>.
+The alias of C<parameters.set_nshift>.
 
 =head2 slurpy
 
-The alias of C<parameters->slurpy>.
+The alias of C<parameters.slurpy>.
 
 =head2 set_slurpy($slurpy)
 
-The alias of C<parameters->set_slurpy>.
+The alias of C<parameters.set_slurpy>.
 
 =head2 returns
 
