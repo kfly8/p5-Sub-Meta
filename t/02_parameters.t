@@ -7,7 +7,13 @@ subtest 'exception' => sub {
     like dies { Sub::Meta::Parameters->new() },
         qr/parameters reqruires args/, 'requires args';
 
-    like dies { Sub::Meta::Parameters->new(args => p(type => 'Foo', named => 1, optional => 1), nshift => 1) },
+    like dies { Sub::Meta::Parameters->new(args => 'Str') },
+        qr/args must be a reference/, 'args is not reference';
+
+    like dies { Sub::Meta::Parameters->new(args => sub { 'Str' }) },
+        qr/cannot normalize args/, 'args is not arrayref/hashref';
+
+    like dies { Sub::Meta::Parameters->new(args => [p(type => 'Foo', named => 1, optional => 1)], nshift => 1) },
         qr/required positional parameters need more than nshift/, 'nshift';
 };
 
@@ -248,10 +254,21 @@ subtest 'setter' => sub {
 };
 
 subtest '_normalize_args' => sub {
-    my $blessed_args = [bless {}, 'Some'];
-    is(Sub::Meta::Parameters->_normalize_args($blessed_args), $blessed_args, 'blessed_args');
+    my $some = bless {}, 'Some';
+
+    is(Sub::Meta::Parameters->_normalize_args([$some]), [p($some)], 'blessed arg list');
     is(Sub::Meta::Parameters->_normalize_args(['Foo', 'Bar']), [p('Foo'), p('Bar')], 'arrayref');
-    is(Sub::Meta::Parameters->_normalize_args('Foo', 'Bar'), [p('Foo'), p('Bar')], 'array');
+
+    like dies { Sub::Meta::Parameters->_normalize_args('Foo', 'Bar') },
+        qr/args must be a reference/, 'cannot use array';
+
+    is(Sub::Meta::Parameters->_normalize_args(
+        { a => 'Foo', b => 'Bar'}),
+        [p(type => 'Foo', name => 'a', named => 1), p(type => 'Bar', name => 'b', named => 1)], 'hashref');
+
+    is(Sub::Meta::Parameters->_normalize_args(
+        { a => { isa => 'Foo' }, b => { isa => 'Bar' } }),
+        [p(type => 'Foo', name => 'a', named => 1), p(type => 'Bar', name => 'b', named => 1)], 'hashref');
 };
 
 subtest 'invocant' => sub {

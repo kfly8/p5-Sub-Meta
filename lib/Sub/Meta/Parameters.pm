@@ -47,8 +47,34 @@ sub set_args {
 
 sub _normalize_args {
     my $self = shift;
-    my @args = @_ == 1 && ref $_[0] && (ref $_[0] eq 'ARRAY') ? @{$_[0]} : @_;
-    [ map { Scalar::Util::blessed($_) ? $_ : Sub::Meta::Param->new($_) } @args ]
+    _croak 'args must be a reference' unless @_ == 1 && ref $_[0];
+
+    my @args;
+    if (ref $_[0] eq 'ARRAY') {
+        @args = @{$_[0]};
+    }
+    elsif (ref $_[0] eq 'HASH') {
+        for my $name (sort { $a cmp $b } keys %{$_[0]}) {
+            my $v = $_[0]->{$name};
+            my $f = ref $v && ref $v eq 'HASH';
+            push @args => {
+                name  => $name,
+                named => 1,
+                ($f ? %$v : (type => $v) ),
+            }
+        }
+    }
+    else {
+        _croak 'cannot normalize args';
+    }
+
+    return [
+        map {
+            Scalar::Util::blessed($_) && $_->isa('Sub::Meta::Param')
+            ? $_
+            : Sub::Meta::Param->new($_)
+        } @args
+    ]
 }
 
 sub _assert_nshift {
@@ -205,10 +231,21 @@ Constructor of C<Sub::Meta::Parameters>.
 
 Subroutine arguments arrayref.
 
-=head2 set_args(LIST), set_args(ArrayRef)
+=head2 set_args(ArrayRef), set_args(HashRef)
 
 Setter for subroutine arguments.
-An element can be an argument of C<Sub::Meta::Param> or any object which has C<positional>,C<named>,C<required> and C<optional> methods.
+An element can be an argument of C<Sub::Meta::Param>.
+
+    my $p = Sub::Meta::Parameters->new(args => []);
+    $p->set_args(['Int','Int']);
+    $p->set_args([{ type => 'Int', name => 'num' }]);
+
+    # named case:
+    $p->set_args({ a => 'Str', b => 'Str' });
+    $p->set_args({
+        a => { isa => 'Str', default => 123 },
+        b => { isa => 'Str', optional => 1 }
+    });
 
 =head2 nshift
 
