@@ -106,7 +106,7 @@ Sub::Meta->new(
 Sub::Meta->new(
     name      => 'twice',
     args      => [],
-    slurpy    => 1,
+    slurpy    => { name => '@numbers' },
     returns   => ArrayRef[Int],
 );
 
