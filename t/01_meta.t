@@ -87,8 +87,8 @@ subtest 'has sub' => sub {
         is $meta->args, Sub::Meta::Parameters->new(args => ['Int'])->args, 'args';
         is $meta->set_nshift(1), $meta, 'set_nshift';
         is $meta->nshift, 1, 'nshift';
-        is $meta->set_slurpy(1), $meta, 'set_slurpy';
-        is $meta->slurpy, 1, 'slurpy';
+        is $meta->set_slurpy('Str'), $meta, 'set_slurpy';
+        is $meta->slurpy, Sub::Meta::Param->new('Str'), 'slurpy';
         is $meta->set_returns([]), $meta, 'set_returns';
         is $meta->returns, Sub::Meta::Returns->new([]), 'returns';
     };

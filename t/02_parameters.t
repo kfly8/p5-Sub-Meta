@@ -66,9 +66,9 @@ my @TEST = (
         args_min                 => 1,
         args_max                 => 1,
     ],
-    { args => [p(type => 'Foo')], nshift => 1, slurpy => 1 } => [
+    { args => [p(type => 'Foo')], nshift => 1, slurpy => 'Str' } => [
         nshift                   => 1,
-        slurpy                   => !!1,
+        slurpy                   => p(type => 'Str'),
         args                     => [p(type => 'Foo')],
         _all_positional_required => [p(type => 'Foo')],
         positional               => [],
@@ -130,9 +130,9 @@ my @TEST = (
         args_min                 => 0,
         args_max                 => 0 + 'Inf',
     ],
-    { args => [p(type => 'Foo', named => 1, optional => 1)], slurpy => 1 } => [
+    { args => [p(type => 'Foo', named => 1, optional => 1)], slurpy => 'Str' } => [
         nshift                   => 0,
-        slurpy                   => !!1,
+        slurpy                   => p(type => 'Str'),
         args                     => [p(type => 'Foo', named => 1, optional => 1)],
         _all_positional_required => [],
         positional               => [],
@@ -236,6 +236,7 @@ while (my ($parameters, $expect) = splice @TEST, 0, 2) {
 }
 
 subtest 'setter' => sub {
+    my $some = bless {}, 'Some';
     my $parameters = Sub::Meta::Parameters->new(args => [p()]);
 
     is $parameters->nshift, 0, 'nshift';
@@ -243,10 +244,12 @@ subtest 'setter' => sub {
     is $parameters->nshift, 1, 'nshift';
 
     ok !$parameters->slurpy, 'slurpy';
-    is $parameters->set_slurpy, $parameters, 'set_slurpy';
-    ok $parameters->slurpy, 'slurpy';
-    is $parameters->set_slurpy(0), $parameters, 'set_slurpy';
-    ok !$parameters->slurpy, 'slurpy';
+    is $parameters->set_slurpy('Str'), $parameters, 'set_slurpy';
+    is $parameters->slurpy, p(type => 'Str'), 'slurpy';
+    is $parameters->set_slurpy(p(type => 'Int')), $parameters, 'set_slurpy';
+    is $parameters->slurpy, p(type => 'Int'), 'slurpy';
+    is $parameters->set_slurpy($some), $parameters, 'set_slurpy';
+    is $parameters->slurpy, p(type => $some), 'slurpy';
 
     is $parameters->args, [p()], 'args';
     is $parameters->set_args([p(type => 'Foo')]), $parameters, 'set_args';

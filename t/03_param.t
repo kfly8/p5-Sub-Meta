@@ -67,10 +67,7 @@ subtest 'setter' => sub {
 
 subtest 'overload' => sub {
     my $param = Sub::Meta::Param->new({ name => '$foo' });
-    is "$param", '$foo', 'overload string';
-
-    my $empty = Sub::Meta::Param->new({ });
-    is "$empty", '', 'overload no string';
+    ok $param eq $param;
 };
 
 subtest 'new' => sub {

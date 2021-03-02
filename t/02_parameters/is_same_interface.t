@@ -63,6 +63,15 @@ my @TEST = (
     { args => [], slurpy => 1, nshift => 0 }, 'valid',
     ]},
 
+    # empty slurpy
+    { args => [], nshift => 0 } => {
+    NG => [
+    { args => [], slurpy => 'Str', nshift => 0 }, 'invalid slurpy',
+    ],
+    OK => [
+    { args => [], nshift => 0 }, 'valid',
+    ]},
+
     # nshift
     { args => [$p1], slurpy => 0, nshift => 1 } => {
     NG => [
