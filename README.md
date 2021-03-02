@@ -39,11 +39,15 @@ Sub::Util::prototype($meta->sub); # $@
 And you can hold meta information of parameter type and return type. See also [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters) and [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns).
 
 ```perl
-$meta->set_parameters( Sub::Meta::Parameters->new(args => [ { type => 'Str' }]) );
+$meta->set_parameters(args => ['Str']));
 $meta->parameters->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
 
-$meta->set_returns( Sub::Meta::Returns->new('Str') );
+$meta->set_args(['Str']);
+$meta->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
+
+$meta->set_returns('Str');
 $meta->returns->scalar; # 'Str'
+$meta->returns->list;   # 'Str'
 ```
 
 And you can compare meta informations:
@@ -65,14 +69,60 @@ $meta eq $other; # 1
 Constructor of `Sub::Meta`.
 
 ```perl
+use Sub::Meta;
+use Types::Standard -types;
+
+# sub Greeting::hello(Str) -> Str
 Sub::Meta->new(
     fullname    => 'Greeting::hello',
     is_constant => 0,
     prototype   => '$',
     attribute   => ['method'],
     is_method   => 1,
-    parameters  => Sub::Meta::Parameters->new(args => [{ type => 'Str' }]),
-    returns     => Sub::Meta::Returns->new('Str'),
+    parameters  => { args => [{ type => Str }]},
+    returns     => Str,
+);
+```
+
+Others are as follows:
+
+```perl
+# sub add(Int, Int) -> Int
+Sub::Meta->new(
+    name    => 'add',
+    args    => [Int, Int],
+    returns => Int,
+);
+
+# method hello(Str) -> Str 
+Sub::Meta->new(
+    name      => 'hello',
+    args      => [{ message => Str }],
+    is_method => 1,
+    returns   => Str,
+);
+
+# sub twice(@numbers) -> ArrayRef[Int]
+Sub::Meta->new(
+    name      => 'twice',
+    args      => [],
+    slurpy    => 1,
+    returns   => ArrayRef[Int],
+);
+
+# Named parameters:
+# sub foo(Str :a) -> Str
+Sub::Meta->new(
+    name      => 'foo',
+    args      => { a => Str },
+    returns   => Str,
+);
+
+# is equivalent to
+Sub::Meta->new(
+    name      => 'foo',
+    args      => [{ name => 'a', isa => Str, named => 1 }],
+    returns   => Str,
 );
 ```
 
@@ -196,17 +246,43 @@ Parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AM
 
 ## set\_parameters($parameters)
 
-Sets the parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters) or any object which has `positional`,`named`,`required` and `optional` methods.
+Sets the parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters).
 
 ```perl
 my $meta = Sub::Meta->new;
-$meta->set_parameters({ type => 'Type'});
-$meta->parameters; # => Sub::Meta::Parameters->new({type => 'Type'});
+$meta->set_parameters(args => ['Str']);
+$meta->parameters; # => Sub::Meta::Parameters->new(args => ['Str']);
 
 # or
-$meta->set_parameters(Sub::Meta::Parameters->new(type => 'Foo'));
-$meta->set_parameters(MyParamters->new)
+$meta->set_parameters(Sub::Meta::Parameters->new(args => ['Str']));
+
+# alias
+$meta->set_args(['Str']);
 ```
+
+## args
+
+The alias of `parameters.args`.
+
+## set\_args($args)
+
+The alias of `parameters.set_args`.
+
+## nshift
+
+The alias of `parameters.nshift`.
+
+## set\_nshift($nshift)
+
+The alias of `parameters.set_nshift`.
+
+## slurpy
+
+The alias of `parameters.slurpy`.
+
+## set\_slurpy($slurpy)
+
+The alias of `parameters.set_slurpy`.
 
 ## returns
 

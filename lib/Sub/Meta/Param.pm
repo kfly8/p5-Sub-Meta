@@ -21,6 +21,7 @@ sub new {
 
     $args{optional} = !delete $args{required} if exists $args{required};
     $args{named}    = !delete $args{positional} if exists $args{positional};
+    $args{type}     = delete $args{isa} if exists $args{isa};
 
     %args = (%DEFAULT, %args);
 
@@ -44,6 +45,13 @@ sub set_optional($;)   { $_[0]{optional} = !!(defined $_[1] ? $_[1] : 1); $_[0] 
 sub set_required($;)   { $_[0]{optional} =  !(defined $_[1] ? $_[1] : 1); $_[0] }
 sub set_named($;)      { $_[0]{named}    = !!(defined $_[1] ? $_[1] : 1); $_[0] }
 sub set_positional($;) { $_[0]{named}    =  !(defined $_[1] ? $_[1] : 1); $_[0] }
+
+# alias
+sub isa_() :method; # NOT isa
+*isa_ = \&type;
+
+sub set_isa($);
+*set_isa = \&set_type;
 
 sub is_same_interface {
     my ($self, $other) = @_;
@@ -128,6 +136,14 @@ Any type constraints, e.g. C<Str>.
 =head2 set_type($type)
 
 Setter for C<type>.
+
+=head2 isa_
+
+The alias of C<type>
+
+=head2 set_isa($type)
+
+The alias of C<set_type>
 
 =head2 default
 
