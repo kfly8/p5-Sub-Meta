@@ -144,22 +144,23 @@ sub args_max() {
 
 sub is_same_interface {
     my ($self, $other) = @_;
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
-    return unless $self->slurpy eq $other->slurpy;
+    return if $self->slurpy ne $other->slurpy;
 
-    return unless @{$self->args} == @{$other->args};
+    return if @{$self->args} != @{$other->args};
     for (my $i = 0; $i < @{$self->args}; $i++) {
-        return unless $self->args->[$i]->is_same_interface($other->args->[$i]);
+        return if !($self->args->[$i]->is_same_interface($other->args->[$i]));
     }
 
     if (defined $self->nshift) {
-        return unless $self->nshift == $other->nshift;
+        return if $self->nshift != $other->nshift;
     }
     else {
         return if defined $other->nshift;
     }
 
-    return 1;
+    return !!1;
 }
 
 1;

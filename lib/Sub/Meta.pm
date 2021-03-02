@@ -195,31 +195,30 @@ sub apply_attribute(@) {
 
 sub is_same_interface {
     my ($self, $other) = @_;
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->subname) {
-        return unless $self->subname eq $other->subname;
+        return if $self->subname ne $other->subname;
     }
     else {
         return if $other->subname;
     }
 
     if ($self->parameters) {
-        return unless $other->parameters;
-        return unless $self->parameters->is_same_interface($other->parameters);
+        return if !($self->parameters->is_same_interface($other->parameters));
     }
     else {
         return if $other->parameters;
     }
 
     if ($self->returns) {
-        return unless $other->returns;
-        return unless $self->returns->is_same_interface($other->returns);
+        return if !($self->returns->is_same_interface($other->returns));
     }
     else {
         return if $other->returns;
     }
 
-    return 1;
+    return !!1;
 }
 
 1;
