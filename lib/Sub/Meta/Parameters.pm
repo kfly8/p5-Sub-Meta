@@ -23,21 +23,25 @@ sub new {
 
     _croak 'parameters reqruires args' unless exists $args{args};
 
-    $args{nshift} = 0 unless exists $args{nshift};
-    $args{slurpy} = 0 unless exists $args{slurpy};
-    $args{args}   = $class->_normalize_args($args{args});
-
     my $self = bless \%args => $class;
-    $self->_assert_nshift;
+    $self->set_args($args{args});
+    $self->set_nshift(exists $args{nshift} ? $args{nshift} : 0);
+    $self->set_slurpy($args{slurpy}) if exists $args{slurpy};
     return $self;
 }
 
 sub nshift()   { $_[0]{nshift} }
-sub slurpy()   { !!$_[0]{slurpy} }
+sub slurpy()   { $_[0]{slurpy} ? $_[0]{slurpy} : !!0 }
 sub args()     { $_[0]{args} }
 
 sub set_nshift($) { $_[0]{nshift} = $_[1]; $_[0]->_assert_nshift; $_[0] }
-sub set_slurpy() { $_[0]{slurpy} = !!(defined $_[1] ? $_[1] : 1); $_[0] }
+sub set_slurpy {
+    my ($self, $v) = @_;
+    $self->{slurpy} = Scalar::Util::blessed($v) && $v->isa('Sub::Meta::Param')
+                    ? $v
+                    : Sub::Meta::Param->new($v);
+    return $self;
+}
 
 sub set_args {
     my $self = shift;
@@ -146,7 +150,12 @@ sub is_same_interface {
     my ($self, $other) = @_;
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
-    return if $self->slurpy ne $other->slurpy;
+    if ($self->slurpy) {
+        return if !($self->slurpy->is_same_interface($other->slurpy))
+    }
+    else {
+        return if $other->slurpy;
+    }
 
     return if @{$self->args} != @{$other->args};
     for (my $i = 0; $i < @{$self->args}; $i++) {
@@ -259,11 +268,14 @@ For example, it is assumed that 1 is specified in the case of methods, and 0 is 
 
 =head2 slurpy
 
-A boolean whether get all rest arguments.
+Subroutine all rest arguments.
 
-=head2 set_slurpy($bool)
+=head2 set_slurpy($param_args)
 
-Setter for slurpy.
+Setter for slurpy:
+
+    my $p = Sub::Meta::Parameters->new(args => [{ isa => 'Int', name => '$a'}]);
+    $p->set_slurpy({ name => '@numbers', isa => 'Int' }); # => (Int $a, Int @numbers)
 
 =head2 positional
 

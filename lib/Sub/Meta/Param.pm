@@ -9,7 +9,6 @@ use Scalar::Util ();
 
 use overload
     fallback => 1,
-    '""'     => sub { $_[0]->name || '' },
     eq       =>  \&is_same_interface,
 ;
 
@@ -27,7 +26,7 @@ sub new {
 
     %args = (%DEFAULT, %args);
 
-    bless \%args => $class;
+    return bless \%args => $class;
 }
 
 sub name()       { $_[0]{name} }

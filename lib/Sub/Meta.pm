@@ -324,7 +324,7 @@ Others are as follows:
     Sub::Meta->new(
         name      => 'twice',
         args      => [],
-        slurpy    => 1,
+        slurpy    => { name => '@numbers' },
         returns   => ArrayRef[Int],
     );
 
