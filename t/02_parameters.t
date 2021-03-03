@@ -10,9 +10,6 @@ subtest 'exception' => sub {
     like dies { Sub::Meta::Parameters->new(args => 'Str') },
         qr/args must be a reference/, 'args is not reference';
 
-    like dies { Sub::Meta::Parameters->new(args => sub { 'Str' }) },
-        qr/cannot normalize args/, 'args is not arrayref/hashref';
-
     like dies { Sub::Meta::Parameters->new(args => [p(type => 'Foo', named => 1, optional => 1)], nshift => 1) },
         qr/required positional parameters need more than nshift/, 'nshift';
 };
@@ -254,6 +251,8 @@ subtest 'setter' => sub {
     is $parameters->args, [p()], 'args';
     is $parameters->set_args([p(type => 'Foo')]), $parameters, 'set_args';
     is $parameters->args, [p(type => 'Foo')], 'args';
+    is $parameters->set_args(p(type => 'Foo')), $parameters, 'set_args';
+    is $parameters->args, [p(type => 'Foo')], 'args';
 };
 
 subtest '_normalize_args' => sub {
@@ -261,6 +260,8 @@ subtest '_normalize_args' => sub {
 
     is(Sub::Meta::Parameters->_normalize_args([$some]), [p($some)], 'blessed arg list');
     is(Sub::Meta::Parameters->_normalize_args(['Foo', 'Bar']), [p('Foo'), p('Bar')], 'arrayref');
+
+    is(Sub::Meta::Parameters->_normalize_args($some), [p($some)], 'single arg');
 
     like dies { Sub::Meta::Parameters->_normalize_args('Foo', 'Bar') },
         qr/args must be a reference/, 'cannot use array';
