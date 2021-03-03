@@ -307,6 +307,16 @@ $meta->set_returns(MyReturns->new)
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether `subname`, `parameters` and `returns` are equal.
 
+## parameters\_class
+
+Returns class name of parameters. default: Sub::Meta::Parameters
+Please override for customization.
+
+## returnss\_class
+
+Returns class name of returns. default: Sub::Meta::Returns
+Please override for customization.
+
 # NOTE
 
 ## setter

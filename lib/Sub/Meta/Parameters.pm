@@ -17,6 +17,8 @@ use overload
 
 sub _croak { require Carp; Carp::croak(@_) }
 
+sub param_class { 'Sub::Meta::Param' }
+
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
@@ -39,7 +41,7 @@ sub set_slurpy {
     my ($self, $v) = @_;
     $self->{slurpy} = Scalar::Util::blessed($v) && $v->isa('Sub::Meta::Param')
                     ? $v
-                    : Sub::Meta::Param->new($v);
+                    : $self->param_class->new($v);
     return $self;
 }
 
@@ -76,7 +78,7 @@ sub _normalize_args {
         map {
             Scalar::Util::blessed($_) && $_->isa('Sub::Meta::Param')
             ? $_
-            : Sub::Meta::Param->new($_)
+            : $self->param_class->new($_)
         } @args
     ]
 }
@@ -331,6 +333,11 @@ This is computed as follows:
 
 A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
 Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
+
+=head2 param_class
+
+Returns class name of param. default: Sub::Meta::Param
+Please override for customization.
 
 =head1 SEE ALSO
 

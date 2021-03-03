@@ -24,6 +24,9 @@ use overload
     eq => \&is_same_interface
     ;
 
+sub parameters_class { 'Sub::Meta::Parameters' }
+sub returns_class    { 'Sub::Meta::Returns' }
+
 sub _croak { require Carp; Carp::croak(@_) }
 
 sub new {
@@ -116,7 +119,7 @@ sub set_parameters {
         }
     }
     else {
-        $self->{parameters} = Sub::Meta::Parameters->new(@_);
+        $self->{parameters} = $self->parameters_class->new(@_);
     }
     return $self
 }
@@ -127,7 +130,7 @@ sub set_args {
         $self->parameters->set_args(@_);
     }
     else {
-        $self->set_parameters(Sub::Meta::Parameters->new(args => @_));
+        $self->set_parameters($self->parameters_class->new(args => @_));
     }
     return $self;
 }
@@ -154,7 +157,7 @@ sub set_returns {
         $self->{returns} = $v
     }
     else {
-        $self->{returns} = Sub::Meta::Returns->new(@_);
+        $self->{returns} = $self->returns_class->new(@_);
     }
     return $self
 }
@@ -515,6 +518,16 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
 
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether C<subname>, C<parameters> and C<returns> are equal.
+
+=head2 parameters_class
+
+Returns class name of parameters. default: Sub::Meta::Parameters
+Please override for customization.
+
+=head2 returnss_class
+
+Returns class name of returns. default: Sub::Meta::Returns
+Please override for customization.
 
 =head1 NOTE
 
