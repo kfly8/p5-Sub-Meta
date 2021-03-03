@@ -1,4 +1,4 @@
-package MyMeta::Returns;
+package MySubMeta::Returns;
 use strict;
 use warnings;
 use parent qw(Sub::Meta::Returns);

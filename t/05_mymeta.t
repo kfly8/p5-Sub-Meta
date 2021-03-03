@@ -1,21 +1,21 @@
 use Test2::V0;
 use lib 't/lib';
 
-use MyMeta;
+use MySubMeta;
 
-my $meta = MyMeta->new(
+my $meta = MySubMeta->new(
     subname => 'hello',
     args    => ['Str'],
     returns => 'Str',
 );
 
-isa_ok $meta,             ('MyMeta',             'Sub::Meta');
-isa_ok $meta->parameters, ('MyMeta::Parameters', 'Sub::Meta::Parameters');
-isa_ok $meta->returns,    ('MyMeta::Returns',    'Sub::Meta::Returns');
-isa_ok $meta->args->[0],  ('MyMeta::Param',      'Sub::Meta::Param');
+isa_ok $meta,             ('MySubMeta',             'Sub::Meta');
+isa_ok $meta->parameters, ('MySubMeta::Parameters', 'Sub::Meta::Parameters');
+isa_ok $meta->returns,    ('MySubMeta::Returns',    'Sub::Meta::Returns');
+isa_ok $meta->args->[0],  ('MySubMeta::Param',      'Sub::Meta::Param');
 
 is $meta->subname, 'hello';
-is $meta->parameters, MyMeta::Parameters->new(args => ['Str']);
-is $meta->returns, MyMeta::Returns->new('Str');
+is $meta->parameters, MySubMeta::Parameters->new(args => ['Str']);
+is $meta->returns, MySubMeta::Returns->new('Str');
 
 done_testing;
