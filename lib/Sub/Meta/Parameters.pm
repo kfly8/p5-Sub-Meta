@@ -71,7 +71,7 @@ sub _normalize_args {
         }
     }
     else {
-        _croak 'cannot normalize args';
+        @args = ($_[0]);
     }
 
     return [
@@ -243,21 +243,26 @@ Constructor of C<Sub::Meta::Parameters>.
 
 Subroutine arguments arrayref.
 
-=head2 set_args(ArrayRef), set_args(HashRef)
+=head2 set_args(ArrayRef), set_args(HashRef), set_args(Ref)
 
 Setter for subroutine arguments.
 An element can be an argument of C<Sub::Meta::Param>.
 
+    use Types::Standard -types;
+
     my $p = Sub::Meta::Parameters->new(args => []);
-    $p->set_args(['Int','Int']);
-    $p->set_args([{ type => 'Int', name => 'num' }]);
+    $p->set_args([Int,Int]);
+    $p->set_args([{ type => Int, name => 'num' }]);
 
     # named case:
-    $p->set_args({ a => 'Str', b => 'Str' });
+    $p->set_args({ a => Str, b => Str });
     $p->set_args({
-        a => { isa => 'Str', default => 123 },
-        b => { isa => 'Str', optional => 1 }
+        a => { isa => Str, default => 123 },
+        b => { isa => Str, optional => 1 }
     });
+
+    # single ref:
+    $p->set_args(Str); # => $p->set_args([Str])
 
 =head2 nshift
 
