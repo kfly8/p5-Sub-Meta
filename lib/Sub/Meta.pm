@@ -310,14 +310,14 @@ Others are as follows:
 
     # sub add(Int, Int) -> Int
     Sub::Meta->new(
-        name    => 'add',
+        subname => 'add',
         args    => [Int, Int],
         returns => Int,
     );
 
     # method hello(Str) -> Str 
     Sub::Meta->new(
-        name      => 'hello',
+        subname   => 'hello',
         args      => [{ message => Str }],
         is_method => 1,
         returns   => Str,
@@ -325,7 +325,7 @@ Others are as follows:
 
     # sub twice(@numbers) -> ArrayRef[Int]
     Sub::Meta->new(
-        name      => 'twice',
+        subname   => 'twice',
         args      => [],
         slurpy    => { name => '@numbers' },
         returns   => ArrayRef[Int],
@@ -334,14 +334,14 @@ Others are as follows:
     # Named parameters:
     # sub foo(Str :a) -> Str
     Sub::Meta->new(
-        name      => 'foo',
+        subname   => 'foo',
         args      => { a => Str },
         returns   => Str,
     );
 
     # is equivalent to
     Sub::Meta->new(
-        name      => 'foo',
+        subname   => 'foo',
         args      => [{ name => 'a', isa => Str, named => 1 }],
         returns   => Str,
     );
