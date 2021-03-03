@@ -53,7 +53,8 @@
          "requires" : {
             "JSON::PP" : "0",
             "Module::Build::Tiny" : "0.035",
-            "Test2::V0" : "0.000111"
+            "Test2::V0" : "0.000111",
+            "parent" : "0"
          }
       }
    },
