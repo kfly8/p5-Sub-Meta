@@ -524,7 +524,7 @@ Specifically, check whether C<subname>, C<parameters> and C<returns> are equal.
 Returns class name of parameters. default: Sub::Meta::Parameters
 Please override for customization.
 
-=head2 returnss_class
+=head2 returns_class
 
 Returns class name of returns. default: Sub::Meta::Returns
 Please override for customization.
