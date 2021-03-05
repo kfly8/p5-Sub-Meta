@@ -151,19 +151,42 @@ sub args_max() {
 sub is_same_interface {
     my ($self, $other) = @_;
 
-    return if !Scalar::Util::blessed($other) or !$other->isa('Sub::Meta::Parameters');
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
-    return if $self->slurpy ? !($self->slurpy->is_same_interface($other->slurpy)) : $other->slurpy;
+    return unless $self->slurpy ? $self->slurpy->is_same_interface($other->slurpy)
+                                : !$other->slurpy;
 
-    return if @{$self->args} != @{$other->args};
+    return unless @{$self->args} == @{$other->args};
 
     for (my $i = 0; $i < @{$self->args}; $i++) {
-        return if !($self->args->[$i]->is_same_interface($other->args->[$i]));
+        return unless $self->args->[$i]->is_same_interface($other->args->[$i]);
     }
 
-    return if defined $self->nshift ? $self->nshift != $other->nshift : defined $other->nshift;
+    return unless defined $self->nshift ? $self->nshift == $other->nshift
+                                        : !defined $other->nshift;
 
     return !!1;
+}
+
+sub is_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Parameters')", $v, $v);
+
+    push @src => $self->slurpy ? $self->slurpy->is_same_interface_inlined(sprintf('%s->slurpy', $v))
+                               : sprintf('!%s->slurpy', $v);
+
+    push @src => sprintf('%d == @{%s->args}', scalar @{$self->args}, $v);
+
+    for (my $i = 0; $i < @{$self->args}; $i++) {
+        push @src => $self->args->[$i]->is_same_interface_inlined(sprintf('%s->args->[%d]', $v, $i))
+    }
+
+    push @src => defined $self->nshift ? sprintf('%d == %s->nshift', $self->nshift, $v) : sprintf('!defined %s->nshift', $v);
+
+    return join "\n && ", @src;
 }
 
 1;

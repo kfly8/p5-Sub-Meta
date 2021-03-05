@@ -118,6 +118,8 @@ my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 
 while (my ($args, $cases) = splice @TEST, 0, 2) {
     my $meta = Sub::Meta->new($args);
+    my $inline = $meta->is_same_interface_inlined('$_[0]');
+    my $is_same_interface = eval sprintf('sub { %s }', $inline);
 
     subtest "@{[$json->encode($args)]}" => sub {
 
@@ -126,6 +128,7 @@ while (my ($args, $cases) = splice @TEST, 0, 2) {
                 my $is_hash = ref $other_args && ref $other_args eq 'HASH';
                 my $other = $is_hash ? Sub::Meta->new($other_args) : $other_args;
                 ok !$meta->is_same_interface($other), $test_message;
+                ok !$is_same_interface->($other), "inlined: $test_message";
             }
         };
 
@@ -133,6 +136,7 @@ while (my ($args, $cases) = splice @TEST, 0, 2) {
             while (my ($other_args, $test_message) = splice @{$cases->{OK}}, 0, 2) {
                 my $other = Sub::Meta->new($other_args);
                 ok $meta->is_same_interface($other), $test_message;
+                ok $is_same_interface->($other), "inlined: $test_message";
             }
         };
     };

@@ -199,18 +199,45 @@ sub apply_attribute(@) {
 sub is_same_interface {
     my ($self, $other) = @_;
 
-    return if !Scalar::Util::blessed($other) or !$other->isa('Sub::Meta');
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
-    return if $self->subname ? $self->subname ne $other->subname : $other->subname;
+    return unless $self->subname ? $self->subname eq $other->subname
+                                 : !$other->subname;
 
-    return if $self->is_method ? !$other->is_method : $other->is_method;
+    return unless $self->is_method ? $other->is_method
+                                   : !$other->is_method;
 
-    return if $self->parameters ? !($self->parameters->is_same_interface($other->parameters)) : $other->parameters;
+    return unless $self->parameters ? $self->parameters->is_same_interface($other->parameters)
+                                    : !$other->parameters;
 
-    return if $self->returns ? !($self->returns->is_same_interface($other->returns)) : $other->returns;
+    return unless $self->returns ? $self->returns->is_same_interface($other->returns)
+                                 : !$other->returns;
 
     return !!1;
 }
+
+sub is_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta')", $v, $v);
+
+    push @src => $self->subname ? sprintf('"%s" eq %s->subname', $self->subname, $v)
+                                : sprintf('!%s->subname', $v);
+
+    push @src => $self->is_method ? sprintf('%s->is_method', $v)
+                                  : sprintf('!%s->is_method', $v);
+
+    push @src => $self->parameters ? $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v))
+                                   : sprintf('!%s->parameters', $v);
+
+    push @src => $self->returns ? $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v))
+                                : sprintf('!%s->returns', $v);
+
+    return join "\n && ", @src;
+}
+
 
 1;
 __END__

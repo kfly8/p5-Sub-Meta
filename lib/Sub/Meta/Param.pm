@@ -57,18 +57,45 @@ sub set_isa($);
 sub is_same_interface {
     my ($self, $other) = @_;
 
-    return if !Scalar::Util::blessed($other) or !$other->isa('Sub::Meta::Param');
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Param');
 
-    return if defined $self->name ? $self->name ne $other->name : defined $other->name;
+    return unless defined $self->name ? $self->name eq $other->name
+                                      : !defined $other->name;
 
-    return if defined $self->type ? $self->type ne $other->type : defined $other->type;
+    return unless defined $self->type ? $self->type eq $other->type
+                                      : !defined $other->type;
 
-    return if $self->optional ne $other->optional;
+    return unless defined $self->optional ? $self->optional eq $other->optional
+                                          : !defined $other->optional;
 
-    return if $self->named ne $other->named;
+    return unless defined $self->named ? $self->named eq $other->named
+                                       : !defined $other->named;
 
     return !!1;
 }
+
+sub is_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Param')", $v, $v);
+
+    push @src => defined $self->name ? sprintf("'%s' eq %s->name", $self->name, $v)
+                                     : sprintf('!defined %s->name', $v);
+
+    my $str = (ref $self->type ? '%s' : "'%s'") . ' eq %s->type';
+    push @src => defined $self->type ? sprintf($str, $self->type, $v)
+                                     : sprintf('!defined %s->type', $v);
+
+    push @src => defined $self->optional ? sprintf("'%s' eq %s->optional", $self->optional, $v)
+                                         : sprintf('!defined %s->optional', $v);
+
+    push @src => defined $self->named ? sprintf("'%s' eq %s->named", $self->named, $v)
+                                         : sprintf('!defined %s->named', $v);
+
+    return join "\n && ", @src;
+}
+
 
 1;
 __END__
