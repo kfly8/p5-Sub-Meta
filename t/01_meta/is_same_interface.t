@@ -72,6 +72,35 @@ my @TEST = (
     { subname => 'foo', parameters => $p1, returns => $r1, attribute => ['method'] }, 'valid w/ attribute',
     { subname => 'foo', parameters => $p1, returns => $r1, prototype => '$' }, 'valid w/ prototype',
     ]},
+
+    # method
+    { subname => 'foo', is_method => !!1 } => {
+    NG => [
+    { subname => 'foo', is_method => !!0 }, 'invalid method',
+    { subname => 'foo' }, 'invalid method',
+    ],
+    OK => [
+    { subname => 'foo', is_method => !!1 }, 'valid method',
+    ]},
+
+    { subname => 'foo', is_method => !!0, } => {
+    NG => [
+    { subname => 'foo', is_method => !!1 }, 'invalid method',
+    ],
+    OK => [
+    { subname => 'foo', is_method => !!0 }, 'valid method',
+    { subname => 'foo' }, 'valid method',
+    ]},
+
+    { subname => 'foo', is_method => !!1, parameters => $p1 } => {
+    NG => [
+    { subname => 'foo', is_method => !!0, parameters => $p1 }, 'invalid method',
+    { subname => 'foo',                parameters => $p1 }, 'invalid method',
+    { subname => 'foo', is_method => !!1, parameters => $p2 }, 'invalid parameters',
+    ],
+    OK => [
+    { subname => 'foo', is_method => !!1, parameters => $p1 }, 'valid method',
+    ]},
 );
 
 use JSON::PP;
