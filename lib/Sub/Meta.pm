@@ -207,6 +207,13 @@ sub is_same_interface {
         return if $other->subname;
     }
 
+    if ($self->is_method) {
+        return if !$other->is_method;
+    }
+    else {
+        return if $other->is_method;
+    }
+
     if ($self->parameters) {
         return if !($self->parameters->is_same_interface($other->parameters));
     }
