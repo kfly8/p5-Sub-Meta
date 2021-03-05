@@ -34,28 +34,14 @@ sub set_coerce($) { $_[0]{coerce} = defined $_[1] ? $_[1] : 1; $_[0] }
 
 sub is_same_interface {
     my ($self, $other) = @_;
-    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
-    if (defined $self->scalar) {
-        return if !_eq($self->scalar, $other->scalar);
-    }
-    else {
-        return if defined $other->scalar;
-    }
+    return if !Scalar::Util::blessed($other) or !$other->isa('Sub::Meta::Returns');
 
-    if (defined $self->list) {
-        return if !_eq($self->list, $other->list);
-    }
-    else {
-        return if defined $other->list;
-    }
+    return if defined $self->scalar ? !_eq($self->scalar, $other->scalar) : defined $other->scalar;
 
-    if (defined $self->void) {
-        return if !_eq($self->void, $other->void);
-    }
-    else {
-        return if defined $other->void;
-    }
+    return if defined $self->list ? !_eq($self->list, $other->list) : defined $other->list;
+
+    return if defined $self->void ? !_eq($self->void, $other->void) : defined $other->void;
 
     return !!1;
 }

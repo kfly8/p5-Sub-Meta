@@ -198,35 +198,16 @@ sub apply_attribute(@) {
 
 sub is_same_interface {
     my ($self, $other) = @_;
-    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
-    if ($self->subname) {
-        return if $self->subname ne $other->subname;
-    }
-    else {
-        return if $other->subname;
-    }
+    return if !Scalar::Util::blessed($other) or !$other->isa('Sub::Meta');
 
-    if ($self->is_method) {
-        return if !$other->is_method;
-    }
-    else {
-        return if $other->is_method;
-    }
+    return if $self->subname ? $self->subname ne $other->subname : $other->subname;
 
-    if ($self->parameters) {
-        return if !($self->parameters->is_same_interface($other->parameters));
-    }
-    else {
-        return if $other->parameters;
-    }
+    return if $self->is_method ? !$other->is_method : $other->is_method;
 
-    if ($self->returns) {
-        return if !($self->returns->is_same_interface($other->returns));
-    }
-    else {
-        return if $other->returns;
-    }
+    return if $self->parameters ? !($self->parameters->is_same_interface($other->parameters)) : $other->parameters;
+
+    return if $self->returns ? !($self->returns->is_same_interface($other->returns)) : $other->returns;
 
     return !!1;
 }

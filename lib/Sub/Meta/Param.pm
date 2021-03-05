@@ -56,23 +56,15 @@ sub set_isa($);
 
 sub is_same_interface {
     my ($self, $other) = @_;
-    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Param');
 
-    if (defined $self->name) {
-        return if $self->name ne $other->name;
-    }
-    else {
-        return if defined $other->name;
-    }
+    return if !Scalar::Util::blessed($other) or !$other->isa('Sub::Meta::Param');
 
-    if (defined $self->type) {
-        return if $self->type ne $other->type;
-    }
-    else {
-        return if defined $other->type;
-    }
+    return if defined $self->name ? $self->name ne $other->name : defined $other->name;
+
+    return if defined $self->type ? $self->type ne $other->type : defined $other->type;
 
     return if $self->optional ne $other->optional;
+
     return if $self->named ne $other->named;
 
     return !!1;
