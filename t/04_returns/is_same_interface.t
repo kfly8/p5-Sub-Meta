@@ -6,7 +6,6 @@ use overload
     ;
 
 sub new { bless {}, $_[0] }
-sub is_same_interface { ref $_[0] eq $_[1] }
 sub TO_JSON { ref $_[0] }
 
 package main;

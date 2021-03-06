@@ -1,3 +1,14 @@
+package DummyType;
+
+use overload
+    fallback => 1,
+    '""' => sub { 'DummyType' }
+    ;
+
+sub new { bless {}, $_[0] }
+sub TO_JSON { ref $_[0] }
+
+package main;
 use Test2::V0;
 
 use Sub::Meta::Param;
@@ -11,6 +22,7 @@ my @TEST = (
     undef, 'invalid other',
     $obj, 'invalid obj',
     { name => '$mgs', type => 'Str', required => 1, positional => 1 }, 'invalid name',
+    { name =>  undef, type => 'Str', required => 1, positional => 1 }, 'undef name',
     { name => '$msg', type => 'Srt', required => 1, positional => 1 }, 'invalid type',
     { name => '$msg', type => 'Str', required => 0, positional => 1 }, 'invalid required',
     { name => '$msg', type => 'Str', required => 1, positional => 0 }, 'invalid positional',
@@ -53,6 +65,41 @@ my @TEST = (
     ],
     OK => [
     { required => 1, positional => 1 }, 'valid',
+    ]},
+
+    # undef optional 
+    { optional => undef } => {
+    NG => [
+    { optional => 1 }, 'invalid optional',
+    ],
+    OK => [
+    { optional => undef }, 'valid',
+    { optional => 0 }, 'valid',
+    { required => !!1 }, 'valid',
+    ]},
+
+    # undef named
+    { named => undef } => {
+    NG => [
+    { named => 1 }, 'invalid named',
+    ],
+    OK => [
+    { named => undef }, 'valid',
+    { named => 0 }, 'valid',
+    { positional => !!1 }, 'valid',
+    ]},
+
+    # blessed type
+    { type => DummyType->new } => {
+    NG => [
+    {  }, 'invalid type',
+    { type => undef }, 'invalid type',
+    { type => $obj }, 'invalid type',
+    { type => 'some' }, 'invalid type',
+    ],
+    OK => [
+    { type => 'DummyType' }, 'valid type',
+    { type => DummyType->new }, 'valid type',
     ]},
 );
 
