@@ -35,6 +35,7 @@ sub new {
 
     my $self = bless \%args => $class;
 
+    $self->set_sub(delete $args{sub})             if exists $args{sub}; # build subinfo
     $self->set_subname(delete $args{subname})     if exists $args{subname};
     $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
@@ -60,9 +61,10 @@ sub new {
 }
 
 sub sub()         { $_[0]{sub} }
-sub subname()     { $_[0]->subinfo->[1] || '' }
-sub stashname()   { $_[0]->subinfo->[0] || '' }
-sub fullname()    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname, $_[0]->subname) : '' }
+sub subname()     { $_[0]->subinfo->[1] }
+sub stashname()   { $_[0]->subinfo->[0] }
+sub fullname()    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname || '', $_[0]->subname || '') : undef }
+
 sub subinfo()     {
     return $_[0]{subinfo} if $_[0]{subinfo};
     $_[0]{subinfo} = $_[0]->_build_subinfo
@@ -198,38 +200,46 @@ sub apply_attribute(@) {
 
 sub is_same_interface {
     my ($self, $other) = @_;
+
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
-    if ($self->subname) {
-        return if $self->subname ne $other->subname;
-    }
-    else {
-        return if $other->subname;
-    }
+    return unless defined $self->subname ? defined $other->subname && $self->subname eq $other->subname
+                                         : !defined $other->subname;
 
-    if ($self->is_method) {
-        return if !$other->is_method;
-    }
-    else {
-        return if $other->is_method;
-    }
+    return unless $self->is_method ? $other->is_method
+                                   : !$other->is_method;
 
-    if ($self->parameters) {
-        return if !($self->parameters->is_same_interface($other->parameters));
-    }
-    else {
-        return if $other->parameters;
-    }
+    return unless $self->parameters ? $self->parameters->is_same_interface($other->parameters)
+                                    : !$other->parameters;
 
-    if ($self->returns) {
-        return if !($self->returns->is_same_interface($other->returns));
-    }
-    else {
-        return if $other->returns;
-    }
+    return unless $self->returns ? $self->returns->is_same_interface($other->returns)
+                                 : !$other->returns;
 
     return !!1;
 }
+
+sub is_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta')", $v, $v);
+
+    push @src => defined $self->subname ? sprintf("defined %s->subname && '%s' eq %s->subname", $v, "@{[$self->subname]}", $v)
+                                        : sprintf('!defined %s->subname', $v);
+
+    push @src => $self->is_method ? sprintf('%s->is_method', $v)
+                                  : sprintf('!%s->is_method', $v);
+
+    push @src => $self->parameters ? $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v))
+                                   : sprintf('!%s->parameters', $v);
+
+    push @src => $self->returns ? $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v))
+                                : sprintf('!%s->returns', $v);
+
+    return join "\n && ", @src;
+}
+
 
 1;
 __END__
@@ -524,7 +534,24 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
 =head2 is_same_interface($other_meta)
 
 A boolean value indicating whether the subroutine's interface is same or not.
-Specifically, check whether C<subname>, C<parameters> and C<returns> are equal.
+Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> are equal.
+
+=head2 is_same_interface_inlined($other_meta_inlined)
+
+Returns inlined C<is_same_interface> string:
+
+    use Sub::Meta;
+    my $meta = Sub::Meta->new(subname => 'hello');
+    my $inline = $meta->is_same_interface_inlined('$_[0]');
+    # $inline looks like this:
+    #    Scalar::Util::blessed($_[0]) && $_[0]->isa('Sub::Meta')
+    #    && defined $_[0]->subname && 'hello' eq $_[0]->subname
+    #    && !$_[0]->is_method
+    #    && !$_[0]->parameters
+    #    && !$_[0]->returns
+    my $check = eval "sub { $inline }";
+    $check->(Sub::Meta->new(subname => 'hello')); # => OK
+    $check->(Sub::Meta->new(subname => 'world')); # => NG
 
 =head2 parameters_class
 

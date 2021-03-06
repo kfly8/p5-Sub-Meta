@@ -56,27 +56,41 @@ sub set_isa($);
 
 sub is_same_interface {
     my ($self, $other) = @_;
+
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Param');
 
-    if (defined $self->name) {
-        return if $self->name ne $other->name;
-    }
-    else {
-        return if defined $other->name;
-    }
+    return unless defined $self->name ? defined $other->name && $self->name eq $other->name
+                                      : !defined $other->name;
 
-    if (defined $self->type) {
-        return if $self->type ne $other->type;
-    }
-    else {
-        return if defined $other->type;
-    }
+    return unless defined $self->type ? defined $other->type && $self->type eq $other->type
+                                      : !defined $other->type;
 
-    return if $self->optional ne $other->optional;
-    return if $self->named ne $other->named;
+    return unless $self->optional eq $other->optional;
+
+    return unless $self->named eq $other->named;
 
     return !!1;
 }
+
+sub is_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Param')", $v, $v);
+
+    push @src => defined $self->name ? sprintf("defined %s->name && '%s' eq %s->name", $v, "@{[$self->name]}", $v)
+                                     : sprintf('!defined %s->name', $v);
+
+    push @src => defined $self->type ? sprintf("defined %s->type && '%s' eq %s->type", $v, "@{[$self->type]}", $v)
+                                     : sprintf('!defined %s->type', $v);
+
+    push @src => sprintf("'%s' eq %s->optional", $self->optional, $v);
+
+    push @src => sprintf("'%s' eq %s->named", $self->named, $v);
+
+    return join "\n && ", @src;
+}
+
 
 1;
 __END__
@@ -203,6 +217,10 @@ Setter for C<positional>.
 
 A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
 Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal.
+
+=head2 is_same_interface_inlined($other_meta_inlined)
+
+Returns inlined C<is_same_interface> string.
 
 =head1 SEE ALSO
 

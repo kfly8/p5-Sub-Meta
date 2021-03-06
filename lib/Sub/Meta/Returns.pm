@@ -34,30 +34,38 @@ sub set_coerce($) { $_[0]{coerce} = defined $_[1] ? $_[1] : 1; $_[0] }
 
 sub is_same_interface {
     my ($self, $other) = @_;
+
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
-    if (defined $self->scalar) {
-        return if !_eq($self->scalar, $other->scalar);
-    }
-    else {
-        return if defined $other->scalar;
-    }
+    return unless defined $self->scalar ? _eq($self->scalar, $other->scalar)
+                                        : !defined $other->scalar;
 
-    if (defined $self->list) {
-        return if !_eq($self->list, $other->list);
-    }
-    else {
-        return if defined $other->list;
-    }
+    return unless defined $self->list ? _eq($self->list, $other->list)
+                                      : !defined $other->list;
 
-    if (defined $self->void) {
-        return if !_eq($self->void, $other->void);
-    }
-    else {
-        return if defined $other->void;
-    }
+    return unless defined $self->void ? _eq($self->void, $other->void)
+                                      : !defined $other->void;
 
     return !!1;
+}
+
+sub is_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Returns')", $v, $v);
+
+    push @src => defined $self->scalar ? _eq_inlined($self->scalar, sprintf('%s->scalar', $v))
+                                       : sprintf('!defined %s->scalar', $v);
+
+    push @src => defined $self->list ? _eq_inlined($self->list, sprintf('%s->list', $v))
+                                     : sprintf('!defined %s->list', $v);
+
+    push @src => defined $self->void ? _eq_inlined($self->void, sprintf('%s->void', $v))
+                                     : sprintf('!defined %s->void', $v);
+
+    return join "\n && ", @src;
 }
 
 sub _eq {
@@ -74,6 +82,24 @@ sub _eq {
         return unless $type eq $other;
     }
     return 1;
+}
+
+sub _eq_inlined {
+    my ($type, $v) = @_;
+
+    my @src;
+    if (ref $type && ref $type eq "ARRAY") {
+        push @src => sprintf('ref %s eq "ARRAY"', $v);
+        push @src => sprintf('%d == @{%s}', scalar @$type, $v);
+        for (my $i = 0; $i < @$type; $i++) {
+            push @src => sprintf('"%s" eq %s->[%d]', $type->[$i], $v, $i);
+        }
+    }
+    else {
+        push @src => sprintf('"%s" eq %s', $type, $v);
+    }
+
+    return join "\n && ", @src;
 }
 
 1;
@@ -143,6 +169,10 @@ Setter for C<coerce>.
 
 A boolean value indicating whether C<Sub::Meta::Returns> object is same or not.
 Specifically, check whether C<scalar>, C<list> and C<void> are equal.
+
+=head2 is_same_interface_inlined($other_meta_inlined)
+
+Returns inlined C<is_same_interface> string.
 
 =head1 LICENSE
 
