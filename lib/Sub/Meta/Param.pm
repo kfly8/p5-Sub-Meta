@@ -137,88 +137,92 @@ Constructor of C<Sub::Meta::Param>.
         positional => 1,
     })
 
-=head2 name
+=head2 ACCESSORS
+
+=head3 name
 
 variable name, e.g. C<$msg>, C<@list>.
 
-=head2 set_name(Str $name)
+=head3 set_name(Str $name)
 
 Setter for C<name>.
 
-=head2 type
+=head3 type
 
 Any type constraints, e.g. C<Str>.
 
-=head2 set_type($type)
+=head3 set_type($type)
 
 Setter for C<type>.
 
-=head2 isa_
+=head3 isa_
 
 The alias of C<type>
 
-=head2 set_isa($type)
+=head3 set_isa($type)
 
 The alias of C<set_type>
 
-=head2 default
+=head3 default
 
 default value, e.g. C<"HELLO">, C<sub { ... }>
 
-=head2 set_default($default)
+=head3 set_default($default)
 
 Setter for C<default>.
 
-=head2 coerce
+=head3 coerce
 
 A boolean value indicating whether to coerce. Default to false.
 
-=head2 set_coerce($bool)
+=head3 set_coerce($bool)
 
 Setter for C<coerce>.
 
-=head2 optional
+=head3 optional
 
 A boolean value indicating whether to optional. Default to false.
 This boolean is the opposite of C<required>.
 
-=head2 set_optional($bool=true)
+=head3 set_optional($bool=true)
 
 Setter for C<optional>.
 
-=head2 required
+=head3 required
 
 A boolean value indicating whether to required. Default to true.
 This boolean is the opposite of C<optional>.
 
-=head2 set_required($bool=true)
+=head3 set_required($bool=true)
 
 Setter for C<required>.
 
-=head2 named
+=head3 named
 
 A boolean value indicating whether to named arguments. Default to false.
 This boolean is the opposite of C<positional>.
 
-=head2 set_named($bool=true)
+=head3 set_named($bool=true)
 
 Setter for C<named>.
 
-=head2 positional
+=head3 positional
 
 A boolean value indicating whether to positional arguments. Default to true.
 This boolean is the opposite of C<positional>.
 
-=head2 set_positional($bool=true)
+=head3 set_positional($bool=true)
 
 Setter for C<positional>.
 
-=head2 is_same_interface($other_meta)
+=head2 OTHERS
+
+=head3 is_same_interface($other_meta)
 
 A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
 Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal.
 
-=head2 is_same_interface_inlined($other_meta_inlined)
+=head3 is_same_interface_inlined($other_meta_inlined)
 
 Returns inlined C<is_same_interface> string.
 

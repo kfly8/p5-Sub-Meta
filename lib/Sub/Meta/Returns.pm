@@ -133,44 +133,48 @@ Sub::Meta::Returns - meta information about return values
 
 Constructor of C<Sub::Meta::Returns>.
 
-=head2 scalar
+=head2 ACCESSORS
+
+=head3 scalar
 
 A type for value when called in scalar context.
 
-=head2 set_scalar($scalar)
+=head3 set_scalar($scalar)
 
 Setter for C<scalar>.
 
-=head2 list
+=head3 list
 
 A type for value when called in list context.
 
-=head2 set_list($list)
+=head3 set_list($list)
 
 Setter for C<list>.
 
-=head2 void
+=head3 void
 
 A type for value when called in void context.
 
-=head2 set_void($void)
+=head3 set_void($void)
 
 Setter for C<void>.
 
-=head2 coerce
+=head3 coerce
 
 A boolean whether with coercions.
 
-=head2 set_coerce($bool)
+=head3 set_coerce($bool)
 
 Setter for C<coerce>.
 
-=head2 is_same_interface($other_meta)
+=head2 OTHERS
+
+=head3 is_same_interface($other_meta)
 
 A boolean value indicating whether C<Sub::Meta::Returns> object is same or not.
 Specifically, check whether C<scalar>, C<list> and C<void> are equal.
 
-=head2 is_same_interface_inlined($other_meta_inlined)
+=head3 is_same_interface_inlined($other_meta_inlined)
 
 Returns inlined C<is_same_interface> string.
 

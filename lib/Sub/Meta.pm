@@ -363,19 +363,25 @@ Others are as follows:
         returns   => Str,
     );
 
-=head2 sub
+=head2 ACCESSORS
+
+=head3 sub
 
 A subroutine reference.
 
-=head2 set_sub
+=head3 set_sub
 
 Setter for subroutine reference.
 
-=head2 subname
+    sub hello { ... }
+    $meta->set_sub(\&hello);
+    $meta->sub # => \&hello
+
+=head3 subname
 
 A subroutine name, e.g. C<hello>
 
-=head2 set_subname($subname)
+=head3 set_subname($subname)
 
 Setter for subroutine name.
 
@@ -384,7 +390,7 @@ Setter for subroutine name.
     $meta->subname; # world
     Sub::Util::subname($meta->sub); # hello (NOT apply to sub)
 
-=head2 apply_subname($subname)
+=head3 apply_subname($subname)
 
 Sets subroutine name and apply to the subroutine reference.
 
@@ -393,91 +399,91 @@ Sets subroutine name and apply to the subroutine reference.
     $meta->subname; # world
     Sub::Util::subname($meta->sub); # world
 
-=head2 fullname
+=head3 fullname
 
 A subroutine full name, e.g. C<main::hello>
 
-=head2 set_fullname($fullname)
+=head3 set_fullname($fullname)
 
 Setter for subroutine full name.
 
-=head2 stashname
+=head3 stashname
 
 A subroutine stash name, e.g. C<main>
 
-=head2 set_stashname($stashname)
+=head3 set_stashname($stashname)
 
 Setter for subroutine stash name.
 
-=head2 subinfo
+=head3 subinfo
 
 A subroutine information, e.g. C<['main', 'hello']>
 
-=head2 set_subinfo([$stashname, $subname])
+=head3 set_subinfo([$stashname, $subname])
 
 Setter for subroutine information.
 
-=head2 file
+=head3 file
 
 A filename where subroutine is defined, e.g. C<path/to/main.pl>.
 
-=head2 set_file($filepath)
+=head3 set_file($filepath)
 
 Setter for C<file>.
 
-=head2 line
+=head3 line
 
 A line where the definition of subroutine started, e.g. C<5>
 
-=head2 set_line($line)
+=head3 set_line($line)
 
 Setter for C<line>.
 
-=head2 is_constant
+=head3 is_constant
 
 A boolean value indicating whether the subroutine is a constant or not.
 
-=head2 set_is_constant($bool)
+=head3 set_is_constant($bool)
 
 Setter for C<is_constant>.
 
-=head2 prototype
+=head3 prototype
 
 A prototype of subroutine reference, e.g. C<$@>
 
-=head2 set_prototype($prototype)
+=head3 set_prototype($prototype)
 
 Setter for C<prototype>.
 
-=head2 apply_prototype($prototype)
+=head3 apply_prototype($prototype)
 
 Sets subroutine prototype and apply to the subroutine reference.
 
-=head2 attribute
+=head3 attribute
 
 A attribute of subroutine reference, e.g. C<undef>, C<['method']>
 
-=head2 set_attribute($attribute)
+=head3 set_attribute($attribute)
 
 Setter for C<attribute>.
 
-=head2 apply_attribute(@attribute)
+=head3 apply_attribute(@attribute)
 
 Sets subroutine attributes and apply to the subroutine reference.
 
-=head2 is_method
+=head3 is_method
 
 A boolean value indicating whether the subroutine is a method or not.
 
-=head2 set_is_method($bool)
+=head3 set_is_method($bool)
 
 Setter for C<is_method>.
 
-=head2 parameters
+=head3 parameters
 
 Parameters object of L<Sub::Meta::Parameters>.
 
-=head2 set_parameters($parameters)
+=head3 set_parameters($parameters)
 
 Sets the parameters object of L<Sub::Meta::Parameters>.
 
@@ -491,35 +497,35 @@ Sets the parameters object of L<Sub::Meta::Parameters>.
     # alias
     $meta->set_args(['Str']);
 
-=head2 args
+=head3 args
 
 The alias of C<parameters.args>.
 
-=head2 set_args($args)
+=head3 set_args($args)
 
 The alias of C<parameters.set_args>.
 
-=head2 nshift
+=head3 nshift
 
 The alias of C<parameters.nshift>.
 
-=head2 set_nshift($nshift)
+=head3 set_nshift($nshift)
 
 The alias of C<parameters.set_nshift>.
 
-=head2 slurpy
+=head3 slurpy
 
 The alias of C<parameters.slurpy>.
 
-=head2 set_slurpy($slurpy)
+=head3 set_slurpy($slurpy)
 
 The alias of C<parameters.set_slurpy>.
 
-=head2 returns
+=head3 returns
 
 Returns object of L<Sub::Meta::Returns>.
 
-=head2 set_returns($returns)
+=head3 set_returns($returns)
 
 Sets the returns object of L<Sub::Meta::Returns> or any object.
 
@@ -531,12 +537,14 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
     $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
     $meta->set_returns(MyReturns->new)
 
-=head2 is_same_interface($other_meta)
+=head2 OTHERS
+
+=head3 is_same_interface($other_meta)
 
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> are equal.
 
-=head2 is_same_interface_inlined($other_meta_inlined)
+=head3 is_same_interface_inlined($other_meta_inlined)
 
 Returns inlined C<is_same_interface> string:
 
@@ -553,12 +561,12 @@ Returns inlined C<is_same_interface> string:
     $check->(Sub::Meta->new(subname => 'hello')); # => OK
     $check->(Sub::Meta->new(subname => 'world')); # => NG
 
-=head2 parameters_class
+=head3 parameters_class
 
 Returns class name of parameters. default: Sub::Meta::Parameters
 Please override for customization.
 
-=head2 returns_class
+=head3 returns_class
 
 Returns class name of returns. default: Sub::Meta::Returns
 Please override for customization.
