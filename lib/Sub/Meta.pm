@@ -35,6 +35,7 @@ sub new {
 
     my $self = bless \%args => $class;
 
+    $self->set_sub(delete $args{sub})             if exists $args{sub}; # build subinfo
     $self->set_subname(delete $args{subname})     if exists $args{subname};
     $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
@@ -60,9 +61,10 @@ sub new {
 }
 
 sub sub()         { $_[0]{sub} }
-sub subname()     { $_[0]->subinfo->[1] || '' }
-sub stashname()   { $_[0]->subinfo->[0] || '' }
-sub fullname()    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname, $_[0]->subname) : '' }
+sub subname()     { $_[0]->subinfo->[1] }
+sub stashname()   { $_[0]->subinfo->[0] }
+sub fullname()    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname || '', $_[0]->subname || '') : undef }
+
 sub subinfo()     {
     return $_[0]{subinfo} if $_[0]{subinfo};
     $_[0]{subinfo} = $_[0]->_build_subinfo
@@ -201,8 +203,8 @@ sub is_same_interface {
 
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
-    return unless $self->subname ? $self->subname eq $other->subname
-                                 : !$other->subname;
+    return unless defined $self->subname ? defined $other->subname && $self->subname eq $other->subname
+                                         : !defined $other->subname;
 
     return unless $self->is_method ? $other->is_method
                                    : !$other->is_method;
@@ -223,8 +225,8 @@ sub is_same_interface_inlined {
 
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta')", $v, $v);
 
-    push @src => $self->subname ? sprintf('"%s" eq %s->subname', $self->subname, $v)
-                                : sprintf('!%s->subname', $v);
+    push @src => defined $self->subname ? sprintf("defined %s->subname && '%s' eq %s->subname", $v, "@{[$self->subname]}", $v)
+                                        : sprintf('!defined %s->subname', $v);
 
     push @src => $self->is_method ? sprintf('%s->is_method', $v)
                                   : sprintf('!%s->is_method', $v);

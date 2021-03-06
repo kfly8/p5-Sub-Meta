@@ -18,6 +18,7 @@ my @TEST = (
     undef, 'invalid other',
     $obj, 'invalid obj',
     { subname => 'bar' }, 'invalid subname',
+    { subname => undef }, 'undef subname',
     { subname => 'foo', parameters => $p1 }, 'invalid parameters',
     { subname => 'foo', returns => $r1 }, 'invalid returns',
     ],
