@@ -534,7 +534,24 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
 =head2 is_same_interface($other_meta)
 
 A boolean value indicating whether the subroutine's interface is same or not.
-Specifically, check whether C<subname>, C<parameters> and C<returns> are equal.
+Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> are equal.
+
+=head2 is_same_interface_inlined($other_meta_inlined)
+
+Returns inlined C<is_same_interface> string:
+
+    use Sub::Meta;
+    my $meta = Sub::Meta->new(subname => 'hello');
+    my $inline = $meta->is_same_interface_inlined('$_[0]');
+    # $inline looks like this:
+    #    Scalar::Util::blessed($_[0]) && $_[0]->isa('Sub::Meta')
+    #    && defined $_[0]->subname && 'hello' eq $_[0]->subname
+    #    && !$_[0]->is_method
+    #    && !$_[0]->parameters
+    #    && !$_[0]->returns
+    my $check = eval "sub { $inline }";
+    $check->(Sub::Meta->new(subname => 'hello')); # => OK
+    $check->(Sub::Meta->new(subname => 'world')); # => NG
 
 =head2 parameters_class
 

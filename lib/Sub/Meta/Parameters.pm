@@ -354,6 +354,10 @@ This is computed as follows:
 A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
 Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
 
+=head2 is_same_interface_inlined($other_meta_inlined)
+
+Returns inlined C<is_same_interface> string.
+
 =head2 param_class
 
 Returns class name of param. default: Sub::Meta::Param

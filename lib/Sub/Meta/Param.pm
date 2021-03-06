@@ -218,6 +218,10 @@ Setter for C<positional>.
 A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
 Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal.
 
+=head2 is_same_interface_inlined($other_meta_inlined)
+
+Returns inlined C<is_same_interface> string.
+
 =head1 SEE ALSO
 
 L<Sub::Meta::Parameters>

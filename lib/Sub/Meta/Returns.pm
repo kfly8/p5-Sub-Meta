@@ -170,6 +170,10 @@ Setter for C<coerce>.
 A boolean value indicating whether C<Sub::Meta::Returns> object is same or not.
 Specifically, check whether C<scalar>, C<list> and C<void> are equal.
 
+=head2 is_same_interface_inlined($other_meta_inlined)
+
+Returns inlined C<is_same_interface> string.
+
 =head1 LICENSE
 
 Copyright (C) kfly8.
