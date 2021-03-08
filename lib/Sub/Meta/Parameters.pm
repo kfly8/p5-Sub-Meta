@@ -15,7 +15,7 @@ use overload
     eq => \&is_same_interface
     ;
 
-sub _croak { require Carp; Carp::croak(@_) }
+sub _croak { require Carp; goto &Carp::croak }
 
 sub param_class { 'Sub::Meta::Param' }
 

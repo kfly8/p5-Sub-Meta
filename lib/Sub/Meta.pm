@@ -27,7 +27,7 @@ use overload
 sub parameters_class { 'Sub::Meta::Parameters' }
 sub returns_class    { 'Sub::Meta::Returns' }
 
-sub _croak { require Carp; Carp::croak(@_) }
+sub _croak { require Carp; goto &Carp::croak }
 
 sub new {
     my $class = shift;
