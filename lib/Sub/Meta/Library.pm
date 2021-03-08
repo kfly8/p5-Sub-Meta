@@ -7,7 +7,6 @@ our $VERSION = "0.06";
 
 use Scalar::Util ();
 use Sub::Meta;
-use Sub::Identify ();
 
 my %INFO;
 
