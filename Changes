@@ -2,6 +2,10 @@ Revision history for Perl extension Sub-Meta
 
 {{$NEXT}}
 
+0.07 2021-03-08T00:50:45Z
+    [IMPROVEMENTS]
+    - feat: Sub::Meta::Library #16
+
 0.06 2021-03-06T02:14:13Z
     [BUG FIXES]
     - is_same_interface supports is_method option #14
