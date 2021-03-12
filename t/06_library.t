@@ -37,4 +37,12 @@ subtest 'get' => sub {
     is( Sub::Meta::Library->get(sub { }), undef );
 };
 
+subtest 'remove' => sub {
+    like dies { Sub::Meta::Library->remove('hello') }, qr/^required coderef/;
+    like dies { Sub::Meta::Library->remove({}) }, qr/^required coderef/;
+    is( Sub::Meta::Library->get(\&hello), Sub::Meta->new(sub => \&hello) );
+    is( Sub::Meta::Library->remove(\&hello), Sub::Meta->new(sub => \&hello) );
+    is( Sub::Meta::Library->get(\&hello), undef );
+};
+
 done_testing;
