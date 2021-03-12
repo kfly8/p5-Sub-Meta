@@ -12,7 +12,7 @@ use overload
     eq       =>  \&is_same_interface,
 ;
 
-my %DEFAULT = ( named => 0, optional => 0 );
+my %DEFAULT = ( named => 0, optional => 0, invocant => 0 );
 
 sub new {
     my $class = shift;
@@ -37,6 +37,7 @@ sub optional()   { !!$_[0]{optional} }
 sub required()   { !$_[0]{optional} }
 sub named()      { !!$_[0]{named} }
 sub positional() { !$_[0]{named} }
+sub invocant()   { !!$_[0]{invocant} }
 
 sub set_name($)      { $_[0]{name}     = $_[1];   $_[0] }
 sub set_type($)      { $_[0]{type}     = $_[1];   $_[0] }
