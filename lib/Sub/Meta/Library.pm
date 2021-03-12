@@ -54,6 +54,18 @@ sub get {
     return $INFO{$id}
 }
 
+sub remove {
+    my $class = shift;
+    my ($sub) = @_;
+
+    unless (ref $sub && ref $sub eq 'CODE') {
+        _croak "required coderef: $sub";
+    }
+
+    my $id = Scalar::Util::refaddr $sub;
+    return delete $INFO{$id}
+}
+
 1;
 __END__
 
@@ -88,6 +100,10 @@ Register a list of coderef and submeta.
 =head3 get(\&sub)
 
 Get submeta of C<\&sub>.
+
+=head3 remove(\&sub)
+
+Remove submeta of C<\&sub> from the library.
 
 =head1 LICENSE
 
