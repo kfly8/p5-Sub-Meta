@@ -240,6 +240,10 @@ Setter for `attribute`.
 
 Sets subroutine attributes and apply to the subroutine reference.
 
+### apply\_meta($other\_meta)
+
+Apply subroutine subname, prototype and attributes of `$other_meta`.
+
 ### is\_method
 
 A boolean value indicating whether the subroutine is a method or not.

@@ -47,6 +47,7 @@ sub set_optional($;)   { $_[0]{optional} = !!(defined $_[1] ? $_[1] : 1); $_[0] 
 sub set_required($;)   { $_[0]{optional} =  !(defined $_[1] ? $_[1] : 1); $_[0] }
 sub set_named($;)      { $_[0]{named}    = !!(defined $_[1] ? $_[1] : 1); $_[0] }
 sub set_positional($;) { $_[0]{named}    =  !(defined $_[1] ? $_[1] : 1); $_[0] }
+sub set_invocant($;)   { $_[0]{invocant} = !!(defined $_[1] ? $_[1] : 1); $_[0] }
 
 # alias
 sub isa_() :method; # NOT isa
@@ -215,6 +216,14 @@ This boolean is the opposite of C<positional>.
 =head3 set_positional($bool=true)
 
 Setter for C<positional>.
+
+=head3 invocant
+
+A boolean value indicating whether to be invocant. Default to false.
+
+=head3 set_invocant($bool=true)
+
+Setter for C<invocant>.
 
 =head2 OTHERS
 
