@@ -79,8 +79,11 @@ sub is_method()   { !!$_[0]{is_method} }
 sub parameters()  { $_[0]{parameters} }
 sub returns()     { $_[0]{returns} }
 sub args()        { $_[0]->parameters->args }
+sub all_args()    { $_[0]->parameters->all_args }
 sub slurpy()      { $_[0]->parameters->slurpy }
 sub nshift()      { $_[0]->parameters->nshift }
+sub invocant()    { $_[0]->parameters->invocant }
+sub invocants()   { $_[0]->parameters->invocants }
 
 sub set_sub($)    {
     $_[0]{sub} = $_[1];
@@ -150,6 +153,12 @@ sub set_nshift {
     }
     $self->parameters->set_nshift(@_);
     return $self;
+}
+
+sub set_invocant {
+    my $self = shift;
+    $self->parameters->set_invocant(@_);
+    $self;
 }
 
 sub set_returns {
@@ -519,6 +528,10 @@ The alias of C<parameters.args>.
 
 The alias of C<parameters.set_args>.
 
+=head3 all_args
+
+The alias of C<parameters.all_args>.
+
 =head3 nshift
 
 The alias of C<parameters.nshift>.
@@ -526,6 +539,18 @@ The alias of C<parameters.nshift>.
 =head3 set_nshift($nshift)
 
 The alias of C<parameters.set_nshift>.
+
+=head3 invocant
+
+The alias of C<parameters.invocant>.
+
+=head3 invocants
+
+The alias of C<parameters.invocants>.
+
+=head3 set_invocant($invocant)
+
+The alias of C<parameters.set_invocant>.
 
 =head3 slurpy
 
