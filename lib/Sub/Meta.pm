@@ -198,6 +198,16 @@ sub apply_attribute(@) {
     return $self;
 }
 
+sub apply_meta {
+    my ($self, $other) = @_;
+
+    $self->apply_subname($other->subname);
+    $self->apply_prototype($other->prototype);
+    $self->apply_attribute(@{$other->attribute});
+
+    return $self;
+}
+
 sub is_same_interface {
     my ($self, $other) = @_;
 
@@ -470,6 +480,10 @@ Setter for C<attribute>.
 =head3 apply_attribute(@attribute)
 
 Sets subroutine attributes and apply to the subroutine reference.
+
+=head3 apply_meta($other_meta)
+
+Apply subroutine subname, prototype and attributes of C<$other_meta>.
 
 =head3 is_method
 
