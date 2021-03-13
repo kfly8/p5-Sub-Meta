@@ -280,6 +280,10 @@ The alias of `parameters.args`.
 
 The alias of `parameters.set_args`.
 
+### all\_args
+
+The alias of `parameters.all_args`.
+
 ### nshift
 
 The alias of `parameters.nshift`.
@@ -287,6 +291,18 @@ The alias of `parameters.nshift`.
 ### set\_nshift($nshift)
 
 The alias of `parameters.set_nshift`.
+
+### invocant
+
+The alias of `parameters.invocant`.
+
+### invocants
+
+The alias of `parameters.invocants`.
+
+### set\_invocant($invocant)
+
+The alias of `parameters.set_invocant`.
 
 ### slurpy
 

@@ -272,4 +272,20 @@ subtest 'set_nshift' => sub {
     qr/nshift of method cannot be zero/, 'invalid nshift';
 };
 
+subtest 'invocant/invocants/set_invocant' => sub {
+    my $invocant = Sub::Meta::Param->new(name => '$self');
+    my $p1 = Sub::Meta::Param->new(type => 'Str');
+
+    my $meta = Sub::Meta->new(args => [$p1]);
+    is $meta->all_args, [ $p1 ];
+    is $meta->invocant, undef;
+
+    is $meta->set_invocant($invocant), $meta;
+    is $meta->invocant, $invocant;
+    is $meta->invocants, [ $invocant ];
+
+    is $meta->all_args, [ $invocant, $p1 ];
+    is $meta->args, [$p1];
+};
+
 done_testing;
