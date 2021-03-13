@@ -118,22 +118,13 @@ sub _normalize_args {
         @args = ($_[0]);
     }
 
-    my @blessed_args = map {
-        Scalar::Util::blessed($_) && $_->isa('Sub::Meta::Param')
-        ? $_
-        : $self->param_class->new($_)
-    } @args;
-
-
-    if ($self->nshift == 1 && !$blessed_args[0]->invocant) {
-        unshift @blessed_args => $self->param_class->new(
-            type     => undef,
-            name     => '$self',
-            invocant => 1,
-        );
-    }
-
-    return \@blessed_args;
+    return [
+        map {
+            Scalar::Util::blessed($_) && $_->isa('Sub::Meta::Param')
+            ? $_
+            : $self->param_class->new($_)
+        } @args
+    ]
 }
 
 sub _all_positional_required() {
