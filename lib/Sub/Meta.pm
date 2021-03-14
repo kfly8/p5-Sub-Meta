@@ -382,6 +382,29 @@ Others are as follows:
         returns   => Str,
     );
 
+Another way to create a Sub::Meta is to use L<Sub::Meta::Creator>:
+
+    use Sub::Meta::Creator;
+    use Sub::Meta::Finder::FunctionParameters;
+
+    my $creator = Sub::Meta::Creator->new(
+        finders => [ \&Sub::Meta::Finder::FunctionParameters::find_materials ],
+    );
+
+    use Function::Parameters;
+    use Types::Standard -types;
+
+    method hello(Str $msg) { }
+    my $meta = $creator->create(\&hello);
+    # =>
+    # Sub::Meta
+    #   args [
+    #       [0] Sub::Meta::Param->new(name => '$msg', type => Str)
+    #   ],
+    #   invocant   Sub::Meta::Param->(name => '$self', invocant => 1),
+    #   nshift     1,
+    #   slurpy     !!0
+
 =head2 ACCESSORS
 
 =head3 sub
