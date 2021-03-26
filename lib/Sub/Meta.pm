@@ -330,6 +330,7 @@ Sub::Meta - handle subroutine meta information
     $meta->is_method   # undef
     $meta->parameters  # undef
     $meta->returns     # undef
+    $meta->display     # 'sub hello'
 
     # setter
     $meta->set_subname('world');
@@ -640,7 +641,7 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
     $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
     $meta->set_returns(MyReturns->new)
 
-=head2 OTHERS
+=head2 METHODS
 
 =head3 is_same_interface($other_meta)
 
@@ -663,6 +664,22 @@ Returns inlined C<is_same_interface> string:
     my $check = eval "sub { $inline }";
     $check->(Sub::Meta->new(subname => 'hello')); # => OK
     $check->(Sub::Meta->new(subname => 'world')); # => NG
+
+=head3 display
+
+Returns the display of Sub::Meta:
+
+    use Sub::Meta;
+    use Types::Standard qw(Str);
+    my $meta = Sub::Meta->new(
+        subname => 'hello',
+        is_method => 1,
+        args => [Str],
+        returns => Str,
+    );
+    $meta->display;  # 'method hello(Str) => Str'
+
+=head2 OTHERS
 
 =head3 parameters_class
 

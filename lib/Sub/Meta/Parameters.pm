@@ -388,16 +388,32 @@ This is computed as follows:
   If there are any named or slurpy parameters, the result is Inf.
   Otherwise the result is the number of all invocants and positional parameters.
 
+=head2 METHODS
+
 =head3 is_same_interface($other_meta)
 
 A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
 Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
 
-=head2 OTHERS
-
 =head3 is_same_interface_inlined($other_meta_inlined)
 
 Returns inlined C<is_same_interface> string.
+
+=head3 display
+
+Returns the display of Sub::Meta::Parameters:
+
+    use Sub::Meta::Parameters;
+    use Types::Standard qw(Num);
+    my $meta = Sub::Meta::Parameters->new(
+        args => [
+            { name => '$lat', type => Num, named => 1 },
+            { name => '$lng', type => Num, named => 1 },
+        ],
+    );
+    $meta->display; # 'Num :$lat, Num :$lng'
+
+=head2 OTHERS
 
 =head3 param_class
 
