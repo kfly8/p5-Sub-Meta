@@ -41,17 +41,46 @@ sub new {
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
 
     if (exists $args{parameters}) {
+        my $is_method = $args{is_method}
+                     || $args{parameters}{nshift}
+                     || $args{parameters}{invocant};
+
+        my $exists_is_method = exists $args{is_method}
+                            || exists $args{parameters}{nshift}
+                            || exists $args{parameters}{invocant};
+
+        $self->set_is_method($is_method) if $exists_is_method;
         $self->set_parameters($args{parameters})
     }
     elsif(exists $args{args}) {
-        $self->set_parameters(
-            args => delete $args{args},
-            ( exists $args{slurpy} ? (slurpy => delete $args{slurpy}) : () ),
+        my $is_method = $args{is_method}
+                     || $args{nshift}
+                     || $args{invocant};
 
-            ( exists $args{nshift}    ? (nshift => delete $args{nshift}) :
-              exists $args{is_method} ? (nshift => $args{is_method} ? 1 : 0) : () ),
+        my $exists_is_method = exists $args{is_method}
+                            || exists $args{nshift}
+                            || exists $args{invocant};
+
+        $self->set_is_method($is_method) if $exists_is_method;
+
+        my $nshift = exists $args{nshift} ? $args{nshift}
+                   : $is_method           ? 1
+                   : $exists_is_method    ? 0
+                   : undef;
+
+        $self->set_parameters(
+            args => $args{args},
+            exists $args{slurpy}   ? (slurpy   => $args{slurpy})   : (),
+            exists $args{invocant} ? (invocant => $args{invocant}) : (),
+            defined $nshift        ? (nshift   => $nshift)         : (),
         );
     }
+
+    # cleaning
+    delete $args{args};
+    delete $args{slurpy};
+    delete $args{invocant};
+    delete $args{nshift};
 
     if (exists $args{returns}) {
         $self->set_returns($args{returns})
