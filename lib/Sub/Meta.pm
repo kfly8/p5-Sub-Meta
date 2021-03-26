@@ -709,7 +709,7 @@ If that fails, or if the environment variable C<PERL_SUB_META_PP> is defined to 
 
 =head1 SEE ALSO
 
-L<Sub::Identify>, L<Sub::Util>, L<Sub::Info>, L<Function::Paramters::Info>, L<Function::Return::Info>
+L<Sub::Identify>, L<Sub::Util>, L<Sub::Info>, L<Function::Parameters::Info>, L<Function::Return::Info>
 
 =head1 LICENSE
 
