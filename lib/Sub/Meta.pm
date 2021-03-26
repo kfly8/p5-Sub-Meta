@@ -288,6 +288,18 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
+sub display {
+    my $self = shift;
+
+    my $keyword = $self->is_method ? 'method' : 'sub';
+    my $subname = $self->subname // '';
+
+    my $s = $keyword;
+    $s .= ' ' . $subname if $subname;
+    $s .= '('. $self->parameters->display .')' if $self->parameters;
+    $s .= ' => ' . $self->returns->display if $self->returns;
+    return $s;
+}
 
 1;
 __END__

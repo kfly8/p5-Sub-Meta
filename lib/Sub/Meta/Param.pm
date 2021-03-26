@@ -93,6 +93,17 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
+sub display {
+    my $self = shift;
+
+    my $s = '';
+    $s .= $self->type if $self->type;
+    $s .= ' ' if $s && $self->name;
+    $s .= ':' if $self->named;
+    $s .= $self->name if $self->name;
+    return $s;
+}
+
 
 1;
 __END__

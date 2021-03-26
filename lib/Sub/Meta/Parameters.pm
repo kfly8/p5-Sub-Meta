@@ -198,6 +198,19 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
+sub display {
+    my $self = shift;
+
+    my $s = '';
+    $s .= $self->invocant->display . ': '
+        if $self->invocant && $self->invocant->display;
+
+    $s .= join ', ', map { $_->display } @{$self->args};
+    $s .= ', ' if $s && $self->slurpy;
+    $s .= $self->slurpy->display if $self->slurpy;
+    return $s;
+}
+
 1;
 __END__
 

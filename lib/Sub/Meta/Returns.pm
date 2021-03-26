@@ -102,6 +102,18 @@ sub _eq_inlined {
     return join "\n && ", @src;
 }
 
+sub display {
+    my $self = shift;
+
+    if (_eq($self->scalar, $self->list) && _eq($self->list, $self->void)) {
+        return $self->scalar . '';
+    }
+    else {
+        my @r = map { $self->$_ ? "$_ => @{[$self->$_]}" : () } qw(scalar list void);
+        return "(@{[join ', ', @r]})";
+    }
+}
+
 1;
 __END__
 
