@@ -8,7 +8,7 @@ Sub::Meta - handle subroutine meta information
 ```perl
 use Sub::Meta;
 
-sub hello($) :mehtod { }
+sub hello($) :method { }
 my $meta = Sub::Meta->new(sub => \&hello);
 $meta->subname; # => hello
 
