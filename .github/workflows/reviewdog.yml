@@ -13,6 +13,6 @@ jobs:
           reporter: github-pr-review
           locale: "US"
       - name: perlcritic
-        uses: gugod/action-perlcritic@v1
+        uses: gugod/action-perlcritic@fun
         with:
           reporter: github-pr-review
