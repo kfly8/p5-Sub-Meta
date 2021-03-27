@@ -1,5 +1,5 @@
 name: reviewdog
-on: [pull_request]
+on: [push, pull_request]
 jobs:
   misspell:
     name: runner / misspell
@@ -11,4 +11,5 @@ jobs:
         uses: reviewdog/action-misspell@v1
         with:
           github_token: ${{ secrets.github_token }}
+          reporter: github-check
           locale: "US"
