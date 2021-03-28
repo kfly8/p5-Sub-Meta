@@ -1,7 +1,7 @@
 name: reviewdog
 on: [push, pull_request]
 jobs:
-  reviewdog:
+  misspell:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -12,6 +12,11 @@ jobs:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
           locale: "US"
+  perlcritic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
       - name: Run perlcritic
         uses: gugod/action-perlcritic@fun
         with:
