@@ -1,0 +1,41 @@
+name: review
+
+on: [push, pull_request]
+jobs:
+  review: 
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Perl
+      uses: shogo82148/actions-setup-perl@v1
+      with:
+        perl-version: '5.32'
+
+    - name: Install dependencies
+      run: |
+        cpm install -g
+
+    - name: Run coverage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cpm install -g Devel::Cover::Report::Coveralls
+        cover -test -report coveralls
+
+    - name: Run misspell
+      uses: reviewdog/action-misspell@v1
+      with:
+        github_token: ${{ secrets.github_token }}
+        reporter: github-pr-review
+        locale: "US"
+        level: "error"
+
+    - name: Run perlcritic
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cpm install -g Perl::Critic
+        perlcritic --profile .perlcriticrc --verbose '%f:%l:%c:**%m**, near <code>%r</code>.<br>(Ref: [%p](https://metacpan.org/pod/Perl::Critic::Policy::%p))\n' lib t | reviewdog -efm=%f:%l:%c:%m -name=perlcritic -reporter=github-pr-review
+
