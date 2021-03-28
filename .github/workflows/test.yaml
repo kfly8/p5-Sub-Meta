@@ -55,13 +55,9 @@ jobs:
         cpm install -g Devel::Cover::Report::Coveralls
         cover -test -report coveralls
 
-    - name: Run misspell
-      uses: reviewdog/action-misspell@v1
-      with:
-        github_token: ${{ secrets.github_token }}
-        reporter: github-pr-review
-        locale: "US"
-        level: "error"
+    - name: Setup Reviewdog
+      if: ${{ matrix.latest }}
+      uses: reviewdog/action-setup@v1
 
     - name: Run perlcritic
       if: ${{ matrix.latest }}
@@ -70,4 +66,12 @@ jobs:
       run: |
         cpm install -g Perl::Critic
         perlcritic --profile .perlcriticrc --verbose '%f:%l:%c:**%m**, near <code>%r</code>.<br>(Ref: [%p](https://metacpan.org/pod/Perl::Critic::Policy::%p))\n' lib t | reviewdog -efm=%f:%l:%c:%m -name=perlcritic -reporter=github-pr-review
+
+    - name: Run misspell
+      uses: reviewdog/action-misspell@v1
+      with:
+        github_token: ${{ secrets.github_token }}
+        reporter: github-pr-review
+        locale: "US"
+        level: "error"
 
