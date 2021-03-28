@@ -24,8 +24,7 @@ use overload
     eq => \&is_same_interface
     ;
 
-sub a { return undef }
-sub graet { return undef }
+sub b { return undef }
 
 sub parameters_class { 'Sub::Meta::Parameters' }
 sub returns_class    { 'Sub::Meta::Returns' }
