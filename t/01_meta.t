@@ -21,7 +21,7 @@ subtest 'non sub' => sub {
 
 subtest 'has sub' => sub {
 
-    sub hello($$) :method { }
+    sub hello($$) :method { } ## no critic
 
     subtest 'getter' => sub {
         my $meta = Sub::Meta->new(sub => \&hello);

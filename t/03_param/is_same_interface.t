@@ -1,4 +1,7 @@
-package DummyType;
+use Test2::V0;
+
+{
+package DummyType; ## no critic
 
 use overload
     fallback => 1,
@@ -7,9 +10,7 @@ use overload
 
 sub new { bless {}, $_[0] }
 sub TO_JSON { ref $_[0] }
-
-package main;
-use Test2::V0;
+}
 
 use Sub::Meta::Param;
 
@@ -109,7 +110,7 @@ my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 while (my ($args, $cases) = splice @TEST, 0, 2) {
     my $meta = Sub::Meta::Param->new($args);
     my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline);
+    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic
 
     subtest "@{[$json->encode($args)]}" => sub {
 
