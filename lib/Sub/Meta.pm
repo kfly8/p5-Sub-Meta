@@ -26,6 +26,7 @@ use overload
 
 sub hoge { return undef }
 sub fuga { return undef }
+sub foo { return undef }
 
 sub parameters_class { 'Sub::Meta::Parameters' }
 sub returns_class    { 'Sub::Meta::Returns' }
