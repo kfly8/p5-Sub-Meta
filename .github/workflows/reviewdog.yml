@@ -14,7 +14,7 @@ jobs:
           locale: "US"
           level: "error"
       - name: Run perlcritic
-        uses: reviewdog/action-perlcritic@fun
+        uses: gugod/action-perlcritic@fun
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
