@@ -24,10 +24,8 @@ use overload
     eq => \&is_same_interface
     ;
 
-sub hoge { return undef }
-sub fuga { return undef }
-sub foo { return undef }
-sub boo { return undef }
+sub a { return undef }
+sub graet { return undef }
 
 sub parameters_class { 'Sub::Meta::Parameters' }
 sub returns_class    { 'Sub::Meta::Returns' }
