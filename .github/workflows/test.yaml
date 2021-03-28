@@ -27,7 +27,7 @@ jobs:
           ]
         include:
           - perl: 5.32
-            latest: true
+            coverage: true
     name: Perl ${{ matrix.perl }}
     steps:
     - name: Checkout
@@ -52,31 +52,45 @@ jobs:
         ./Build test
 
     - name: Run coverage
-      if: ${{ matrix.latest }}
+      if: ${{ matrix.coverage }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cpm install -g Devel::Cover::Report::Coveralls
         cover -test -report coveralls
 
-    - name: Setup Reviewdog
-      if: ${{ matrix.latest }}
-      uses: reviewdog/action-setup@v1
-
-    - name: Run perlcritic
-      if: ${{ matrix.latest }}
-      env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        cpm install -g Perl::Critic
-        perlcritic --profile .perlcriticrc --verbose '%f:%l:%c:**%m**, near <code>%r</code>.<br>(Ref: [%p](https://metacpan.org/pod/Perl::Critic::Policy::%p))\n' lib t | reviewdog -efm=%f:%l:%c:%m -name=perlcritic -reporter=github-pr-review -level=error
+  misspell:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Run misspell
-      if: ${{ matrix.latest }}
       uses: reviewdog/action-misspell@v1
       with:
         github_token: ${{ secrets.github_token }}
         reporter: github-pr-review
         locale: "US"
         level: "error"
+  
+  perlcritic:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Perl
+      uses: shogo82148/actions-setup-perl@v1
+      with:
+        perl-version: '5.32'
+
+    - name: Setup Reviewdog
+      uses: reviewdog/action-setup@v1
+
+    - name: Run perlcritic
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cpm install -g Perl::Critic
+        perlcritic --profile .perlcriticrc --verbose '%f:%l:%c:**%m**, near <code>%r</code>.<br>(Ref: [%p](https://metacpan.org/pod/Perl::Critic::Policy::%p))\n' lib t | reviewdog -efm=%f:%l:%c:%m -name=perlcritic -reporter=github-pr-review -level=error
 
