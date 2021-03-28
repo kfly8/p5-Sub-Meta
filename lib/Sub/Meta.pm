@@ -24,6 +24,8 @@ use overload
     eq => \&is_same_interface
     ;
 
+sub hoge { 'aaa' }
+
 sub parameters_class { 'Sub::Meta::Parameters' }
 sub returns_class    { 'Sub::Meta::Returns' }
 

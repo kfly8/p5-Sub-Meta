@@ -1,7 +1,7 @@
 name: reviewdog
 on: [push, pull_request]
 jobs:
-  misspell:
+  reviewdog:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -12,31 +12,9 @@ jobs:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
           locale: "US"
-
-  perlcritic:
-    env:
-      perl-version: '5.32'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Set up Perl
-        uses: shogo82148/actions-setup-perl@v1
+      - name: Run perlcritic
+        uses: gugod/action-perlcritic@fun
         with:
-          perl-version: ${{ env.perl-version }}
-
-      - name: Install dependencies
-        run: |
-          cpm install -g
-
-      - name: Set up Reviewdog
-        uses: reviewdog/action-setup@v1
-
-      - name: Run reviewdog
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cpm install -g Perl::Critic
-          perlcritic --profile .perlcriticrc --verbose '%f:%l:%c:**%m**, near <code>%r</code>.<br>(Ref: [%p](https://metacpan.org/pod/Perl::Critic::Policy::%p))\n' lib t | reviewdog -efm=%f:%l:%c:%m -name=perlcritic -reporter=github-pr-review
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
 
