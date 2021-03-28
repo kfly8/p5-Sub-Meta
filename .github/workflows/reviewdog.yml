@@ -36,4 +36,4 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cpm install -g Perl::Critic
-          perlcritic --profile .perlcriticrc --verbose '%f:%l:%c:**%m**, near <code>%r</code>.<br>(Ref: [%p](https://metacpan.org/pod/Perl::Critic::Policy::%p))\n' lib t | reviewdog -efm=%f:%l:%c:%m -name=perlcritic -reporter=github-pr-review
+          perlcritic --profile .perlcriticrc --verbose '%f:%l:%c:**%m**, near <code>%r</code>.<br>(Ref: [%p](https://metacpan.org/pod/Perl::Critic::Policy::%p))\n' lib t | reviewdog -efm=%f:%l:%c:%m -name=perlcritic -reporter=github-pr-review -level=warning
