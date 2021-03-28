@@ -120,7 +120,7 @@ my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 while (my ($args, $cases) = splice @TEST, 0, 2) {
     my $meta = Sub::Meta->new($args);
     my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline);
+    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic
 
     subtest "@{[$json->encode($args)]}" => sub {
 

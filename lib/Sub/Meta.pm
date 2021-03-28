@@ -89,32 +89,32 @@ sub new {
     return $self;
 }
 
-sub sub()         { $_[0]{sub} }
-sub subname()     { $_[0]->subinfo->[1] }
-sub stashname()   { $_[0]->subinfo->[0] }
-sub fullname()    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname || '', $_[0]->subname || '') : undef }
+sub sub         { $_[0]{sub} }
+sub subname     { $_[0]->subinfo->[1] }
+sub stashname   { $_[0]->subinfo->[0] }
+sub fullname    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname || '', $_[0]->subname || '') : undef }
 
-sub subinfo()     {
+sub subinfo     {
     return $_[0]{subinfo} if $_[0]{subinfo};
     $_[0]{subinfo} = $_[0]->_build_subinfo
 }
 
-sub file()        { $_[0]{file}        ||= $_[0]->_build_file }
-sub line()        { $_[0]{line}        ||= $_[0]->_build_line }
-sub is_constant() { $_[0]{is_constant} ||= $_[0]->_build_is_constant }
-sub prototype()   { $_[0]{prototype}   ||= $_[0]->_build_prototype }
-sub attribute()   { $_[0]{attribute}   ||= $_[0]->_build_attribute }
-sub is_method()   { !!$_[0]{is_method} }
-sub parameters()  { $_[0]{parameters} }
-sub returns()     { $_[0]{returns} }
-sub args()        { $_[0]->parameters->args }
-sub all_args()    { $_[0]->parameters->all_args }
-sub slurpy()      { $_[0]->parameters->slurpy }
-sub nshift()      { $_[0]->parameters->nshift }
-sub invocant()    { $_[0]->parameters->invocant }
-sub invocants()   { $_[0]->parameters->invocants }
+sub file        { $_[0]{file}        ||= $_[0]->_build_file }
+sub line        { $_[0]{line}        ||= $_[0]->_build_line }
+sub is_constant { $_[0]{is_constant} ||= $_[0]->_build_is_constant }
+sub prototype   { $_[0]{prototype}   ||= $_[0]->_build_prototype }
+sub attribute   { $_[0]{attribute}   ||= $_[0]->_build_attribute }
+sub is_method   { !!$_[0]{is_method} }
+sub parameters  { $_[0]{parameters} }
+sub returns     { $_[0]{returns} }
+sub args        { $_[0]->parameters->args }
+sub all_args    { $_[0]->parameters->all_args }
+sub slurpy      { $_[0]->parameters->slurpy }
+sub nshift      { $_[0]->parameters->nshift }
+sub invocant    { $_[0]->parameters->invocant }
+sub invocants   { $_[0]->parameters->invocants }
 
-sub set_sub($)    {
+sub set_sub {
     $_[0]{sub} = $_[1];
 
     # rebuild subinfo
@@ -123,23 +123,23 @@ sub set_sub($)    {
     $_[0];
 }
 
-sub set_subname($)     { $_[0]{subinfo}[1]  = $_[1]; $_[0] }
-sub set_stashname($)   { $_[0]{subinfo}[0]  = $_[1]; $_[0] }
-sub set_fullname($)    {
+sub set_subname   { $_[0]{subinfo}[1]  = $_[1]; $_[0] }
+sub set_stashname { $_[0]{subinfo}[0]  = $_[1]; $_[0] }
+sub set_fullname  {
     $_[0]{subinfo} = $_[1] =~ m!^(.+)::([^:]+)$! ? [$1, $2] : [];
     $_[0];
 }
-sub set_subinfo($)     {
+sub set_subinfo {
     $_[0]{subinfo} = @_ > 2 ? [ $_[1], $_[2] ] : $_[1];
     $_[0];
 }
 
-sub set_file($)        { $_[0]{file}        = $_[1]; $_[0] }
-sub set_line($)        { $_[0]{line}        = $_[1]; $_[0] }
-sub set_is_constant($) { $_[0]{is_constant} = $_[1]; $_[0] }
-sub set_prototype($)   { $_[0]{prototype}   = $_[1]; $_[0] }
-sub set_attribute($)   { $_[0]{attribute}   = $_[1]; $_[0] }
-sub set_is_method($)   { $_[0]{is_method}   = $_[1]; $_[0] }
+sub set_file        { $_[0]{file}        = $_[1]; $_[0] }
+sub set_line        { $_[0]{line}        = $_[1]; $_[0] }
+sub set_is_constant { $_[0]{is_constant} = $_[1]; $_[0] }
+sub set_prototype   { $_[0]{prototype}   = $_[1]; $_[0] }
+sub set_attribute   { $_[0]{attribute}   = $_[1]; $_[0] }
+sub set_is_method   { $_[0]{is_method}   = $_[1]; $_[0] }
 
 sub set_parameters {
     my $self = shift;
@@ -202,14 +202,14 @@ sub set_returns {
     return $self
 }
 
-sub _build_subinfo()     { $_[0]->sub ? [ Sub::Identify::get_code_info($_[0]->sub) ] : [] }
-sub _build_file()        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[0] : '' }
-sub _build_line()        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[1] : undef }
-sub _build_is_constant() { $_[0]->sub ? Sub::Identify::is_sub_constant($_[0]->sub) : undef }
-sub _build_prototype()   { $_[0]->sub ? Sub::Util::prototype($_[0]->sub) : '' }
-sub _build_attribute()   { $_[0]->sub ? [ attributes::get($_[0]->sub) ] : undef }
+sub _build_subinfo     { $_[0]->sub ? [ Sub::Identify::get_code_info($_[0]->sub) ] : [] }
+sub _build_file        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[0] : '' }
+sub _build_line        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[1] : undef }
+sub _build_is_constant { $_[0]->sub ? Sub::Identify::is_sub_constant($_[0]->sub) : undef }
+sub _build_prototype   { $_[0]->sub ? Sub::Util::prototype($_[0]->sub) : '' }
+sub _build_attribute   { $_[0]->sub ? [ attributes::get($_[0]->sub) ] : undef }
 
-sub apply_subname($) {
+sub apply_subname {
     my ($self, $subname) = @_;
     _croak 'apply_subname requires subroutine reference' unless $self->sub;
     $self->set_subname($subname);
@@ -217,7 +217,7 @@ sub apply_subname($) {
     return $self;
 }
 
-sub apply_prototype($) {
+sub apply_prototype {
     my ($self, $prototype) = @_;
     _croak 'apply_prototype requires subroutine reference' unless $self->sub;
     Sub::Util::set_prototype($prototype, $self->sub);
@@ -225,7 +225,7 @@ sub apply_prototype($) {
     return $self;
 }
 
-sub apply_attribute(@) {
+sub apply_attribute {
     my ($self, @attribute) = @_;
     _croak 'apply_attribute requires subroutine reference' unless $self->sub;
     {

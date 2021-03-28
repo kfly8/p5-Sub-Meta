@@ -1,1 +1,7 @@
 severity = 5
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Test2::V0
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Test2::V0
