@@ -4,7 +4,7 @@ use Sub::Meta::Parameters;
 
 my $p1 = Sub::Meta::Param->new("Str");
 my $p2 = Sub::Meta::Param->new("Int");
-sub param { Sub::Meta::Param->new(@_); }
+sub param { my @args = @_; return Sub::Meta::Param->new(@args); }
 
 my $obj = bless {} => 'Some';
 
@@ -114,7 +114,7 @@ my @TEST = (
 use JSON::PP;
 my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 {
-    no warnings qw/once/;
+    no warnings qw/once/; ## no critic
     *{Sub::Meta::Param::TO_JSON} = sub {
         my $s = $_[0]->type;
         $s .= ':named' if $_[0]->named;

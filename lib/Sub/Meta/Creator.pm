@@ -10,8 +10,8 @@ use Sub::Meta;
 sub _croak { require Carp; goto &Carp::croak }
 
 sub new {
-    my $class = shift;
-    my %args = @_ == 1 ? %{$_[0]} : @_;
+    my ($class, @args) = @_;
+    my %args = @args == 1 ? %{$args[0]} : @args;
 
     unless (exists $args{finders}) {
         _croak 'required finders';
@@ -28,9 +28,9 @@ sub new {
     return bless \%args => $class;
 }
 
-sub sub_meta_class { 'Sub::Meta' }
+sub sub_meta_class { return 'Sub::Meta' }
 
-sub finders { $_[0]{finders} }
+sub finders { my $self = shift; return $self->{finders} }
 
 sub find_materials {
     my ($self, $sub) = @_;

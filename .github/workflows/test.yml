@@ -42,6 +42,7 @@ jobs:
     - name: Install dependencies
       run: |
         cpm install -g
+        cpm install -g Module::Build::Tiny
 
     - name: Build
       run: |

@@ -240,7 +240,7 @@ my @TEST = (
 use JSON::PP;
 my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 {
-    no warnings qw/once/;
+    no warnings qw/once/; ## no critic
     *{Sub::Meta::Param::TO_JSON} = sub {
         my $s = $_[0]->type;
         $s .= ':named' if $_[0]->named;
@@ -249,7 +249,7 @@ my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
     }
 }
 
-sub p { Sub::Meta::Param->new(@_); }
+sub p { my @args = @_; return Sub::Meta::Param->new(@args); }
 
 while (my ($parameters, $expect) = splice @TEST, 0, 2) {
     my $meta = Sub::Meta::Parameters->new($parameters);

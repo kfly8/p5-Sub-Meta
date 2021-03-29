@@ -8,8 +8,8 @@ use overload
     '""' => sub { 'DummyType' }
     ;
 
-sub new { bless {}, $_[0] }
-sub TO_JSON { ref $_[0] }
+sub new { my $class = shift; return bless {}, $class }
+sub TO_JSON { my $self = shift; return ref $self }
 }
 
 use Sub::Meta::Param;
