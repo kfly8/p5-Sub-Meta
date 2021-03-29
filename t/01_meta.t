@@ -94,7 +94,7 @@ subtest 'has sub' => sub {
     };
 
     subtest 'apply' => sub {
-        sub hello3 { "HELLO!!" }
+        sub hello3 { return "HELLO!!" }
 
         my $meta = Sub::Meta->new(sub => \&hello3);
         is $meta->apply_subname('HELLO'), $meta, 'apply_subname';
@@ -191,7 +191,7 @@ subtest 'constant' => sub {
     }
 
     {
-        sub one() { 1 }
+        sub one() { return 1 }
         my $m = Sub::Meta->new(sub => \&one);
         is $m->is_constant, 1;
     }

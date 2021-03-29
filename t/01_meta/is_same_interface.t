@@ -107,7 +107,7 @@ my @TEST = (
 use JSON::PP;
 my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 {
-    no warnings qw/once/;
+    no warnings qw/once/; ## no critic
     *{Sub::Meta::Parameters::TO_JSON} = sub {
         join ",", map { $_->type } @{$_[0]->args};
     };

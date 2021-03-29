@@ -7,10 +7,10 @@ use Sub::Meta::Creator;
 use Sub::Meta::Finder::FunctionParameters;
 
 sub find_materials { goto &Sub::Meta::Finder::FunctionParameters::find_materials }
-sub param { Sub::Meta::Param->new(@_) }
+sub param { my @args = @_; return Sub::Meta::Param->new(@args) }
 
-sub Str() { bless {}, 'SomeStr' }
-sub Int() { bless {}, 'SomeInt' }
+sub Str() { return bless {}, 'SomeStr' }
+sub Int() { return bless {}, 'SomeInt' }
 
 sub not_function_parameters {};
 fun case_fun_positional(Str $a) {};

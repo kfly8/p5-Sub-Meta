@@ -1,7 +1,15 @@
-severity = 5
+severity = 4
+
+[-Subroutines::ProhibitExplicitReturnUndef]
+[-ValuesAndExpressions::ProhibitConstantPragma]
 
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = Test2::V0
 
 [TestingAndDebugging::RequireUseWarnings]
 equivalent_modules = Test2::V0
+
+[-Modules::RequireExplicitPackage]
+[-Modules::RequireEndWithOne]
+[-Variables::RequireLocalizedPunctuationVars]
+
