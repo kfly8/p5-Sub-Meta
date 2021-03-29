@@ -152,7 +152,7 @@ sub args_min() {
 
 sub args_max() {
     my $self = shift;
-    return 0 + 'Inf' if $self->slurpy || @{$self->named};
+    return 0 + 'Inf' if $self->slurpy || @{$self->named}; ## no critic (ProhibitMismatchedOperators)
     my $r = 0;
     $r += @{$self->_all_positional_required};
     $r += @{$self->positional_optional};

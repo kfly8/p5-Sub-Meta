@@ -4,7 +4,7 @@ use Sub::Meta;
 use Sub::Meta::Library;
 
 {
-    package Foo; ## no critic
+    package Foo; ## no critic (RequireFilenameMatchesPackage)
     sub foo { }
     sub bar { }
 }

@@ -21,7 +21,7 @@ subtest 'non sub' => sub {
 
 subtest 'has sub' => sub {
 
-    sub hello($$) :method { } ## no critic
+    sub hello($$) :method { } ## no critic (ProhibitSubroutinePrototypes)
 
     subtest 'getter' => sub {
         my $meta = Sub::Meta->new(sub => \&hello);
@@ -191,7 +191,7 @@ subtest 'constant' => sub {
     }
 
     {
-        sub one() { 1 } ## no critic
+        sub one() { 1 } ## no critic (RequireFinalReturn)
         my $m = Sub::Meta->new(sub => \&one);
         is $m->is_constant, 1;
     }
@@ -204,33 +204,36 @@ subtest 'constant' => sub {
 };
 
 subtest 'set_parameters/args/returns' => sub {
-    my $meta = Sub::Meta->new;
     my $obj = bless {}, 'Some::Object';
     my $parameters = Sub::Meta::Parameters->new(args => [{ type => $obj }]);
-
-    $meta->set_parameters(args => [$obj]);
-    is $meta->parameters, $parameters,
-        'if $obj is not Sub::Meta::Parameters, $obj will be treated as type';
-
-    $meta->set_args([$obj]);
-    is $meta->args, $parameters->args, 'set_args';
-
-    {
+    
+    subtest 'basic' => sub {
         my $meta = Sub::Meta->new;
-        is $meta->parameters, undef;
-        $meta->set_args([$obj]);
-        is $meta->args, $parameters->args, 'set_args when no parameters';
-    }
 
-    {
+        $meta->set_parameters(args => [$obj]);
+        is $meta->parameters, $parameters,
+            'if $obj is not Sub::Meta::Parameters, $obj will be treated as type';
+
+        $meta->set_args([$obj]);
+        is $meta->args, $parameters->args, 'set_args';
+
+        $meta->set_returns($obj);
+        is $meta->returns, Sub::Meta::Returns->new($obj),
+            'if $obj is not Sub::Meta::Returns, $obj will be treated as type';
+    };
+
+    subtest 'set_args when no parameters' => sub {
+        my $meta = Sub::Meta->new;
+        is $meta->parameters, undef; $meta->set_args([$obj]);
+        is $meta->args, $parameters->args, 'set_args when no parameters';
+    };
+
+    subtest 'invalid parameters' => sub {
         my $meta = Sub::Meta->new;
         like dies { $meta->set_parameters($obj) },
         qr/object must be Sub::Meta::Parameters/, 'invalid parameters';
     }
 
-    $meta->set_returns($obj);
-    is $meta->returns, Sub::Meta::Returns->new($obj),
-        'if $obj is not Sub::Meta::Returns, $obj will be treated as type';
 };
 
 subtest 'set invalid fullname' => sub {
