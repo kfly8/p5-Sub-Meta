@@ -234,7 +234,7 @@ sub apply_attribute {
     my ($self, @attribute) = @_;
     _croak 'apply_attribute requires subroutine reference' unless $self->sub;
     {
-        no warnings qw(misc); ## no critic
+        no warnings qw(misc); ## no critic (ProhibitNoWarnings)
         attributes->import($self->stashname, $self->sub, @attribute);
     }
     $self->set_attribute($self->_build_attribute);

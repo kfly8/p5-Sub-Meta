@@ -1,7 +1,7 @@
 use Test2::V0;
 
 {
-package DummyType; ## no critic
+package DummyType; ## no critic (RequireFilenameMatchesPackage)
 
 use overload
     fallback => 1,
@@ -82,7 +82,7 @@ my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 while (my ($args, $cases) = splice @TEST, 0, 2) {
     my $meta = Sub::Meta::Returns->new($args);
     my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic
+    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic (ProhibitStringyEval)
 
     subtest "@{[$json->encode($args)]}" => sub {
 
