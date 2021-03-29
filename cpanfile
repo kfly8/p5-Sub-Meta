@@ -7,10 +7,10 @@ requires 'Scalar::Util';
 on 'develop' => sub {
     requires 'Devel::Cover';
     requires 'Perl::Critic';
-    requires 'Module::Build::Tiny', 0.035;
 };
 
 on 'test' => sub {
     requires 'Test2::V0', '0.000111';
     requires 'JSON::PP';
 };
+
