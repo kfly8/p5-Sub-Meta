@@ -30,8 +30,10 @@ subtest 'register_list' => sub {
     my $meta_world = Sub::Meta->new(sub => \&world);
 
     ok lives { Sub::Meta::Library->register_list([\&hello, $meta_hello], [\&world, $meta_world]) };
-    ok lives { Sub::Meta::Library->register_list([ [\&hello, $meta_hello], [\&world, $meta_world] ] ) };
+    ok lives { Sub::Meta::Library->register_list([\&hello, $meta_hello]) };
+    ok dies { Sub::Meta::Library->register_list([ [\&hello, $meta_hello], [\&world, $meta_world] ] ) };
     ok dies { Sub::Meta::Library->register_list({ }) };
+    ok dies { Sub::Meta::Library->register_list('hello') };
     ok dies { Sub::Meta::Library->register_list('hello', $meta_hello) };
 };
 

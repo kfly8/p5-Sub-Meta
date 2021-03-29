@@ -37,7 +37,6 @@ sub register {
 
 sub register_list {
     my ($class, @list) = @_;
-    @list = @{$list[0]} if @list == 1 && ref $list[0] && ref $list[0] eq 'ARRAY';
 
     for (@list) {
         $class->register(@$_)
