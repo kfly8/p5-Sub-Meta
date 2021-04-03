@@ -30,7 +30,7 @@ sub new {
 
     $self->set_invocant(delete $args{invocant}) if exists $args{invocant};
     $self->set_nshift(delete $args{nshift}) if exists $args{nshift};
-    $self->set_slurpy(delete $args{slurpy}) if exists $args{slurpy};
+    $self->set_slurpy(delete $args{slurpy}) if $args{slurpy};
 
     return $self;
 }
@@ -167,13 +167,13 @@ sub is_same_interface {
     return unless $self->slurpy ? $self->slurpy->is_same_interface($other->slurpy)
                                 : !$other->slurpy;
 
+    return unless $self->nshift == $other->nshift;
+
     return unless @{$self->all_args} == @{$other->all_args};
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {
         return unless $self->all_args->[$i]->is_same_interface($other->all_args->[$i]);
     }
-
-    return unless $self->nshift == $other->nshift;
 
     return !!1;
 }
@@ -188,15 +188,45 @@ sub is_same_interface_inlined {
     push @src => $self->slurpy ? $self->slurpy->is_same_interface_inlined(sprintf('%s->slurpy', $v))
                                : sprintf('!%s->slurpy', $v);
 
+    push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
+
     push @src => sprintf('%d == @{%s->all_args}', scalar @{$self->all_args}, $v);
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {
         push @src => $self->all_args->[$i]->is_same_interface_inlined(sprintf('%s->all_args->[%d]', $v, $i))
     }
 
-    push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
-
     return join "\n && ", @src;
+}
+
+sub interface_error_message {
+    my ($self, $other) = @_;
+
+    return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
+
+    if ($self->slurpy) {
+        return sprintf('invalid slurpy. got: %s, expected: %s', $other->slurpy ? $other->slurpy->display : '', $self->slurpy->display)
+            unless $self->slurpy->is_same_interface($other->slurpy)
+    }
+    else {
+        return 'should not have slurpy' unless !$other->slurpy;
+    }
+
+    return sprintf('nshift is not equal. got: %d, expected: %d', $other->nshift, $self->nshift)
+        unless $self->nshift == $other->nshift;
+
+    return sprintf('args length is not equal. got: %d, expected: %d', scalar @{$other->all_args}, scalar @{$self->all_args})
+        unless @{$self->all_args} == @{$other->all_args};
+
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        my $s = $self->all_args->[$i];
+        my $o = $other->all_args->[$i];
+        return sprintf('args[%d] is invalid. got: %s, expected: %s', $i, $o->display, $s->display)
+            unless $s->is_same_interface($o);
+    }
+
+    return '';
 }
 
 sub display {
@@ -413,6 +443,10 @@ Returns the display of Sub::Meta::Parameters:
         ],
     );
     $meta->display; # 'Num :$lat, Num :$lng'
+
+=head3 interface_error_message($other_meta)
+
+Return the error message when the interface does not match.
 
 =head2 OTHERS
 
