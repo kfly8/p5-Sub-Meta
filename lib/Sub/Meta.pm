@@ -314,6 +314,44 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
+sub interface_error_message {
+    my ($self, $other) = @_;
+
+    return sprintf('must be Sub::Meta. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
+
+    if (defined $self->subname) {
+        return sprintf('invalid subname. got: %s, expected: %s', $other->subname // '', $self->subname)
+            unless defined $other->subname && $self->subname eq $other->subname
+    }
+    else {
+        return sprintf('should not have subname. got: %s', $other->subname) unless !defined $other->subname;
+    }
+
+    if ($self->is_method) {
+        return 'must be method' unless $other->is_method
+    }
+    else {
+        return 'should not be method' unless !$other->is_method;
+    }
+
+    if ($self->parameters) {
+        return $self->parameters->interface_error_message($other->parameters)
+            unless $self->parameters->is_same_interface($other->parameters)
+    }
+    else {
+        return 'should not have parameters' unless !$other->parameters;
+    }
+
+    if ($self->returns) {
+        return $self->returns->interface_error_message($other->returns)
+    }
+    else {
+        return 'should not have returns' unless !$other->returns;
+    }
+    return '';
+}
+
 sub display {
     my $self = shift;
 
@@ -690,6 +728,10 @@ Returns inlined C<is_same_interface> string:
     my $check = eval "sub { $inline }";
     $check->(Sub::Meta->new(subname => 'hello')); # => OK
     $check->(Sub::Meta->new(subname => 'world')); # => NG
+
+=head3 interface_error_message($other_meta)
+
+Return the error message when the interface does not match.
 
 =head3 display
 

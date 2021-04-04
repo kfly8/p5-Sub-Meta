@@ -382,6 +382,10 @@ $check->(Sub::Meta->new(subname => 'hello')); # => OK
 $check->(Sub::Meta->new(subname => 'world')); # => NG
 ```
 
+### interface\_error\_message($other\_meta)
+
+Return the error message when the interface does not match.
+
 ### display
 
 Returns the display of Sub::Meta:

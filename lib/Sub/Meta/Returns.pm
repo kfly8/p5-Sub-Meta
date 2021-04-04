@@ -85,6 +85,38 @@ sub _eq {
     return 1;
 }
 
+sub interface_error_message {
+    my ($self, $other) = @_;
+
+    return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
+
+    if (defined $self->scalar) {
+        return sprintf('invalid scalar return. got: %s, expected: %s', $other->scalar, $self->scalar)
+            unless _eq($self->scalar, $other->scalar);
+    }
+    else {
+        return 'should not have scalar return' unless !defined $other->scalar;
+    }
+
+    if (defined $self->list) {
+        return sprintf('invalid list return. got: %s, expected: %s', $other->list, $self->list)
+            unless _eq($self->list, $other->list);
+    }
+    else {
+        return 'should not have list return' unless !defined $other->list;
+    }
+
+    if (defined $self->void) {
+        return sprintf('invalid void return. got: %s, expected: %s', $other->void, $self->void)
+            unless _eq($self->void, $other->void);
+    }
+    else {
+        return 'should not have void return' unless !defined $other->void;
+    }
+    return '';
+}
+
 sub _eq_inlined {
     my ($type, $v) = @_;
 
@@ -190,6 +222,10 @@ Specifically, check whether C<scalar>, C<list> and C<void> are equal.
 =head3 is_same_interface_inlined($other_meta_inlined)
 
 Returns inlined C<is_same_interface> string.
+
+=head3 interface_error_message($other_meta)
+
+Return the error message when the interface does not match.
 
 =head3 display
 
