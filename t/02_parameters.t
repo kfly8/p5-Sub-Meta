@@ -16,7 +16,8 @@ subtest 'exception' => sub {
 my @TEST = (
     { args => [] } => [
         nshift                   => 0,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [],
         all_args                 => [],
         _all_positional_required => [],
@@ -33,7 +34,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo')] } => [
         nshift                   => 0,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo')],
         all_args                 => [p(type => 'Foo')],
         _all_positional_required => [p(type => 'Foo')],
@@ -50,7 +52,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo')], nshift => 1 } => [
         nshift                   => 1,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo')],
         all_args                 => [p(invocant => 1), p(type => 'Foo')],
         _all_positional_required => [p(invocant => 1), p(type => 'Foo')],
@@ -67,7 +70,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo')], invocant => p(name => '$self') } => [
         nshift                   => 1,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo')],
         all_args                 => [p(name => '$self', invocant => 1), p(type => 'Foo')],
         _all_positional_required => [p(name => '$self', invocant => 1), p(type => 'Foo')],
@@ -85,6 +89,7 @@ my @TEST = (
     { args => [p(type => 'Foo')], nshift => 1, slurpy => 'Str' } => [
         nshift                   => 1,
         slurpy                   => p(type => 'Str'),
+        has_slurpy               => !!1,
         args                     => [p(type => 'Foo')],
         all_args                 => [p(invocant => 1), p(type => 'Foo')],
         _all_positional_required => [p(invocant => 1), p(type => 'Foo')],
@@ -101,7 +106,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo', named => 1)] } => [
         nshift                   => 0,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo', named => 1)],
         all_args                 => [p(type => 'Foo', named => 1)], 
         _all_positional_required => [],
@@ -118,7 +124,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo', optional => 1)] } => [
         nshift                   => 0,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo', optional => 1)],
         all_args                 => [p(type => 'Foo', optional => 1)],
         _all_positional_required => [],
@@ -135,7 +142,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo', named => 1, optional => 1)] } => [
         nshift                   => 0,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo', named => 1, optional => 1)],
         all_args                 => [p(type => 'Foo', named => 1, optional => 1)],
         _all_positional_required => [],
@@ -153,6 +161,7 @@ my @TEST = (
     { args => [p(type => 'Foo', named => 1, optional => 1)], slurpy => 'Str' } => [
         nshift                   => 0,
         slurpy                   => p(type => 'Str'),
+        has_slurpy               => !!1,
         args                     => [p(type => 'Foo', named => 1, optional => 1)],
         all_args                 => [p(type => 'Foo', named => 1, optional => 1)],
         _all_positional_required => [],
@@ -169,7 +178,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo'), p(type => 'Bar')] } => [
         nshift                   => 0,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo'), p(type => 'Bar')],
         all_args                 => [p(type => 'Foo'), p(type => 'Bar')],
         _all_positional_required => [p(type => 'Foo'), p(type => 'Bar')],
@@ -186,7 +196,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo'), p(type => 'Bar')], nshift => 1 } => [
         nshift                   => 1,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo'), p(type => 'Bar')],
         all_args                 => [p(invocant => 1), p(type => 'Foo'), p(type => 'Bar')],
         _all_positional_required => [p(invocant => 1), p(type => 'Foo'), p(type => 'Bar')],
@@ -203,7 +214,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo'), p(type => 'Bar', named => 1)] } => [
         nshift                   => 0,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo'), p(type => 'Bar', named => 1)],
         all_args                 => [p(type => 'Foo'), p(type => 'Bar', named => 1)],
         _all_positional_required => [p(type => 'Foo')],
@@ -220,7 +232,8 @@ my @TEST = (
     ],
     { args => [p(type => 'Foo'), p(type => 'Bar', named => 1, optional => 1)] } => [
         nshift                   => 0,
-        slurpy                   => !!0,
+        slurpy                   => undef,
+        has_slurpy               => !!0,
         args                     => [p(type => 'Foo'), p(type => 'Bar', named => 1,optional => 1)],
         all_args                 => [p(type => 'Foo'), p(type => 'Bar', named => 1,optional => 1)],
         _all_positional_required => [p(type => 'Foo')],

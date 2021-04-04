@@ -36,11 +36,13 @@ sub new {
 }
 
 sub nshift()    { my $self = shift; return $self->{nshift} // 0 }
-sub slurpy()    { my $self = shift; return $self->{slurpy} ? $self->{slurpy} : !!0 }
+sub slurpy()    { my $self = shift; return $self->{slurpy} }
 sub args()      { my $self = shift; return $self->{args} }
 sub invocant()  { my $self = shift; return $self->{invocant} }
 sub invocants() { my $self = shift; return defined $self->{invocant} ? [ $self->{invocant} ] : [] }
 sub all_args()  { my $self = shift; return [ @{$self->invocants}, @{$self->args} ] }
+
+sub has_slurpy() { my $self = shift; return !!$self->slurpy }
 
 sub set_slurpy {
     my ($self, $v) = @_;
@@ -164,8 +166,12 @@ sub is_same_interface {
 
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
-    return unless $self->slurpy ? $self->slurpy->is_same_interface($other->slurpy)
-                                : !$other->slurpy;
+    if ($self->has_slurpy) {
+        return unless $self->slurpy->is_same_interface($other->slurpy)
+    }
+    else {
+        return if $other->has_slurpy;
+    }
 
     return unless $self->nshift == $other->nshift;
 
@@ -185,8 +191,8 @@ sub is_same_interface_inlined {
 
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Parameters')", $v, $v);
 
-    push @src => $self->slurpy ? $self->slurpy->is_same_interface_inlined(sprintf('%s->slurpy', $v))
-                               : sprintf('!%s->slurpy', $v);
+    push @src => $self->has_slurpy ? $self->slurpy->is_same_interface_inlined(sprintf('%s->slurpy', $v))
+                                   : sprintf('!%s->has_slurpy', $v);
 
     push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
 
@@ -205,12 +211,12 @@ sub interface_error_message {
     return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
-    if ($self->slurpy) {
-        return sprintf('invalid slurpy. got: %s, expected: %s', $other->slurpy ? $other->slurpy->display : '', $self->slurpy->display)
+    if ($self->has_slurpy) {
+        return sprintf('invalid slurpy. got: %s, expected: %s', $other->has_slurpy ? $other->slurpy->display : '', $self->slurpy->display)
             unless $self->slurpy->is_same_interface($other->slurpy)
     }
     else {
-        return 'should not have slurpy' unless !$other->slurpy;
+        return 'should not have slurpy' if $other->has_slurpy;
     }
 
     return sprintf('nshift is not equal. got: %d, expected: %d', $other->nshift, $self->nshift)

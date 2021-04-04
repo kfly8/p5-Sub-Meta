@@ -111,9 +111,9 @@ sub _normalize_args_parameters {
 }
 
 sub sub() :method { my $self = shift; return $self->{sub} } ## no critic (ProhibitBuiltinHomonyms)
-sub subname()     { my $self = shift; return $self->subinfo->[1] }
-sub stashname()   { my $self = shift; return $self->subinfo->[0] }
-sub fullname()    { my $self = shift; return @{$self->subinfo} ? sprintf('%s::%s', $self->stashname || '', $self->subname || '') : undef }
+sub subname()     { my $self = shift; return $self->subinfo->[1] // '' }
+sub stashname()   { my $self = shift; return $self->subinfo->[0] // '' }
+sub fullname()    { my $self = shift; return @{$self->subinfo} ? sprintf('%s::%s', $self->stashname, $self->subname) : '' }
 
 sub subinfo()     {
     my $self = shift;
@@ -136,6 +136,14 @@ sub slurpy()      { my $self = shift; return $self->parameters->slurpy }
 sub nshift()      { my $self = shift; return $self->parameters->nshift }
 sub invocant()    { my $self = shift; return $self->parameters->invocant }
 sub invocants()   { my $self = shift; return $self->parameters->invocants }
+
+sub has_sub()        { my $self = shift; return !!$self->sub }
+sub has_subname()    { my $self = shift; return !!$self->subname }
+sub has_stashname()  { my $self = shift; return !!$self->stashname }
+sub has_prototype()  { my $self = shift; return !!$self->prototype }
+sub has_attribute()  { my $self = shift; return !!$self->attribute }
+sub has_parameters() { my $self = shift; return !!$self->parameters }
+sub has_returns()    { my $self = shift; return !!$self->returns }
 
 sub set_sub {
     my ($self, $v) = @_;
@@ -277,17 +285,33 @@ sub is_same_interface {
 
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
-    return unless defined $self->subname ? defined $other->subname && $self->subname eq $other->subname
-                                         : !defined $other->subname;
+    if ($self->has_subname) {
+        return unless $self->subname eq $other->subname
+    }
+    else {
+        return if $other->has_subname;
+    }
 
-    return unless $self->is_method ? $other->is_method
-                                   : !$other->is_method;
+    if ($self->is_method) {
+        return unless $other->is_method
+    }
+    else {
+        return if $other->is_method
+    }
 
-    return unless $self->parameters ? $self->parameters->is_same_interface($other->parameters)
-                                    : !$other->parameters;
+    if ($self->has_parameters) {
+        return unless $self->parameters->is_same_interface($other->parameters)
+    }
+    else {
+        return if $other->has_parameters;
+    }
 
-    return unless $self->returns ? $self->returns->is_same_interface($other->returns)
-                                 : !$other->returns;
+    if ($self->has_returns) {
+        return unless $self->returns->is_same_interface($other->returns)
+    }
+    else {
+        return if $other->has_returns;
+    }
 
     return !!1;
 }
@@ -299,17 +323,17 @@ sub is_same_interface_inlined {
 
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta')", $v, $v);
 
-    push @src => defined $self->subname ? sprintf("defined %s->subname && '%s' eq %s->subname", $v, "@{[$self->subname]}", $v)
-                                        : sprintf('!defined %s->subname', $v);
+    push @src => $self->has_subname ? sprintf("'%s' eq %s->subname", $self->subname, $v)
+                                    : sprintf('!%s->has_subname', $v);
 
     push @src => $self->is_method ? sprintf('%s->is_method', $v)
                                   : sprintf('!%s->is_method', $v);
 
-    push @src => $self->parameters ? $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v))
-                                   : sprintf('!%s->parameters', $v);
+    push @src => $self->has_parameters ? $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v))
+                                       : sprintf('!%s->has_parameters', $v);
 
-    push @src => $self->returns ? $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v))
-                                : sprintf('!%s->returns', $v);
+    push @src => $self->has_returns ? $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v))
+                                    : sprintf('!%s->has_returns', $v);
 
     return join "\n && ", @src;
 }
@@ -320,34 +344,34 @@ sub interface_error_message {
     return sprintf('must be Sub::Meta. got: %s', $other // '')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
-    if (defined $self->subname) {
-        return sprintf('invalid subname. got: %s, expected: %s', $other->subname // '', $self->subname)
-            unless defined $other->subname && $self->subname eq $other->subname
+    if ($self->has_subname) {
+        return sprintf('invalid subname. got: %s, expected: %s', $other->subname, $self->subname)
+            unless $self->subname eq $other->subname
     }
     else {
-        return sprintf('should not have subname. got: %s', $other->subname) unless !defined $other->subname;
+        return sprintf('should not have subname. got: %s', $other->subname) if $other->has_subname;
     }
 
     if ($self->is_method) {
         return 'must be method' unless $other->is_method
     }
     else {
-        return 'should not be method' unless !$other->is_method;
+        return 'should not be method' if $other->is_method;
     }
 
-    if ($self->parameters) {
+    if ($self->has_parameters) {
         return $self->parameters->interface_error_message($other->parameters)
             unless $self->parameters->is_same_interface($other->parameters)
     }
     else {
-        return 'should not have parameters' unless !$other->parameters;
+        return 'should not have parameters' if $other->parameters;
     }
 
-    if ($self->returns) {
+    if ($self->has_returns) {
         return $self->returns->interface_error_message($other->returns)
     }
     else {
-        return 'should not have returns' unless !$other->returns;
+        return 'should not have returns' if $other->returns;
     }
     return '';
 }
@@ -356,7 +380,7 @@ sub display {
     my $self = shift;
 
     my $keyword = $self->is_method ? 'method' : 'sub';
-    my $subname = $self->subname // '';
+    my $subname = $self->subname;
 
     my $s = $keyword;
     $s .= ' ' . $subname if $subname;

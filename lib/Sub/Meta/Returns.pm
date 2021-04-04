@@ -25,27 +25,43 @@ sub new {
 sub scalar() :method { my $self = shift; return $self->{scalar} } ## no critic (ProhibitBuiltinHomonyms)
 sub list()           { my $self = shift; return $self->{list} }
 sub void()           { my $self = shift; return $self->{void} }
+sub coerce()         { my $self = shift; return $self->{coerce} }
 
-sub set_scalar    { my ($self, $v) = @_; $self->{scalar} = $v; return $self }
-sub set_list      { my ($self, $v) = @_; $self->{list}   = $v; return $self }
-sub set_void      { my ($self, $v) = @_; $self->{void}   = $v; return $self }
+sub has_scalar() { my $self = shift; return !!$self->scalar }
+sub has_list()   { my $self = shift; return !!$self->list }
+sub has_void()   { my $self = shift; return !!$self->void }
+sub has_coerce() { my $self = shift; return !!$self->coerce }
 
-sub coerce()   { my $self = shift; return !!$self->{coerce} }
-sub set_coerce { my ($self, $v) = @_; $self->{coerce} = defined $v ? $v : 1; return $self }
+sub set_scalar { my ($self, $v) = @_; $self->{scalar} = $v; return $self }
+sub set_list   { my ($self, $v) = @_; $self->{list}   = $v; return $self }
+sub set_void   { my ($self, $v) = @_; $self->{void}   = $v; return $self }
+sub set_coerce { my ($self, $v) = @_; $self->{coerce} = $v; return $self }
 
 sub is_same_interface {
     my ($self, $other) = @_;
 
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
-    return unless defined $self->scalar ? _eq($self->scalar, $other->scalar)
-                                        : !defined $other->scalar;
+    if ($self->has_scalar) {
+        return unless _eq($self->scalar, $other->scalar)
+    }
+    else {
+        return if $other->has_scalar
+    }
 
-    return unless defined $self->list ? _eq($self->list, $other->list)
-                                      : !defined $other->list;
+    if ($self->has_list) {
+        return unless _eq($self->list, $other->list)
+    }
+    else {
+        return if $other->has_list
+    }
 
-    return unless defined $self->void ? _eq($self->void, $other->void)
-                                      : !defined $other->void;
+    if ($self->has_void) {
+        return unless _eq($self->void, $other->void)
+    }
+    else {
+        return if $other->has_void
+    }
 
     return !!1;
 }
@@ -57,14 +73,14 @@ sub is_same_interface_inlined {
 
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Returns')", $v, $v);
 
-    push @src => defined $self->scalar ? _eq_inlined($self->scalar, sprintf('%s->scalar', $v))
-                                       : sprintf('!defined %s->scalar', $v);
+    push @src => $self->has_scalar ? _eq_inlined($self->scalar, sprintf('%s->scalar', $v))
+                                   : sprintf('!%s->has_scalar', $v);
 
-    push @src => defined $self->list ? _eq_inlined($self->list, sprintf('%s->list', $v))
-                                     : sprintf('!defined %s->list', $v);
+    push @src => $self->has_list ? _eq_inlined($self->list, sprintf('%s->list', $v))
+                                   : sprintf('!%s->has_list', $v);
 
-    push @src => defined $self->void ? _eq_inlined($self->void, sprintf('%s->void', $v))
-                                     : sprintf('!defined %s->void', $v);
+    push @src => $self->has_void ? _eq_inlined($self->void, sprintf('%s->void', $v))
+                                   : sprintf('!%s->has_void', $v);
 
     return join "\n && ", @src;
 }
@@ -91,28 +107,28 @@ sub interface_error_message {
     return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
-    if (defined $self->scalar) {
+    if ($self->has_scalar) {
         return sprintf('invalid scalar return. got: %s, expected: %s', $other->scalar, $self->scalar)
             unless _eq($self->scalar, $other->scalar);
     }
     else {
-        return 'should not have scalar return' unless !defined $other->scalar;
+        return 'should not have scalar return' if $other->has_scalar;
     }
 
-    if (defined $self->list) {
+    if ($self->has_list) {
         return sprintf('invalid list return. got: %s, expected: %s', $other->list, $self->list)
             unless _eq($self->list, $other->list);
     }
     else {
-        return 'should not have list return' unless !defined $other->list;
+        return 'should not have list return' if $other->has_list;
     }
 
-    if (defined $self->void) {
+    if ($self->has_void) {
         return sprintf('invalid void return. got: %s, expected: %s', $other->void, $self->void)
             unless _eq($self->void, $other->void);
     }
     else {
-        return 'should not have void return' unless !defined $other->void;
+        return 'should not have void return' if $other->has_void;
     }
     return '';
 }
@@ -164,13 +180,11 @@ Sub::Meta::Returns - meta information about return values
         scalar  => 'Int',      # optional
         list    => 'ArrayRef', # optional
         void    => 'Void',     # optional
-        coerce  => 1,          # optional
     );
 
     $r->scalar; # 'Int'
     $r->list;   # 'ArrayRef'
     $r->void;   # 'Void'
-    $r->coerce; # 1
 
 =head1 METHODS
 
@@ -206,7 +220,7 @@ Setter for C<void>.
 
 =head3 coerce
 
-A boolean whether with coercions.
+coercions.
 
 =head3 set_coerce($bool)
 

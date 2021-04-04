@@ -3,7 +3,6 @@ severity = 3
 [-Subroutines::ProhibitExplicitReturnUndef]
 [-ValuesAndExpressions::ProhibitConstantPragma]
 [-RegularExpressions::RequireExtendedFormatting]
-[-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
 
 [TestingAndDebugging::RequireUseStrict]
 equivalent_modules = Test2::V0

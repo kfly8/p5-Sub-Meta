@@ -30,8 +30,8 @@ sub new {
     return bless \%args => $class;
 }
 
-sub name()       { my $self = shift; return $self->{name} }
-sub type()       { my $self = shift; return $self->{type} }
+sub name()       { my $self = shift; return $self->{name} // '' }
+sub type()       { my $self = shift; return $self->{type} // '' }
 sub default()    { my $self = shift; return $self->{default} } ## no critic (ProhibitBuiltinHomonyms)
 sub coerce()     { my $self = shift; return $self->{coerce} }
 sub optional()   { my $self = shift; return !!$self->{optional} }
@@ -39,6 +39,11 @@ sub required()   { my $self = shift; return !$self->{optional} }
 sub named()      { my $self = shift; return !!$self->{named} }
 sub positional() { my $self = shift; return !$self->{named} }
 sub invocant()   { my $self = shift; return !!$self->{invocant} }
+
+sub has_name()    { my $self = shift; return !!$self->name }
+sub has_type()    { my $self = shift; return !!$self->type }
+sub has_default() { my $self = shift; return !!$self->default }
+sub has_coerce()  { my $self = shift; return !!$self->coerce }
 
 sub set_name      { my ($self, $v) = @_; $self->{name}     = $v; return $self }
 sub set_type      { my ($self, $v) = @_; $self->{type}     = $v; return $self }
@@ -62,11 +67,19 @@ sub is_same_interface {
 
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Param');
 
-    return unless defined $self->name ? defined $other->name && $self->name eq $other->name
-                                      : !defined $other->name;
+    if ($self->has_name) {
+        return unless $self->name eq $other->name
+    }
+    else {
+        return if $other->has_name
+    }
 
-    return unless defined $self->type ? defined $other->type && $self->type eq $other->type
-                                      : !defined $other->type;
+    if ($self->has_type) {
+        return unless $self->type eq $other->type
+    }
+    else {
+        return if $other->has_type
+    }
 
     return unless $self->optional eq $other->optional;
 
@@ -81,11 +94,11 @@ sub is_same_interface_inlined {
     my @src;
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Param')", $v, $v);
 
-    push @src => defined $self->name ? sprintf("defined %s->name && '%s' eq %s->name", $v, "@{[$self->name]}", $v)
-                                     : sprintf('!defined %s->name', $v);
+    push @src => $self->has_name ? sprintf("'%s' eq %s->name", $self->name, $v)
+                                 : sprintf('!%s->has_name', $v);
 
-    push @src => defined $self->type ? sprintf("defined %s->type && '%s' eq %s->type", $v, "@{[$self->type]}", $v)
-                                     : sprintf('!defined %s->type', $v);
+    push @src => $self->has_type ? sprintf("'%s' eq %s->type", "@{[$self->type]}", $v)
+                                 : sprintf('!%s->has_type', $v);
 
     push @src => sprintf("'%s' eq %s->optional", $self->optional, $v);
 
