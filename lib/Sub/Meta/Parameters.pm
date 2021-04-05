@@ -42,7 +42,8 @@ sub invocant()  { my $self = shift; return $self->{invocant} }
 sub invocants() { my $self = shift; return defined $self->{invocant} ? [ $self->{invocant} ] : [] }
 sub all_args()  { my $self = shift; return [ @{$self->invocants}, @{$self->args} ] }
 
-sub has_slurpy() { my $self = shift; return !!$self->slurpy }
+sub has_invocant() { my $self = shift; return defined $self->{invocant} }
+sub has_slurpy()   { my $self = shift; return defined $self->{slurpy} }
 
 sub set_slurpy {
     my ($self, $v) = @_;

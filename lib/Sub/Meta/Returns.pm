@@ -27,10 +27,10 @@ sub list()           { my $self = shift; return $self->{list} }
 sub void()           { my $self = shift; return $self->{void} }
 sub coerce()         { my $self = shift; return $self->{coerce} }
 
-sub has_scalar() { my $self = shift; return !!$self->scalar }
-sub has_list()   { my $self = shift; return !!$self->list }
-sub has_void()   { my $self = shift; return !!$self->void }
-sub has_coerce() { my $self = shift; return !!$self->coerce }
+sub has_scalar() { my $self = shift; return defined $self->{scalar} }
+sub has_list()   { my $self = shift; return defined $self->{list} }
+sub has_void()   { my $self = shift; return defined $self->{void} }
+sub has_coerce() { my $self = shift; return defined $self->{coerce} }
 
 sub set_scalar { my ($self, $v) = @_; $self->{scalar} = $v; return $self }
 sub set_list   { my ($self, $v) = @_; $self->{list}   = $v; return $self }

@@ -40,10 +40,10 @@ sub named()      { my $self = shift; return !!$self->{named} }
 sub positional() { my $self = shift; return !$self->{named} }
 sub invocant()   { my $self = shift; return !!$self->{invocant} }
 
-sub has_name()    { my $self = shift; return !!$self->name }
-sub has_type()    { my $self = shift; return !!$self->type }
-sub has_default() { my $self = shift; return !!$self->default }
-sub has_coerce()  { my $self = shift; return !!$self->coerce }
+sub has_name()    { my $self = shift; return defined $self->{name} }
+sub has_type()    { my $self = shift; return defined $self->{type} }
+sub has_default() { my $self = shift; return defined $self->{default} }
+sub has_coerce()  { my $self = shift; return defined $self->{coerce} }
 
 sub set_name      { my ($self, $v) = @_; $self->{name}     = $v; return $self }
 sub set_type      { my ($self, $v) = @_; $self->{type}     = $v; return $self }

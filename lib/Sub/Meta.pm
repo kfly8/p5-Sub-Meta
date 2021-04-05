@@ -137,13 +137,13 @@ sub nshift()      { my $self = shift; return $self->parameters->nshift }
 sub invocant()    { my $self = shift; return $self->parameters->invocant }
 sub invocants()   { my $self = shift; return $self->parameters->invocants }
 
-sub has_sub()        { my $self = shift; return !!$self->sub }
-sub has_subname()    { my $self = shift; return !!$self->subname }
-sub has_stashname()  { my $self = shift; return !!$self->stashname }
-sub has_prototype()  { my $self = shift; return !!$self->prototype }
-sub has_attribute()  { my $self = shift; return !!$self->attribute }
-sub has_parameters() { my $self = shift; return !!$self->parameters }
-sub has_returns()    { my $self = shift; return !!$self->returns }
+sub has_sub()        { my $self = shift; return defined $self->{sub} }
+sub has_subname()    { my $self = shift; return defined $self->subinfo->[1] }
+sub has_stashname()  { my $self = shift; return defined $self->subinfo->[0] }
+sub has_prototype()  { my $self = shift; return !!$self->prototype } # after build_prototype
+sub has_attribute()  { my $self = shift; return !!$self->attribute } # after build_attribute
+sub has_parameters() { my $self = shift; return defined $self->{parameters} }
+sub has_returns()    { my $self = shift; return defined $self->{returns} }
 
 sub set_sub {
     my ($self, $v) = @_;
