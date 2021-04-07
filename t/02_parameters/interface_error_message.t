@@ -2,6 +2,7 @@ use Test2::V0;
 
 use Sub::Meta::Parameters;
 
+my $Slurpy = Sub::Meta::Param->new("Slurpy");
 my $Str = Sub::Meta::Param->new("Str");
 my $Int = Sub::Meta::Param->new("Int");
 
@@ -12,12 +13,12 @@ my @TEST = (
     undef, 'must be Sub::Meta::Parameters. got: ',
     $obj, qr/^must be Sub::Meta::Parameters\. got: Some/,
     { args => [$Str] }, 'args length is not equal. got: 1, expected: 0', 
-    { args => [], slurpy => 1 }, 'should not have slurpy', 
+    { args => [], slurpy => $Slurpy }, 'should not have slurpy', 
     { args => [], nshift => 1 }, 'nshift is not equal. got: 1, expected: 0', 
     { args => [] }, '', # valid
-    { args => [], slurpy => 0 }, '', # valid
+    { args => [], slurpy => undef }, '', # valid
     { args => [], nshift => 0 }, '', # valid
-    { args => [], slurpy => 0, nshift => 0 }, '', # valid
+    { args => [], slurpy => undef, nshift => 0 }, '', # valid
     ],
 
     # one args
