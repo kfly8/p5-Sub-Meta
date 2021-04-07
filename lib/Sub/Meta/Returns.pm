@@ -198,50 +198,122 @@ Constructor of C<Sub::Meta::Returns>.
 
 A type for value when called in scalar context.
 
-=head3 set_scalar($scalar)
+=over
+
+=item C<< scalar >>
+
+    method scalar() => Maybe[Any]
+
+=item C<< has_scalar >>
+
+    method has_scalar() => Bool
+
+Whether Sub::Meta::Returns has scalar type or not.
+
+=item C<< set_scalar($type) >>
+
+    method set_scalar(Any $type) $self
 
 Setter for C<scalar>.
+
+=back
 
 =head3 list
 
 A type for value when called in list context.
 
-=head3 set_list($list)
+=over
+
+=item C<< list >>
+
+    method list() => Maybe[Any]
+
+=item C<< has_list >>
+
+    method has_list() => Bool
+
+Whether Sub::Meta::Returns has list type or not.
+
+=item C<< set_list($type) >>
+
+    method set_list(Any $type) => $self
 
 Setter for C<list>.
+
+=back
 
 =head3 void
 
 A type for value when called in void context.
 
-=head3 set_void($void)
+=over
+
+=item C<< void >>
+
+    method void() => Maybe[Any]
+
+=item C<< has_void >>
+
+    method has_void() => Bool
+
+Whether Sub::Meta::Returns has void type or not.
+
+=item C<< set_void($type) >>
+
+    method set_void(Any $type) => $self
 
 Setter for C<void>.
+
+=back
 
 =head3 coerce
 
 coercions.
 
-=head3 set_coerce($bool)
+=over
+
+=item C<< coerce >>
+
+    method coerce() => Maybe[Any]
+
+=item C<< has_coerce >>
+
+    method has_coerce() => Bool
+
+Whether Sub::Meta::Returns has coercions or not.
+
+=item C<< set_coerce($bool) >>
+
+    method set_coerce(Bool $bool) => $self
 
 Setter for C<coerce>.
+
+=back
 
 =head2 METHODS
 
 =head3 is_same_interface($other_meta)
+
+    method is_same_interface(InstanceOf[Sub::Meta::Returns] $other_meta) => Bool
 
 A boolean value indicating whether C<Sub::Meta::Returns> object is same or not.
 Specifically, check whether C<scalar>, C<list> and C<void> are equal.
 
 =head3 is_same_interface_inlined($other_meta_inlined)
 
+    method is_same_interface_inlined(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
+
 Returns inlined C<is_same_interface> string.
 
 =head3 interface_error_message($other_meta)
 
-Return the error message when the interface does not match.
+    method interface_error_message(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
+
+Return the error message when the interface does not match. If match, then return empty string.
 
 =head3 display
+
+    method display() => Str
 
 Returns the display of Sub::Meta::Returns:
 

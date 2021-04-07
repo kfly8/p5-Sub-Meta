@@ -168,17 +168,37 @@ Constructor of C<Sub::Meta::Param>.
 
 =head3 name
 
+  method name() => Str
+
 variable name, e.g. C<$msg>, C<@list>.
 
-=head3 set_name(Str $name)
+=head3 has_name
+
+  method has_name() => Bool
+
+Whether Sub::Meta::Param has name or not.
+
+=head3 set_name($name)
+
+  method set_name(Str $name) => $self
 
 Setter for C<name>.
 
 =head3 type
 
+  method type() => Any
+
 Any type constraints, e.g. C<Str>.
 
+=head3 has_type
+
+  method has_type() => Bool
+
+Whether Sub::Meta::Param has type or not.
+
 =head3 set_type($type)
+
+  method set_type(Any $type) => $self
 
 Setter for C<type>.
 
@@ -192,61 +212,101 @@ The alias of C<set_type>
 
 =head3 default
 
+  method default() => Any
+
 default value, e.g. C<"HELLO">, C<sub { ... }>
 
+=head3 has_default
+
+  method has_default() => Bool
+
+Whether Sub::Meta::Param has default or not.
+
 =head3 set_default($default)
+
+  method set_default(Any $default) => $self
 
 Setter for C<default>.
 
 =head3 coerce
 
+  method coerce() => Any
+
 A boolean value indicating whether to coerce. Default to false.
 
-=head3 set_coerce($bool)
+=head3 has_coerce
+
+  method has_coerce() => Bool
+
+Whether Sub::Meta::Param has coerce or not.
+
+=head3 set_coerce($coerce)
+
+  method set_coerce(Any $coerce) => $self
 
 Setter for C<coerce>.
 
 =head3 optional
+
+  method optional() => Bool
 
 A boolean value indicating whether to optional. Default to false.
 This boolean is the opposite of C<required>.
 
 =head3 set_optional($bool=true)
 
+  method set_optional(Bool $bool=true) => $self
+
 Setter for C<optional>.
 
 =head3 required
+
+  method required() => Bool
 
 A boolean value indicating whether to required. Default to true.
 This boolean is the opposite of C<optional>.
 
 =head3 set_required($bool=true)
 
+  method set_required(Bool $bool=true) => $self
+
 Setter for C<required>.
 
 =head3 named
+
+  method named() => Bool
 
 A boolean value indicating whether to named arguments. Default to false.
 This boolean is the opposite of C<positional>.
 
 =head3 set_named($bool=true)
 
+  method set_named(Bool $bool=true) => $self
+
 Setter for C<named>.
 
 =head3 positional
+
+  method positional() => Bool
 
 A boolean value indicating whether to positional arguments. Default to true.
 This boolean is the opposite of C<positional>.
 
 =head3 set_positional($bool=true)
 
+  method set_positional(Bool $bool=true) => $self
+
 Setter for C<positional>.
 
 =head3 invocant
 
+  method invocant() => Bool
+
 A boolean value indicating whether to be invocant. Default to false.
 
 =head3 set_invocant($bool=true)
+
+  method set_invocant(Bool $bool=true) => $self
 
 Setter for C<invocant>.
 
@@ -254,14 +314,20 @@ Setter for C<invocant>.
 
 =head3 is_same_interface($other_meta)
 
+  method is_same_interface(InstanceOf[Sub::Meta::Param] $other_meta) => Bool
+
 A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
 Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal.
 
 =head3 is_same_interface_inlined($other_meta_inlined)
 
+  method is_same_interface_inlined(InstanceOf[Sub::Meta::Param] $other_meta) => Str
+
 Returns inlined C<is_same_interface> string.
 
 =head3 display
+
+  method display() => Str
 
 Returns the display of Sub::Meta::Param:
 

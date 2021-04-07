@@ -318,9 +318,16 @@ Constructor of C<Sub::Meta::Parameters>.
 
 =head3 args
 
+    method args() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Subroutine arguments arrayref.
 
-=head3 set_args(ArrayRef), set_args(HashRef), set_args(Ref)
+=head3 set_args
+
+    method set_args(ArrayRef[InstanceOf[Sub::Meta::Param]]) => $self
+    method set_args(ArrayRef[$sub_meta_param_args]) => $self
+    method set_args(Dict[Str, $sub_meta_param_args]) => $self
+    method set_args(Ref $type) => $self
 
 Setter for subroutine arguments.
 An element can be an argument of C<Sub::Meta::Param>.
@@ -343,22 +350,39 @@ An element can be an argument of C<Sub::Meta::Param>.
 
 =head3 all_args
 
+    method all_args() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Subroutine invocants and arguments arrayref.
 
 =head3 nshift
 
+    method nshift() => Enum[0,1]
+
 Number of shift arguments.
 
 =head3 set_nshift($nshift)
+
+    method nshift(Enum[0,1] $nshift) => $self
 
 Setter for nshift.
 For example, it is assumed that 1 is specified in the case of methods, and 0 is specified in the case of normal functions.
 
 =head3 slurpy
 
+    method slurpy() => Maybe[InstanceOf[Sub::Meta::Param]]
+
 Subroutine all rest arguments.
 
+=head3 has_slurpy
+
+    method has_slurpy() => Bool
+
+Whether Sub::Meta::Parameters has slurpy or not.
+
 =head3 set_slurpy($param_args)
+
+    method set_slurpy(InstanceOf[Sub::Meta::Param]) => $self> or
+    method set_slurpy($sub_meta_param_args)> or
 
 Setter for slurpy:
 
@@ -367,37 +391,62 @@ Setter for slurpy:
 
 =head3 positional
 
+    method positional() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Returns an arrayref of parameter objects for the positional arguments.
 
 =head3 positional_required
+
+    method positional_required() => ArrayRef[InstanceOf[Sub::Meta::Param]]
 
 Returns an arrayref of parameter objects for the required positional arguments.
 
 =head3 positional_optional
 
+    method positional_optional() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Returns an arrayref of parameter objects for the optional positional arguments.
 
 =head3 named
+
+    method named() => ArrayRef[InstanceOf[Sub::Meta::Param]]
 
 Returns an arrayref of parameter objects for the named arguments.
 
 =head3 named_required
 
+    method named_required() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Returns an arrayref of parameter objects for the required named arguments.
 
 =head3 named_optional
+
+    method named_optional() => ArrayRef[InstanceOf[Sub::Meta::Param]]
 
 Returns an arrayref of parameter objects for the optional named arguments.
 
 =head3 invocant
 
+    method invocant() => Maybe[InstanceOf[Sub::Meta::Param]]
+
 First element of invocants.
 
 =head3 invocants
 
+    method invocants() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Returns an arrayref of parameter objects for the variables into which initial arguments are shifted automatically. This will usually return () for normal functions and ('$self') for methods.
 
-=head3 set_invocant
+=head3 has_invocant 
+
+    method has_invocant() => Bool
+
+Whether Sub::Meta::Parameters has invocant or not.
+
+=head3 set_invocant($param_args)
+
+    method set_invocant(InstanceOf[Sub::Meta::Param]) => $self
+    method set_invocant($sub_meta_param_args) => $self
 
 Setter for invocant:
 
@@ -410,6 +459,8 @@ Setter for invocant:
 
 =head3 args_min
 
+    method args_min() => NonNegativeInt
+
 Returns the minimum number of required arguments.
 
 This is computed as follows:
@@ -419,6 +470,8 @@ This is computed as follows:
   Slurpy parameters don't count either because they accept empty lists.
 
 =head3 args_max
+
+    method args_max() => NonNegativeInt
 
 Returns the maximum number of arguments.
 
@@ -430,14 +483,26 @@ This is computed as follows:
 
 =head3 is_same_interface($other_meta)
 
+    method is_same_interface(InstanceOf[Sub::Meta::Parameters] $other_meta) => Bool
+
 A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
 Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
 
 =head3 is_same_interface_inlined($other_meta_inlined)
 
+    method is_same_interface_inlined(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+
 Returns inlined C<is_same_interface> string.
 
+=head3 interface_error_message($other_meta)
+
+    method interface_error_message(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+
+Return the error message when the interface does not match.
+
 =head3 display
+
+    method display() => Str
 
 Returns the display of Sub::Meta::Parameters:
 
@@ -451,13 +516,11 @@ Returns the display of Sub::Meta::Parameters:
     );
     $meta->display; # 'Num :$lat, Num :$lng'
 
-=head3 interface_error_message($other_meta)
-
-Return the error message when the interface does not match.
-
 =head2 OTHERS
 
 =head3 param_class
+
+    method param_class() => Str
 
 Returns class name of param. default: Sub::Meta::Param
 Please override for customization.

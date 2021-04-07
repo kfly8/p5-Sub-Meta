@@ -14,7 +14,7 @@ subtest 'non sub' => sub {
     is $meta->file, '', 'file';
     is $meta->line, undef, 'line';
     is $meta->is_constant, undef, 'is_constant';
-    is $meta->prototype, '', 'prototype';
+    is $meta->prototype, undef, 'prototype';
     is $meta->attribute, undef, 'prototype';
     ok !$meta->is_method, 'is_method';
     is $meta->parameters, undef, 'parameters';
