@@ -311,7 +311,8 @@ Accessor for subroutine information
 - `set_subinfo($stashname, $subname)`
 
     ```perl
-    method set_stashname(Str $stashname, Str $subname) => $self or C<method set_stashname(Tuple[Str, Str]) => $self
+    method set_stashname(Str $stashname, Str $subname) => $self
+    method set_stashname(Tuple[Str, Str]) => $self
     ```
 
     Setter for subroutine information.
@@ -339,7 +340,7 @@ Accessor for filename and line where subroutine is defined
 - `line`
 
     ```perl
-    method line() => Int>
+    method line() => Int
     ```
 
     A line where the definition of subroutine started, e.g. `5`
@@ -477,7 +478,7 @@ Accessor for parameters object of [Sub::Meta::Parameters](https://metacpan.org/p
 - `has_parameters`
 
     ```perl
-    method has_parameters() => Bool >
+    method has_parameters() => Bool
     ```
 
     Whether Sub::Meta has parameters or not.
@@ -560,7 +561,7 @@ Accessor for returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub
 - `has_returns`
 
     ```perl
-    method has_returns() => Bool >
+    method has_returns() => Bool
     ```
 
     Whether Sub::Meta has returns or not.

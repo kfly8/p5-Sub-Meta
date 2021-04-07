@@ -677,7 +677,8 @@ A subroutine information, e.g. C<['main', 'hello']>
 
 =item C<< set_subinfo($stashname, $subname) >>
 
-    method set_stashname(Str $stashname, Str $subname) => $self or C<method set_stashname(Tuple[Str, Str]) => $self
+    method set_stashname(Str $stashname, Str $subname) => $self
+    method set_stashname(Tuple[Str, Str]) => $self
 
 Setter for subroutine information.
 
@@ -703,7 +704,7 @@ Setter for C<file>.
 
 =item C<< line >>
 
-    method line() => Int>
+    method line() => Int
 
 A line where the definition of subroutine started, e.g. C<5>
 
@@ -831,7 +832,7 @@ If the parameters is set, it returns the parameters object.
 
 =item C<< has_parameters >>
 
-    method has_parameters() => Bool >
+    method has_parameters() => Bool
 
 Whether Sub::Meta has parameters or not.
 
@@ -910,7 +911,7 @@ If the returns is set, it returns the returns object.
 
 =item C<< has_returns >>
 
-    method has_returns() => Bool >
+    method has_returns() => Bool
 
 Whether Sub::Meta has returns or not.
 
