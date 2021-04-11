@@ -36,7 +36,7 @@ subtest 'has sub' => sub {
         is $meta->subname, 'hello', 'subname';
         is $meta->fullname, 'main::hello', 'fullname';
         is $meta->stashname, 'main', 'stashname';
-        is $meta->file, 't/01_meta.t', 'file';
+        is $meta->file, __FILE__, 'file';
         is $meta->line, 6, 'line';
         ok !$meta->is_constant, 'is_constant';
         is $meta->prototype, '$$', 'prototype';
