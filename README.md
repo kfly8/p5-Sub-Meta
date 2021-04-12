@@ -161,7 +161,7 @@ Accessor for subroutine.
 - `sub`
 
     ```perl
-    method sub() Maybe[CodeRef]
+    method sub() => Maybe[CodeRef]
     ```
 
     Return a subroutine.

@@ -545,7 +545,7 @@ Accessor for subroutine.
 
 =item C<< sub >>
 
-    method sub() Maybe[CodeRef]
+    method sub() => Maybe[CodeRef]
 
 Return a subroutine.
 
