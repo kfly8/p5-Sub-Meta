@@ -124,12 +124,13 @@ sub subinfo()     {
 
 sub file()        { my $self = shift; return $self->{file}        ||= $self->_build_file }
 sub line()        { my $self = shift; return $self->{line}        ||= $self->_build_line }
-sub is_constant() { my $self = shift; return $self->{is_constant} ||= $self->_build_is_constant }
 sub prototype() :method { my $self = shift; return $self->{prototype}   ||= $self->_build_prototype } ## no critic (ProhibitBuiltinHomonyms)
 sub attribute()   { my $self = shift; return $self->{attribute}   ||= $self->_build_attribute }
+sub is_constant() { my $self = shift; return $self->{is_constant} ||= !!$self->_build_is_constant }
 sub is_method()   { my $self = shift; return !!$self->{is_method} }
 sub parameters()  { my $self = shift; return $self->{parameters} }
 sub returns()     { my $self = shift; return $self->{returns} }
+
 sub args()        { my $self = shift; return $self->parameters->args }
 sub all_args()    { my $self = shift; return $self->parameters->all_args }
 sub slurpy()      { my $self = shift; return $self->parameters->slurpy }
@@ -144,14 +145,18 @@ sub has_prototype()  { my $self = shift; return !!$self->prototype } # after bui
 sub has_attribute()  { my $self = shift; return !!$self->attribute } # after build_attribute
 sub has_parameters() { my $self = shift; return defined $self->{parameters} }
 sub has_returns()    { my $self = shift; return defined $self->{returns} }
+sub has_file()       { my $self = shift; return defined $self->{file} }
+sub has_line()       { my $self = shift; return defined $self->{line} }
 
 sub set_sub {
     my ($self, $v) = @_;
     $self->{sub} = $v;
 
-    # rebuild subinfo
-    delete $self->{subinfo};
-    $self->subinfo;
+    # rebuild
+    for (qw/subinfo file line prototype attribute is_constant/) {
+        delete $self->{$_};
+        $self->$_;
+    }
     return $self;
 }
 
@@ -237,7 +242,7 @@ sub set_returns {
 }
 
 sub _build_subinfo     { my $self = shift; return $self->sub ? [ Sub::Identify::get_code_info($self->sub) ] : [] }
-sub _build_file        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[0] : '' }
+sub _build_file        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[0] : undef }
 sub _build_line        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[1] : undef }
 sub _build_is_constant { my $self = shift; return $self->sub ? Sub::Identify::is_sub_constant($self->sub) : undef }
 sub _build_prototype   { my $self = shift; return $self->sub ? Sub::Util::prototype($self->sub) : undef }
@@ -692,7 +697,7 @@ Accessor for filename and line where subroutine is defined
 
 =item C<< file >>
 
-    method file() => Str
+    method file() => Maybe[Str]
 
 A filename where subroutine is defined, e.g. C<path/to/main.pl>.
 
@@ -704,7 +709,7 @@ Setter for C<file>.
 
 =item C<< line >>
 
-    method line() => Int
+    method line() => Maybe[Int]
 
 A line where the definition of subroutine started, e.g. C<5>
 
