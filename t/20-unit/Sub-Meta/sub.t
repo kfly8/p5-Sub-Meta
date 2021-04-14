@@ -1,76 +1,41 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Test::SubMeta;
+use Sub::Meta::Test qw(test_submeta);
 
-subtest 'set_sub' => sub {
+subtest 'empty subroutine' => sub {
+    sub test1 {}
     my $meta = Sub::Meta->new;
+    is $meta->set_sub(\&test1), $meta, 'set_sub';
 
-    subtest 'empty subroutine' => sub {
-        sub set_sub_test1 {}
-        is $meta->set_sub(\&set_sub_test1), $meta, 'set_sub';
-
-        test_meta($meta, {
-            sub         => \&set_sub_test1,
-            subname     => 'set_sub_test1',
-            stashname   => 'main',
-            fullname    => 'main::set_sub_test1',
-            subinfo     => ['main', 'set_sub_test1'],
-            file        => __FILE__,
-            line        => 19,
-            attribute   => [],
-        });
-    };
-
-    subtest 'subroutine prototype && attribute' => sub {
-        sub set_sub_test2($) :method {}
-        is $meta->set_sub(\&set_sub_test2), $meta, 'set_sub';
-
-        test_meta($meta, {
-            sub         => \&set_sub_test2,
-            subname     => 'set_sub_test2',
-            stashname   => 'main',
-            fullname    => 'main::set_sub_test2',
-            subinfo     => ['main', 'set_sub_test2'],
-            file        => __FILE__,
-            line        => 35,
-            prototype   => '$',
-            attribute   => ['method'],
-        });
-    };
+    test_submeta($meta, {
+        sub         => \&test1,
+        subname     => 'test1',
+        stashname   => 'main',
+        fullname    => 'main::test1',
+        subinfo     => ['main', 'test1'],
+        file        => __FILE__,
+        line        => 7,
+        attribute   => [],
+    });
 };
 
-subtest 'set invalid fullname' => sub {
+subtest 'subroutine prototype && attribute' => sub {
+    sub test2($) :method {}
     my $meta = Sub::Meta->new;
+    is $meta->set_sub(\&test2), $meta, 'set_sub';
 
-    is $meta->set_fullname('invalid'), $meta, 'set_fullname';
-    is $meta->subinfo, [], 'subinfo';
-};
-
-subtest 'set_subinfo' => sub {
-    my $meta = Sub::Meta->new;
-
-    is $meta->subinfo, [], 'subinfo';
-
-    is $meta->set_subinfo(['foo', 'bar']), $meta, 'set_subinfo';
-    is $meta->subinfo, ['foo','bar'], 'subinfo';
-
-    is $meta->set_subinfo('hoge', 'fuga'), $meta, 'set_subinfo';
-    is $meta->subinfo, ['hoge','fuga'], 'subinfo';
-};
-
-
-subtest 'set_sub' => sub {
-    my $meta = Sub::Meta->new;
-
-    is $meta->subinfo, [], 'subinfo 1';
-
-    $meta->set_sub(\&hello);
-    is $meta->subinfo, ['main', 'hello'], 'subinfo 2';
-
-    $meta->set_sub(\&hello2);
-    is $meta->subinfo, ['main', 'hello2'], 'subinfo 3';
+    test_submeta($meta, {
+        sub         => \&test2,
+        subname     => 'test2',
+        stashname   => 'main',
+        fullname    => 'main::test2',
+        subinfo     => ['main', 'test2'],
+        file        => __FILE__,
+        line        => 24,
+        prototype   => '$',
+        attribute   => ['method'],
+    });
 };
 
 done_testing;
-

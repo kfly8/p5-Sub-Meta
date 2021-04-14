@@ -1,25 +1,63 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Test::SubMeta;
+use Sub::Meta::Test qw(test_submeta);
+use lib 't/lib';
 
 subtest 'set_parameters' => sub {
-    my $parameters = Sub::Meta::Parameters->new(args => ['Int']);
+    use MySubMeta::Parameters;
+    my $parameters   = Sub::Meta::Parameters->new(args => ['Int']);
+    my $myparameters = MySubMeta::Parameters->new(args => ['Str', 'Str']);
+
+    my @tests = (
+        # message         # arguments            # expected
+        'parameters'      => $parameters         => $parameters,
+        'my parameters'   => $myparameters       => $myparameters,
+        'parameters args' => { args => ['Int'] } => $parameters,
+    );
 
     my $meta = Sub::Meta->new;
-    is $meta->set_parameters($parameters), $meta, 'set_parameters';
+    while (@tests) {
+        my ($message, $args, $expected) = splice @tests, 0, 3;
 
-    test_meta($meta, {
-        parameters => $parameters,
-    });
+        is $meta->set_parameters($args), $meta, 'set_parameters';
+        test_submeta($meta, {
+            parameters => $expected,
+        });
+    }
+
+    note 'exceptions';
+    ok dies { $meta->set_parameters(bless {}, 'Foo') }, 'not Sub::Meta::Parameters object';
+    ok dies { $meta->set_parameters({}) },              'hashref';
+    ok dies { $meta->set_parameters('Int') },           'string';
+    ok dies { $meta->set_parameters(['Int']) },         'arrayref';
 };
 
-#        is $meta->set_args(['Int']), $meta, 'set_args';
-#        is $meta->args, Sub::Meta::Parameters->new(args => ['Int'])->args, 'args';
-#        is $meta->set_nshift(1), $meta, 'set_nshift';
-#        is $meta->nshift, 1, 'nshift';
-#        is $meta->set_slurpy('Str'), $meta, 'set_slurpy';
-#        is $meta->slurpy, Sub::Meta::Param->new('Str'), 'slurpy';
+subtest 'set_args' => sub {
+    my $meta = Sub::Meta->new;
+
+    is $meta->set_args(['Int']), $meta;
+    is $meta->args, Sub::Meta::Parameters->new(args => ['Int'])->args;
+
+    is $meta->set_args(['Str', 'Str']), $meta;
+    is $meta->args, Sub::Meta::Parameters->new(args => ['Str', 'Str'])->args;
+
+    is $meta->set_args([]), $meta;
+    is $meta->args, Sub::Meta::Parameters->new(args => [])->args;
+};
+
+subtest 'set_slurpy' => sub {
+    my $meta = Sub::Meta->new;
+    ok dies { $meta->set_slurpy('Int') }, 'no parameters';
+
+    is $meta->set_args([]), $meta, 'set parameters';
+
+    is $meta->set_slurpy('Int'), $meta;
+    is $meta->slurpy, Sub::Meta::Param->new(isa => 'Int');
+
+    is $meta->set_slurpy(Sub::Meta::Param->new(isa => 'Str')), $meta;
+    is $meta->slurpy, Sub::Meta::Param->new(isa => 'Str');
+};
 
 subtest 'set_nshift' => sub {
     my $meta = Sub::Meta->new(args => ['Str']);

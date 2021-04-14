@@ -1,13 +1,13 @@
-package Test::SubMeta;
+package Sub::Meta::Test;
 use strict;
 use warnings;
 use parent qw(Exporter);
-our @EXPORT = qw(test_meta);
+our @EXPORT_OK = qw(test_submeta);
 
 use Test2::API qw(context);
 use Test2::V0;
 
-sub test_meta {
+sub test_submeta {
     my ($meta, $expected) = @_;
     $expected //= {};
 
@@ -38,6 +38,9 @@ sub test_meta {
     is $meta->has_line,       !!$expected->{line},                'has_line';
 
     $ctx->release;
+    return;
 };
+
+
 
 1;

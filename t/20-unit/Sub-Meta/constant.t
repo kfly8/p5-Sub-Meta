@@ -1,21 +1,13 @@
-subtest 'constant' => sub {
-    {
-        use constant PI => 4 * atan2(1, 1);
-        my $m = Sub::Meta->new(sub => \&PI);
-        is $m->is_constant, 1;
-    }
+use Test2::V0;
 
-    {
-        sub one() { 1 } ## no critic (RequireFinalReturn)
-        my $m = Sub::Meta->new(sub => \&one);
-        is $m->is_constant, 1;
-    }
+use Sub::Meta;
 
-    {
-        sub two() { return 2 }
-        my $m = Sub::Meta->new(sub => \&two);
-        ok !$m->is_constant;
-    }
-};
+use constant PI => 4 * atan2(1, 1);
+sub one() { 1 } ## no critic (RequireFinalReturn)
+sub two() { return 2 }
 
+ok(Sub::Meta->new(sub => \&PI)->is_constant);
+ok(Sub::Meta->new(sub => \&one)->is_constant);
+ok(!Sub::Meta->new(sub => \&two)->is_constant);
 
+done_testing;
