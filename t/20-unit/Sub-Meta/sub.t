@@ -21,7 +21,7 @@ subtest 'empty subroutine' => sub {
 };
 
 subtest 'subroutine prototype && attribute' => sub {
-    sub test2($) :method {}
+    sub test2($) :method {} ## no critic (ProhibitSubroutinePrototypes)
     my $meta = Sub::Meta->new;
     is $meta->set_sub(\&test2), $meta, 'set_sub';
 

@@ -9,7 +9,7 @@ subtest 'no arguments meta' => sub {
 };
 
 subtest 'set_sub' => sub {
-    sub hello($) :method {}
+    sub hello($) :method {} ## no critic (ProhibitSubroutinePrototypes)
     my $meta = Sub::Meta->new;
     is $meta->set_sub(\&hello), $meta, 'set_sub';
 
