@@ -101,7 +101,7 @@ sub set_invocant {
 sub _normalize_args {
     my ($self, @args) = @_;
     my $args = $args[0];
-    _croak 'args must be a reference' unless @args == 1 && ref $args;
+    _croak 'args must be a single reference' unless @args == 1 && ref $args;
 
     my @normalized_args;
     if (ref $args eq 'ARRAY') {
