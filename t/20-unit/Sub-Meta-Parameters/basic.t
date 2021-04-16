@@ -1,23 +1,35 @@
-use lib 't/lib';
 use Test2::V0;
+
+use Sub::Meta::Test qw(test_submeta_parameters);
 
 use Sub::Meta::Parameters;
 use Sub::Meta::Param;
-use MySubMeta::Param;
+
+sub Inf() { return 0 + 'Inf' } ## no critic (ProhibitMismatchedOperators)
+
+my $p1              = Sub::Meta::Param->new(type => 'Str');
+my $p2              = Sub::Meta::Param->new(type => 'Int');
+my $p_optional      = Sub::Meta::Param->new(type => 'Int', optional => 1);
+my $n1              = Sub::Meta::Param->new(type => 'Str', named => 1);
+my $n2              = Sub::Meta::Param->new(type => 'Int', named => 1);
+my $n_optional      = Sub::Meta::Param->new(type => 'Int', named => 1, optional => 1);
+my $invocant        = Sub::Meta::Param->new(invocant => 1);
+my $invocant_self   = Sub::Meta::Param->new(invocant => 1, name => '$self');
+my $invocant_class  = Sub::Meta::Param->new(invocant => 1, name => '$class');
+my $slurpy          = Sub::Meta::Param->new(type => 'Num', name => '@numbers');
+
 
 subtest 'exception' => sub {
     like dies { Sub::Meta::Parameters->new() },
         qr/parameters reqruires args/, 'requires args';
-
-    like dies { Sub::Meta::Parameters->new(args => 'Str') },
-        qr/args must be a reference/, 'args is not reference';
 };
 
-my @TEST = (
-    { args => [] } => [
-        nshift                   => 0,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
+
+note '==== TEST args ====';
+
+subtest 'empty args: { args => [] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => []);
+    test_submeta_parameters($meta, {
         args                     => [],
         all_args                 => [],
         _all_positional_required => [],
@@ -27,340 +39,294 @@ my @TEST = (
         named                    => [],
         named_required           => [],
         named_optional           => [],
-        invocant                 => undef,
-        invocants                => [],
-        has_invocant             => !!0,
-        args_min                 => 0,
-        args_max                 => 0,
-    ],
-    { args => [p(type => 'Foo')] } => [
-        nshift                   => 0,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo')],
-        all_args                 => [p(type => 'Foo')],
-        _all_positional_required => [p(type => 'Foo')],
-        positional               => [p(type => 'Foo')],
-        positional_required      => [p(type => 'Foo')],
-        positional_optional      => [],
-        named                    => [],
-        named_required           => [],
-        named_optional           => [],
-        invocant                 => undef,
-        invocants                => [],
-        has_invocant             => !!0,
-        args_min                 => 1,
-        args_max                 => 1,
-    ],
-    { args => [p(type => 'Foo')], nshift => 1 } => [
-        nshift                   => 1,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo')],
-        all_args                 => [p(invocant => 1), p(type => 'Foo')],
-        _all_positional_required => [p(invocant => 1), p(type => 'Foo')],
-        positional               => [p(type => 'Foo')],
-        positional_required      => [p(type => 'Foo')],
-        positional_optional      => [],
-        named                    => [],
-        named_required           => [],
-        named_optional           => [],
-        invocant                 => p(invocant => 1),
-        invocants                => [p(invocant => 1)],
-        has_invocant             => !!1,
-        args_min                 => 2,
-        args_max                 => 2,
-    ],
-    { args => [p(type => 'Foo')], invocant => p(name => '$self') } => [
-        nshift                   => 1,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo')],
-        all_args                 => [p(name => '$self', invocant => 1), p(type => 'Foo')],
-        _all_positional_required => [p(name => '$self', invocant => 1), p(type => 'Foo')],
-        positional               => [p(type => 'Foo')],
-        positional_required      => [p(type => 'Foo')],
-        positional_optional      => [],
-        named                    => [],
-        named_required           => [],
-        named_optional           => [],
-        invocant                 => p(name => '$self', invocant => 1),
-        invocants                => [p(name => '$self', invocant => 1)],
-        has_invocant             => !!1,
-        args_min                 => 2,
-        args_max                 => 2,
-    ],
-    { args => [p(type => 'Foo')], nshift => 1, slurpy => 'Str' } => [
-        nshift                   => 1,
-        slurpy                   => p(type => 'Str'),
-        has_slurpy               => !!1,
-        args                     => [p(type => 'Foo')],
-        all_args                 => [p(invocant => 1), p(type => 'Foo')],
-        _all_positional_required => [p(invocant => 1), p(type => 'Foo')],
-        positional               => [p(type => 'Foo')],
-        positional_required      => [p(type => 'Foo')],
-        positional_optional      => [],
-        named                    => [],
-        named_required           => [],
-        named_optional           => [],
-        invocant                 => p(invocant => 1),
-        invocants                => [p(invocant => 1)],
-        has_invocant             => !!1,
-        args_min                 => 2,
-        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
-    ],
-    { args => [p(type => 'Foo', named => 1)] } => [
-        nshift                   => 0,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo', named => 1)],
-        all_args                 => [p(type => 'Foo', named => 1)], 
-        _all_positional_required => [],
-        positional               => [],
-        positional_required      => [],
-        positional_optional      => [],
-        named                    => [p(type => 'Foo', named => 1)],
-        named_required           => [p(type => 'Foo', named => 1)],
-        named_optional           => [],
-        invocant                 => undef,
-        invocants                => [],
-        has_invocant             => !!0,
-        args_min                 => 2,
-        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
-    ],
-    { args => [p(type => 'Foo', optional => 1)] } => [
-        nshift                   => 0,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo', optional => 1)],
-        all_args                 => [p(type => 'Foo', optional => 1)],
-        _all_positional_required => [],
-        positional               => [p(type => 'Foo', optional => 1)],
-        positional_required      => [],
-        positional_optional      => [p(type => 'Foo', optional => 1)],
-        named                    => [],
-        named_required           => [],
-        named_optional           => [],
-        invocant                 => undef,
-        invocants                => [],
-        has_invocant             => !!0,
-        args_min                 => 0,
-        args_max                 => 1,
-    ],
-    { args => [p(type => 'Foo', named => 1, optional => 1)] } => [
-        nshift                   => 0,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo', named => 1, optional => 1)],
-        all_args                 => [p(type => 'Foo', named => 1, optional => 1)],
-        _all_positional_required => [],
-        positional               => [],
-        positional_required      => [],
-        positional_optional      => [],
-        named                    => [p(type => 'Foo', named => 1, optional => 1)],
-        named_required           => [],
-        named_optional           => [p(type => 'Foo', named => 1, optional => 1)],
-        invocant                 => undef,
-        invocants                => [],
-        has_invocant             => !!0,
-        args_min                 => 0,
-        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
-    ],
-    { args => [p(type => 'Foo', named => 1, optional => 1)], slurpy => 'Str' } => [
-        nshift                   => 0,
-        slurpy                   => p(type => 'Str'),
-        has_slurpy               => !!1,
-        args                     => [p(type => 'Foo', named => 1, optional => 1)],
-        all_args                 => [p(type => 'Foo', named => 1, optional => 1)],
-        _all_positional_required => [],
-        positional               => [],
-        positional_required      => [],
-        positional_optional      => [],
-        named                    => [p(type => 'Foo', named => 1, optional => 1)],
-        named_required           => [],
-        named_optional           => [p(type => 'Foo', named => 1, optional => 1)],
-        invocant                 => undef,
-        invocants                => [],
-        has_invocant             => !!0,
-        args_min                 => 0,
-        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
-    ],
-    { args => [p(type => 'Foo'), p(type => 'Bar')] } => [
-        nshift                   => 0,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo'), p(type => 'Bar')],
-        all_args                 => [p(type => 'Foo'), p(type => 'Bar')],
-        _all_positional_required => [p(type => 'Foo'), p(type => 'Bar')],
-        positional               => [p(type => 'Foo'), p(type => 'Bar')],
-        positional_required      => [p(type => 'Foo'), p(type => 'Bar')],
-        positional_optional      => [],
-        named                    => [],
-        named_required           => [],
-        named_optional           => [],
-        invocant                 => undef,
-        invocants                => [],
-        has_invocant             => !!0,
-        args_min                 => 2,
-        args_max                 => 2,
-    ],
-    { args => [p(type => 'Foo'), p(type => 'Bar')], nshift => 1 } => [
-        nshift                   => 1,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo'), p(type => 'Bar')],
-        all_args                 => [p(invocant => 1), p(type => 'Foo'), p(type => 'Bar')],
-        _all_positional_required => [p(invocant => 1), p(type => 'Foo'), p(type => 'Bar')],
-        positional               => [p(type => 'Foo'), p(type => 'Bar')],
-        positional_required      => [p(type => 'Foo'), p(type => 'Bar')],
-        positional_optional      => [],
-        named                    => [],
-        named_required           => [],
-        named_optional           => [],
-        invocant                 => p(invocant => 1),
-        invocants                => [p(invocant => 1)],
-        has_invocant             => !!1,
-        args_min                 => 3,
-        args_max                 => 3,
-    ],
-    { args => [p(type => 'Foo'), p(type => 'Bar', named => 1)] } => [
-        nshift                   => 0,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo'), p(type => 'Bar', named => 1)],
-        all_args                 => [p(type => 'Foo'), p(type => 'Bar', named => 1)],
-        _all_positional_required => [p(type => 'Foo')],
-        positional               => [p(type => 'Foo')],
-        positional_required      => [p(type => 'Foo')],
-        positional_optional      => [],
-        named                    => [p(type => 'Bar', named => 1)],
-        named_required           => [p(type => 'Bar', named => 1)],
-        named_optional           => [],
-        invocant                 => undef,
-        invocants                => [],
-        has_invocant             => !!0,
-        args_min                 => 3,
-        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
-    ],
-    { args => [p(type => 'Foo'), p(type => 'Bar', named => 1, optional => 1)] } => [
-        nshift                   => 0,
-        slurpy                   => undef,
-        has_slurpy               => !!0,
-        args                     => [p(type => 'Foo'), p(type => 'Bar', named => 1,optional => 1)],
-        all_args                 => [p(type => 'Foo'), p(type => 'Bar', named => 1,optional => 1)],
-        _all_positional_required => [p(type => 'Foo')],
-        positional               => [p(type => 'Foo')],
-        positional_required      => [p(type => 'Foo')],
-        positional_optional      => [],
-        named                    => [p(type => 'Bar', named => 1, optional => 1)],
-        named_required           => [],
-        named_optional           => [p(type => 'Bar', named => 1, optional => 1)],
-        invocant                 => undef,
-        invocants                => [],
-        has_invocant             => !!0,
-        args_min                 => 1,
-        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
-    ],
-);
-
-use JSON::PP;
-my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
-{
-    no warnings qw/once/; ## no critic (ProhibitNoWarnings)
-    *{Sub::Meta::Param::TO_JSON} = sub {
-        my $s = $_[0]->type;
-        $s .= ':named' if $_[0]->named;
-        $s .= ':optional' if $_[0]->optional;
-        return $s;
-    }
-}
-
-sub p { my @args = @_; return Sub::Meta::Param->new(@args); }
-
-while (my ($parameters, $expect) = splice @TEST, 0, 2) {
-    my $meta = Sub::Meta::Parameters->new($parameters);
-    subtest "parameters: @{[$json->encode($parameters)]}" => sub {
-        while (my ($key, $exp) = splice @$expect, 0, 2) {
-            is $meta->$key, $exp, "$key is @{[$json->encode($exp)]}";
-        }
-    };
-}
-
-subtest 'setter' => sub {
-    my $some = bless {}, 'Some';
-    my $parameters = Sub::Meta::Parameters->new(args => [p()]);
-
-    is $parameters->nshift, 0, 'nshift';
-    is $parameters->set_nshift(1), $parameters, 'set_nshift';
-    is $parameters->nshift, 1, 'nshift';
-
-    ok !$parameters->slurpy, 'slurpy';
-    is $parameters->set_slurpy('Str'), $parameters, 'set_slurpy';
-    is $parameters->slurpy, p(type => 'Str'), 'slurpy';
-    is $parameters->set_slurpy(p(type => 'Int')), $parameters, 'set_slurpy';
-    is $parameters->slurpy, p(type => 'Int'), 'slurpy';
-    is $parameters->set_slurpy($some), $parameters, 'set_slurpy';
-    is $parameters->slurpy, p(type => $some), 'slurpy';
-
-    is $parameters->args, [p()], 'args';
-    is $parameters->set_args([p(type => 'Foo')]), $parameters, 'set_args';
-    is $parameters->args, [p(type => 'Foo')], 'args';
-    is $parameters->set_args(p(type => 'Foo')), $parameters, 'set_args';
-    is $parameters->args, [p(type => 'Foo')], 'args';
+    });
 };
 
-subtest '_normalize_args' => sub {
-    my $some = bless {}, 'Some';
-
-## no critic (ProtectPrivateSubs)
-    is(Sub::Meta::Parameters->_normalize_args([$some]), [p($some)], 'blessed arg list');
-    is(Sub::Meta::Parameters->_normalize_args(['Foo', 'Bar']), [p('Foo'), p('Bar')], 'arrayref');
-
-    is(Sub::Meta::Parameters->_normalize_args($some), [p($some)], 'single arg');
-
-    like dies { Sub::Meta::Parameters->_normalize_args('Foo', 'Bar') },
-        qr/args must be a reference/, 'cannot use array';
-
-    is(Sub::Meta::Parameters->_normalize_args(
-        { a => 'Foo', b => 'Bar'}),
-        [p(type => 'Foo', name => 'a', named => 1), p(type => 'Bar', name => 'b', named => 1)], 'hashref');
-
-    is(Sub::Meta::Parameters->_normalize_args(
-        { a => { isa => 'Foo' }, b => { isa => 'Bar' } }),
-        [p(type => 'Foo', name => 'a', named => 1), p(type => 'Bar', name => 'b', named => 1)], 'hashref');
-
-    my $foo = sub { 'Foo' };
-    is(Sub::Meta::Parameters->_normalize_args(
-        { a => $foo }),
-        [p(type => $foo, name => 'a', named => 1)], 'hashref');
-## use critic
+subtest 'one args: { args => [$p1] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p1]);
+    test_submeta_parameters($meta, {
+        args                     => [$p1],
+        all_args                 => [$p1],
+        _all_positional_required => [$p1],
+        positional               => [$p1],
+        positional_required      => [$p1],
+        positional_optional      => [],
+        args_min                 => 1,
+        args_max                 => 1,
+    });
 };
 
-subtest 'invocant' => sub {
-    my $parameters = Sub::Meta::Parameters->new(args => [p('Foo'), p('Bar')]);
-    is $parameters->invocant, undef, 'no invocant';
-    is $parameters->set_nshift(1), $parameters, 'if set nshift';
-    is $parameters->invocant, p(invocant => 1), 'then set default invocant';
+subtest 'two args: { args => [$p1, $p2] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p1, $p2]);
+    test_submeta_parameters($meta, {
+        args                     => [$p1, $p2],
+        all_args                 => [$p1, $p2],
+        _all_positional_required => [$p1, $p2],
+        positional               => [$p1, $p2],
+        positional_required      => [$p1, $p2],
+        positional_optional      => [],
+        args_min                 => 2,
+        args_max                 => 2,
+    });
+};
 
-    like dies { $parameters->set_nshift(2) }, qr/^Can't set this nshift: /, $parameters;
-    like dies { $parameters->set_nshift(undef) }, qr/^Can't set this nshift: /, $parameters;
+subtest 'one optional args: { args => [$p_optional] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p_optional]);
+    test_submeta_parameters($meta, {
+        args                     => [$p_optional],
+        all_args                 => [$p_optional],
+        _all_positional_required => [],
+        positional               => [$p_optional],
+        positional_required      => [],
+        positional_optional      => [$p_optional],
+        args_min                 => 0,
+        args_max                 => 1,
+    });
+};
 
-    is $parameters->set_nshift(0), $parameters, 'if set nshift:0';
-    is $parameters->invocant, undef, 'then remove invocant';
+subtest 'required and optional args: { args => [$p1, $p_optional] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p1, $p_optional]);
+    test_submeta_parameters($meta, {
+        args                     => [$p1, $p_optional],
+        all_args                 => [$p1, $p_optional],
+        _all_positional_required => [$p1],
+        positional               => [$p1, $p_optional],
+        positional_required      => [$p1],
+        positional_optional      => [$p_optional],
+        args_min                 => 1,
+        args_max                 => 2,
+    });
+};
 
-    is $parameters->set_invocant(p(name => '$self')), $parameters, 'if set original invocant';
-    is $parameters->invocant, p(name => '$self', invocant => 1), 'then original with invocant flag';
+subtest 'optional and required args: { args => [$p_optional, $p1] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p_optional, $p1]);
+    test_submeta_parameters($meta, {
+        args                     => [$p_optional, $p1],
+        all_args                 => [$p_optional, $p1],
+        _all_positional_required => [$p1],
+        positional               => [$p_optional, $p1],
+        positional_required      => [$p1],
+        positional_optional      => [$p_optional],
+        args_min                 => 1,
+        args_max                 => 2,
+    });
+};
 
-    is $parameters->set_invocant({ name => '$class'}), $parameters, 'set_invocant can take hashref';
-    is $parameters->invocant, p(name => '$class', invocant => 1);
+subtest 'one named args: { args => [$n1] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$n1]);
+    test_submeta_parameters($meta, {
+        args                     => [$n1],
+        all_args                 => [$n1],
+        named                    => [$n1],
+        named_required           => [$n1],
+        named_optional           => [],
+        args_min                 => 2,
+        args_max                 => Inf,
+    });
+};
 
-    my $some = bless {}, 'Some';
-    is $parameters->set_invocant($some), $parameters, 'set_invocant can take type';
-    is $parameters->invocant, p(type=> $some, invocant => 1);
+subtest 'two named args: { args => [$n1, $n2] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$n1, $n2]);
+    test_submeta_parameters($meta, {
+        args                     => [$n1, $n2],
+        all_args                 => [$n1, $n2],
+        named                    => [$n1, $n2],
+        named_required           => [$n1, $n2],
+        named_optional           => [],
+        args_min                 => 4,
+        args_max                 => Inf,
+    });
+};
 
-    my $myparam = MySubMeta::Param->new(name => '$self');
-    is $parameters->set_invocant($myparam), $parameters, 'set_invocant can take your Sub::Meta::Param';
-    is $parameters->invocant, $myparam->set_invocant(1);
+subtest 'one named optional args: { args => [$n_optional] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$n_optional]);
+    test_submeta_parameters($meta, {
+        args                     => [$n_optional],
+        all_args                 => [$n_optional],
+        named                    => [$n_optional],
+        named_required           => [],
+        named_optional           => [$n_optional],
+        args_min                 => 0,
+        args_max                 => Inf,
+    });
+};
+
+subtest 'named required and named optional args: { args => [$n1, $n_optional] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$n1, $n_optional]);
+    test_submeta_parameters($meta, {
+        args                     => [$n1, $n_optional],
+        all_args                 => [$n1, $n_optional],
+        named                    => [$n1, $n_optional],
+        named_required           => [$n1],
+        named_optional           => [$n_optional],
+        args_min                 => 2,
+        args_max                 => Inf,
+    });
+};
+
+subtest 'named optional and named required args: { args => [$n_optional, $n1] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$n_optional, $n1]);
+    test_submeta_parameters($meta, {
+        args                     => [$n_optional, $n1],
+        all_args                 => [$n_optional, $n1],
+        named                    => [$n_optional, $n1],
+        named_required           => [$n1],
+        named_optional           => [$n_optional],
+        args_min                 => 2,
+        args_max                 => Inf,
+    });
+};
+
+subtest 'one positional and one named args: { args => [$p1, $n1] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p1, $n1]);
+    test_submeta_parameters($meta, {
+        args                     => [$p1, $n1],
+        all_args                 => [$p1, $n1],
+        _all_positional_required => [$p1],
+        positional               => [$p1],
+        positional_required      => [$p1],
+        positional_optional      => [],
+        named                    => [$n1],
+        named_required           => [$n1],
+        named_optional           => [],
+        args_min                 => 3,
+        args_max                 => Inf,
+    });
+};
+
+subtest 'one named and one positional args: { args => [$n1, $p1] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$n1, $p1]);
+    test_submeta_parameters($meta, {
+        args                     => [$n1, $p1],
+        all_args                 => [$n1, $p1],
+        _all_positional_required => [$p1],
+        positional               => [$p1],
+        positional_required      => [$p1],
+        positional_optional      => [],
+        named                    => [$n1],
+        named_required           => [$n1],
+        named_optional           => [],
+        args_min                 => 3,
+        args_max                 => Inf,
+    });
+};
+
+subtest 'two positional and one named args: { args => [$p1, $p2 $n1] }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p1, $p2, $n1]);
+    test_submeta_parameters($meta, {
+        args                     => [$p1, $p2, $n1],
+        all_args                 => [$p1, $p2, $n1],
+        _all_positional_required => [$p1, $p2],
+        positional               => [$p1, $p2],
+        positional_required      => [$p1, $p2],
+        positional_optional      => [],
+        named                    => [$n1],
+        named_required           => [$n1],
+        named_optional           => [],
+        args_min                 => 4,
+        args_max                 => Inf,
+    });
+};
+
+note '==== TEST nshift, invocant ====';
+
+subtest 'set nshift: { args => [], nshift => 1 }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [], nshift => 1);
+    test_submeta_parameters($meta, {
+        nshift                   => 1,
+        args                     => [],
+        all_args                 => [$invocant],
+        _all_positional_required => [$invocant],
+        positional               => [],
+        positional_required      => [],
+        positional_optional      => [],
+        invocant                 => $invocant,
+        invocants                => [$invocant],
+        args_min                 => 1,
+        args_max                 => 1,
+    });
+};
+
+subtest 'set nshift and args: { args => [$p1], nshift => 1 }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p1], nshift => 1);
+    test_submeta_parameters($meta, {
+        nshift                   => 1,
+        args                     => [$p1],
+        all_args                 => [$invocant, $p1],
+        _all_positional_required => [$invocant, $p1],
+        positional               => [$p1],
+        positional_required      => [$p1],
+        positional_optional      => [],
+        invocant                 => $invocant,
+        invocants                => [$invocant],
+        args_min                 => 2,
+        args_max                 => 2,
+    });
+};
+
+subtest 'set invocant: { args => [], invocant => $invocant_self }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [], invocant => $invocant_self);
+    test_submeta_parameters($meta, {
+        nshift                   => 1,
+        args                     => [],
+        all_args                 => [$invocant_self],
+        _all_positional_required => [$invocant_self],
+        positional               => [],
+        positional_required      => [],
+        positional_optional      => [],
+        invocant                 => $invocant_self,
+        invocants                => [$invocant_self],
+        args_min                 => 1,
+        args_max                 => 1,
+    });
+};
+
+subtest 'set invocant and args: { args => [$p1], invocant => $invocant_self }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p1], invocant => $invocant_self);
+    test_submeta_parameters($meta, {
+        nshift                   => 1,
+        args                     => [$p1],
+        all_args                 => [$invocant_self, $p1],
+        _all_positional_required => [$invocant_self, $p1],
+        positional               => [$p1],
+        positional_required      => [$p1],
+        positional_optional      => [],
+        named                    => [],
+        named_required           => [],
+        named_optional           => [],
+        invocant                 => $invocant_self,
+        invocants                => [$invocant_self],
+        args_min                 => 2,
+        args_max                 => 2,
+    });
+};
+
+note '==== TEST slurpy ====';
+
+subtest 'set slurpy: { args => [], slurpy => $slurpy }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [], slurpy => $slurpy);
+    test_submeta_parameters($meta, {
+        slurpy                   => $slurpy,
+        args                     => [],
+        all_args                 => [],
+        args_min                 => 0,
+        args_max                 => Inf,
+    });
+};
+
+subtest 'set slurpy and args: { args => [$p1], slurpy => $slurpy }' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => [$p1], slurpy => $slurpy);
+    test_submeta_parameters($meta, {
+        slurpy                   => $slurpy,
+        args                     => [$p1],
+        all_args                 => [$p1],
+        _all_positional_required => [$p1],
+        positional               => [$p1],
+        positional_required      => [$p1],
+        positional_optional      => [],
+        args_min                 => 1,
+        args_max                 => Inf,
+    });
 };
 
 done_testing;

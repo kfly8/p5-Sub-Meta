@@ -2,7 +2,7 @@ package Sub::Meta::Test;
 use strict;
 use warnings;
 use parent qw(Exporter);
-our @EXPORT_OK = qw(test_submeta);
+our @EXPORT_OK = qw(test_submeta test_submeta_parameters);
 
 use Test2::API qw(context);
 use Test2::V0;
@@ -41,6 +41,33 @@ sub test_submeta {
     return;
 };
 
+sub test_submeta_parameters {
+    my ($meta, $expected) = @_;
+    $expected //= {};
 
+    my $ctx = context;
+
+    isa_ok $meta, 'Sub::Meta::Parameters';
+    is $meta->nshift                   => $expected->{nshift}                   // 0,      'nshift';
+    is $meta->slurpy                   => $expected->{slurpy}                   // undef,  'slurpy';
+    is $meta->args                     => $expected->{args}                     // [],     'args';
+    is $meta->all_args                 => $expected->{all_args}                 // [],     'all_args';
+    is $meta->_all_positional_required => $expected->{_all_positional_required} // [],     '_all_positional_required';
+    is $meta->positional               => $expected->{positional}               // [],     'positional';
+    is $meta->positional_required      => $expected->{positional_required}      // [],     'positional_required';
+    is $meta->positional_optional      => $expected->{positional_optional}      // [],     'positional_optional';
+    is $meta->named                    => $expected->{named}                    // [],     'named';
+    is $meta->named_required           => $expected->{named_required}           // [],     'named_required';
+    is $meta->named_optional           => $expected->{named_optional}           // [],     'named_optional';
+    is $meta->invocant                 => $expected->{invocant}                 // undef,  'invocant';
+    is $meta->invocants                => $expected->{invocants}                // [],     'invocants';
+    is $meta->args_min                 => $expected->{args_min}                 // 0,      'args_min';
+    is $meta->args_max                 => $expected->{args_max}                 // 0,      'args_max';
+    is $meta->has_slurpy               => !!$expected->{slurpy}                 // !!0,    'has_slurpy';
+    is $meta->has_invocant             => !!$expected->{invocant}               // !!0,    'has_invocant';
+ 
+    $ctx->release;
+    return;
+}
 
 1;
