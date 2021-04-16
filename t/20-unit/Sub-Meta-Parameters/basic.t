@@ -1,10 +1,11 @@
 use Test2::V0;
 
 use Sub::Meta::Test qw(test_submeta_parameters);
-use POSIX qw(Inf);
 
 use Sub::Meta::Parameters;
 use Sub::Meta::Param;
+
+sub Inf() { return 0 + 'Inf' } ## no critic (ProhibitMismatchedOperators)
 
 my $p1              = Sub::Meta::Param->new(type => 'Str');
 my $p2              = Sub::Meta::Param->new(type => 'Int');
