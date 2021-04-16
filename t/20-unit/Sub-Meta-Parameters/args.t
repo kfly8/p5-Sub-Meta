@@ -13,61 +13,50 @@ my $myp = MySubMeta::Param->new(type => 'MyStr');
 subtest set_args => sub {
     my $parameters = Sub::Meta::Parameters->new(args => []);
 
-    is $parameters->args, [];
+    is $parameters->args, [], 'no args';
+
     is $parameters->set_args($p1), $parameters;
-    is $parameters->args, [$p1];
+    is $parameters->args, [$p1], 'args: $p1';
 
     is $parameters->set_args($p2), $parameters;
-    is $parameters->args, [$p2];
-
-    like dies { $parameters->set_args($p1, $p2) }, qr/args must be a single reference/;
+    is $parameters->args, [$p2], 'args: $p2';
 
     is $parameters->set_args([$p1, $p2]), $parameters;
-    is $parameters->args, [$p1, $p2];
+    is $parameters->args, [$p1, $p2], 'args: $p1, $p2';
 
     is $parameters->set_args($myp), $parameters;
-    is $parameters->args, [$myp];
+    is $parameters->args, [$myp], 'args: $my param';
 
     my $some = bless {}, 'Some';
     is $parameters->set_args($some), $parameters;
-    is $parameters->args, [Sub::Meta::Param->new(type => $some)];
+    is $parameters->args, [Sub::Meta::Param->new(type => $some)], 'args: some object';
 
     my $sub = sub {};
     is $parameters->set_args($sub), $parameters;
-    is $parameters->args, [Sub::Meta::Param->new(type => $sub)];
+    is $parameters->args, [Sub::Meta::Param->new(type => $sub)], 'args: sub';
 
     is $parameters->set_args({}), $parameters;
-    is $parameters->args, [];
+    is $parameters->args, [], 'args: { } / empty hashref';
 
+    is $parameters->set_args({ a => 'Int' }), $parameters;
+    is $parameters->args, [Sub::Meta::Param->new(type => 'Int', name => 'a', named => 1)], 'args: hashref';
 
+    is $parameters->set_args({ a => 'Int', b => 'Str' }), $parameters;
+    is $parameters->args, [
+        Sub::Meta::Param->new(type => 'Int', name => 'a', named => 1),
+        Sub::Meta::Param->new(type => 'Str', name => 'b', named => 1),
+    ], 'args: { a => Int, b => Str }';
+
+    is $parameters->set_args({ a => { type => 'Int', default => 1 } }), $parameters;
+    is $parameters->args, [Sub::Meta::Param->new(type => 'Int', name => 'a', named => 1, default => 1)], 'args: { a => { type => Int, default => 1 } } / value is sub meta param args';
+
+    is $parameters->set_args({ a => { name => 'hoge' } }), $parameters;
+    is $parameters->args, [Sub::Meta::Param->new(name => 'hoge', named => 1)], 'args: { a => { name => hoge } } / override name';
+
+    like dies { $parameters->set_args($p1, $p2) }, qr/args must be a single reference/;
+    like dies { $parameters->set_args(1) },        qr/args must be a single reference/;
+    like dies { $parameters->set_args('Str') },    qr/args must be a single reference/;
 };
-
-#subtest 'normalize_args' => sub {
-#    my $some = bless {}, 'Some';
-#
-### no critic (ProtectPrivateSubs)
-#    is(Sub::Meta::Parameters->_normalize_args([$some]), [p($some)], 'blessed arg list');
-#    is(Sub::Meta::Parameters->_normalize_args(['Foo', 'Bar']), [p('Foo'), p('Bar')], 'arrayref');
-#
-#    is(Sub::Meta::Parameters->_normalize_args($some), [p($some)], 'single arg');
-#
-#    like dies { Sub::Meta::Parameters->_normalize_args('Foo', 'Bar') },
-#        qr/args must be a reference/, 'cannot use array';
-#
-#    is(Sub::Meta::Parameters->_normalize_args(
-#        { a => 'Foo', b => 'Bar'}),
-#        [p(type => 'Foo', name => 'a', named => 1), p(type => 'Bar', name => 'b', named => 1)], 'hashref');
-#
-#    is(Sub::Meta::Parameters->_normalize_args(
-#        { a => { isa => 'Foo' }, b => { isa => 'Bar' } }),
-#        [p(type => 'Foo', name => 'a', named => 1), p(type => 'Bar', name => 'b', named => 1)], 'hashref');
-#
-#    my $foo = sub { 'Foo' };
-#    is(Sub::Meta::Parameters->_normalize_args(
-#        { a => $foo }),
-#        [p(type => $foo, name => 'a', named => 1)], 'hashref');
-### use critic
-#};
 
 done_testing;
 
