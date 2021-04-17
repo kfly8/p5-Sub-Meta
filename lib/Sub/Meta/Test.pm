@@ -2,7 +2,7 @@ package Sub::Meta::Test;
 use strict;
 use warnings;
 use parent qw(Exporter);
-our @EXPORT_OK = qw(test_submeta test_submeta_parameters);
+our @EXPORT_OK = qw(test_submeta test_submeta_parameters test_submeta_param);
 
 use Test2::API qw(context);
 use Test2::V0;
@@ -66,6 +66,32 @@ sub test_submeta_parameters {
     is $meta->has_slurpy               => !!$expected->{slurpy}                 // !!0,    'has_slurpy';
     is $meta->has_invocant             => !!$expected->{invocant}               // !!0,    'has_invocant';
  
+    $ctx->release;
+    return;
+}
+
+sub test_submeta_param {
+    my ($meta, $expected) = @_;
+    $expected //= {};
+
+    my $ctx = context;
+    isa_ok $meta, 'Sub::Meta::Param';
+    is $meta->name         => $expected->{name} // '',       'name';
+    is $meta->type         => $expected->{type},             'type';
+    is $meta->isa_         => $expected->{type},             'isa_';
+    is $meta->default      => $expected->{default},          'default';
+    is $meta->coerce       => $expected->{coerce},           'coerce';
+    is $meta->optional     => $expected->{optional} // !!0,  'optional';
+    is $meta->required     => !$expected->{optional},        'required';
+    is $meta->named        => $expected->{named}    // !!0,  'named';
+    is $meta->positional   => !$expected->{named},           'positional';
+    is $meta->invocant     => $expected->{invocant} // !!0,  'invocant';
+
+    is $meta->has_name     => !!$expected->{name},      'has_name';
+    is $meta->has_type     => !!$expected->{type},      'has_type';
+    is $meta->has_default  => !!$expected->{default},   'has_default';
+    is $meta->has_coerce   => !!$expected->{coerce},    'has_coerce';
+
     $ctx->release;
     return;
 }
