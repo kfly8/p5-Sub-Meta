@@ -1,100 +1,111 @@
 use Test2::V0;
 
 use Sub::Meta::Param;
+use Sub::Meta::Test qw(test_submeta_param);
 
-subtest 'single arg' => sub {
-    my $param = Sub::Meta::Param->new('Type');
-    is $param->type, 'Type', 'type';
-    is $param->isa_, 'Type', 'isa';
-    is $param->name, '', 'name';
-    is $param->default, undef, 'default';
-    is $param->coerce, undef, 'coerce';
-    ok $param->positional, 'positional';
-    ok !$param->named, 'named';
-    ok $param->required, 'required';
-    ok !$param->optional, 'optional';
-    ok !$param->invocant, 'not invocant';
-    ok !$param->has_name;
-    ok $param->has_type;
-    ok !$param->has_default;
-    ok !$param->has_coerce;
+subtest 'arg: type => Str' => sub {
+    my $param = Sub::Meta::Param->new({ type => 'Str' });
+    test_submeta_param($param, {
+        type => 'Str',
+    });
 };
 
-subtest 'hashref arg' => sub {
-    my $param = Sub::Meta::Param->new({ type => 'Type', name => 'foo', named => 1, optional => 1, default => 999 });
-    is $param->type, 'Type', 'type';
-    is $param->name, 'foo', 'name';
-    is $param->default, 999, 'default';
-    is $param->coerce, undef, 'coerce';
-    ok !$param->positional, 'positional';
-    ok $param->named, 'named';
-    ok !$param->required, 'required';
-    ok $param->optional, 'optional';
-    ok !$param->invocant, 'not invocant';
-    ok $param->has_name;
-    ok $param->has_type;
-    ok $param->has_default;
-    ok !$param->has_coerce;
+subtest 'arg: name => $a' => sub {
+    my $param = Sub::Meta::Param->new({ name => '$a' });
+    test_submeta_param($param, {
+        name => '$a',
+    });
 };
 
-subtest 'setter' => sub {
-    my $param = Sub::Meta::Param->new;
-
-    is $param->set_name('$foo'), $param, 'set_name';
-    is $param->name, '$foo', 'name';
-
-    is $param->set_type('Type'), $param, 'set_type';
-    is $param->type, 'Type', 'type';
-    is $param->set_isa('Type2'), $param, 'set_isa';
-    is $param->isa_, 'Type2', 'type2';
-    is $param->type, 'Type2', 'type2';
-
-    is $param->set_default('Default'), $param, 'set_default';
-    is $param->default, 'Default', 'default';
-    is $param->set_coerce('Coerce'), $param, 'set_coerce';
-    is $param->coerce, 'Coerce', 'coerce';
-
-    is $param->set_optional, $param, 'set_optional';
-    ok $param->optional, 'optional';
-    is $param->set_optional(0), $param, 'set_optional';
-    ok !$param->optional, 'optional';
-
-    is $param->set_required, $param, 'set_required';
-    ok $param->required, 'required';
-    is $param->set_required(0), $param, 'set_required';
-    ok !$param->required, 'required';
-
-    is $param->set_positional, $param, 'set_positional';
-    ok $param->positional, 'positional';
-    is $param->set_positional(0), $param, 'set_positional';
-    ok !$param->positional, 'positional';
-
-    is $param->set_named, $param, 'set_named';
-    ok $param->named, 'named';
-    is $param->set_named(0), $param, 'set_named';
-    ok !$param->named, 'named';
-
-    is $param->set_invocant, $param, 'set_invocant';
-    ok $param->invocant, 'invocant';
-    is $param->set_invocant(0), $param, 'set_invocant';
-    ok !$param->invocant, 'invocant';
+subtest 'arg: default => hoge' => sub {
+    my $param = Sub::Meta::Param->new({ default => 'hoge' });
+    test_submeta_param($param, {
+        default => 'hoge',
+    });
 };
 
-subtest 'overload' => sub {
-    my $param = Sub::Meta::Param->new({ name => '$foo' });
-    ok $param eq $param;
+subtest 'arg: coerce => $sub' => sub {
+    my $sub = sub { };
+    my $param = Sub::Meta::Param->new({ coerce => $sub });
+    test_submeta_param($param, {
+        coerce => $sub,
+    });
 };
 
-subtest 'new' => sub {
-    is(Sub::Meta::Param->new(name => '$foo')->name, '$foo', 'args list');
+subtest 'arg: optional => !!1' => sub {
+    my $param = Sub::Meta::Param->new({ optional => !!1 });
+    test_submeta_param($param, {
+        optional => !!1,
+    });
+};
 
-    is(Sub::Meta::Param->new([])->type, [], 'args NOT HASH');
+subtest 'arg: named => !!1' => sub {
+    my $param = Sub::Meta::Param->new({ named => !!1 });
+    test_submeta_param($param, {
+        named => !!1,
+    });
+};
 
-    ok(Sub::Meta::Param->new(required => 0)->optional, 'args required');
-    ok(Sub::Meta::Param->new(positional => 0)->named, 'args positional');
+subtest 'arg: invocant => !!1' => sub {
+    my $param = Sub::Meta::Param->new({ invocant => !!1 });
+    test_submeta_param($param, {
+        invocant => !!1,
+    });
+};
 
-    ok(Sub::Meta::Param->new(invocant => 1)->invocant, 'args invocant');
-    ok(!Sub::Meta::Param->new(invocant => 0)->invocant, 'args invocant');
+subtest 'single arg is treated as a type' => sub {
+    test_submeta_param(Sub::Meta::Param->new('Str'), {
+        type => 'Str',
+    });
+
+    test_submeta_param(Sub::Meta::Param->new([]), {
+        type => [],
+    });
+
+    my $type = sub {};
+    test_submeta_param(Sub::Meta::Param->new($type), {
+        type => $type,
+    });
+
+    my $type2 = bless {}, 'Type';
+    test_submeta_param(Sub::Meta::Param->new($type2), {
+        type => $type2,
+    });
+};
+
+subtest 'mixed arg' => sub {
+    my $param = Sub::Meta::Param->new({
+        type     => 'Int',
+        name     => '$num',
+        default  => 999,
+        coerce   => undef,
+        optional => !!1,
+        named    => !!1,
+    });
+    test_submeta_param($param, {
+        type     => 'Int',
+        name     => '$num',
+        default  => 999,
+        coerce   => undef,
+        optional => !!1,
+        named    => !!1,
+    });
+};
+
+subtest 'other mixed arg' => sub {
+    my $default = sub {};
+    my $param = Sub::Meta::Param->new({
+        type     => 'Int',
+        name     => '$num',
+        default  => $default,
+    });
+    test_submeta_param($param, {
+        type     => 'Int',
+        name     => '$num',
+        default  => $default,
+        optional => !!0,
+        named    => !!0,
+    });
 };
 
 done_testing;

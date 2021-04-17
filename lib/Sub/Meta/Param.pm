@@ -31,7 +31,7 @@ sub new {
 }
 
 sub name()       { my $self = shift; return $self->{name} // '' }
-sub type()       { my $self = shift; return $self->{type} // '' }
+sub type()       { my $self = shift; return $self->{type} }
 sub default()    { my $self = shift; return $self->{default} } ## no critic (ProhibitBuiltinHomonyms)
 sub coerce()     { my $self = shift; return $self->{coerce} }
 sub optional()   { my $self = shift; return !!$self->{optional} }
@@ -75,7 +75,7 @@ sub is_same_interface {
     }
 
     if ($self->has_type) {
-        return unless $self->type eq $other->type
+        return unless $self->type eq ($other->type // '');
     }
     else {
         return if $other->has_type
@@ -97,7 +97,7 @@ sub is_same_interface_inlined {
     push @src => $self->has_name ? sprintf("'%s' eq %s->name", $self->name, $v)
                                  : sprintf('!%s->has_name', $v);
 
-    push @src => $self->has_type ? sprintf("'%s' eq %s->type", "@{[$self->type]}", $v)
+    push @src => $self->has_type ? sprintf("'%s' eq (%s->type // '')", "@{[$self->type]}", $v)
                                  : sprintf('!%s->has_type', $v);
 
     push @src => sprintf("'%s' eq %s->optional", $self->optional, $v);
