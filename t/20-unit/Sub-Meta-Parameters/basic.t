@@ -27,6 +27,11 @@ subtest 'exception' => sub {
 
 note '==== TEST args ====';
 
+subtest 'no args' => sub {
+    my $meta = Sub::Meta::Parameters->new(args => []);
+    test_submeta_parameters($meta);
+};
+
 subtest 'empty args: { args => [] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => []);
     test_submeta_parameters($meta, {

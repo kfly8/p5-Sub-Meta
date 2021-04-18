@@ -3,6 +3,11 @@ use Test2::V0;
 use Sub::Meta::Param;
 use Sub::Meta::Test qw(test_submeta_param);
 
+subtest 'no arg' => sub {
+    my $param = Sub::Meta::Param->new;
+    test_submeta_param($param);
+};
+
 subtest 'arg: type => Str' => sub {
     my $param = Sub::Meta::Param->new({ type => 'Str' });
     test_submeta_param($param, {
