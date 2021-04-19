@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Sub::Meta::Test qw(test_submeta);
+use Sub::Meta::Test qw(sub_meta);
 use lib 't/lib';
 
 subtest 'set_parameters' => sub {
@@ -21,7 +21,7 @@ subtest 'set_parameters' => sub {
         my ($message, $args, $expected) = splice @tests, 0, 3;
 
         is $meta->set_parameters($args), $meta, 'set_parameters';
-        test_submeta($meta, {
+        is $meta, sub_meta({
             parameters => $expected,
         });
     }

@@ -2,17 +2,15 @@ package Sub::Meta::Test;
 use strict;
 use warnings;
 use parent qw(Exporter);
-our @EXPORT_OK = qw(test_submeta test_submeta_parameters test_submeta_param);
+our @EXPORT_OK = qw(sub_meta sub_meta_parameters sub_meta_param);
 
 use Test2::V0;
 
-sub test_submeta {
-    my ($meta, $expected) = @_;
+sub sub_meta {
+    my ($expected) = @_;
     $expected //= {};
 
-    my $ctx = context;
-
-    is $meta, object {
+    return object {
         prop isa            => 'Sub::Meta';
         call sub            => $expected->{sub}         // undef;
         call subname        => $expected->{subname}     // '';
@@ -36,19 +34,14 @@ sub test_submeta {
         call has_returns    => !!$expected->{returns};
         call has_file       => !!$expected->{file};
         call has_line       => !!$expected->{line};
-    }, 'test submeta';
-
-    $ctx->release;
-    return;
+    };
 };
 
-sub test_submeta_parameters {
-    my ($meta, $expected) = @_;
+sub sub_meta_parameters {
+    my ($expected) = @_;
     $expected //= {};
 
-    my $ctx = context;
-
-    is $meta, object {
+    return object {
         prop isa                      => 'Sub::Meta::Parameters';
         call nshift                   => $expected->{nshift}                   // 0;
         call slurpy                   => $expected->{slurpy}                   // undef;
@@ -67,19 +60,14 @@ sub test_submeta_parameters {
         call args_max                 => $expected->{args_max}                 // 0;
         call has_slurpy               => !!$expected->{slurpy};
         call has_invocant             => !!$expected->{invocant};
-    }, 'test submeta_parameters';
- 
-    $ctx->release;
-    return;
+    };
 }
 
-sub test_submeta_param {
-    my ($meta, $expected) = @_;
+sub sub_meta_param {
+    my ($expected) = @_;
     $expected //= {};
 
-    my $ctx = context;
-
-    is $meta, object {
+    return object {
         prop isa         => 'Sub::Meta::Param';
         call name        => $expected->{name} // '';
         call type        => $expected->{type};
@@ -95,10 +83,7 @@ sub test_submeta_param {
         call has_type    => !!$expected->{type};
         call has_default => !!$expected->{default};
         call has_coerce  => !!$expected->{coerce};
-    }, 'test submeta_param';
-
-    $ctx->release;
-    return;
+    };
 }
 
 1;
@@ -112,17 +97,17 @@ Sub::Meta::Test - testing utilities for Sub::Meta
 
 =head1 SYNOPSIS
 
-    use Sub::Meta::Test qw(test_submeta test_submeta_parameters test_submeta_param);
+    use Sub::Meta::Test qw(sub_meta sub_meta_parameters sub_meta_param);
 
-    test_submeta(Sub::Meta->new, {
+    is Sub::Meta->new, sub_meta({
         subname => 'foo'
     }); # => Fail test
 
-    test_submeta_parameters(Sub::Meta::Parameters->new(args => []), {
+    is Sub::Meta::Parameters->new(args => []), sub_meta_parameters({
         args => ['Str'],
     }); # => Fail test
 
-    test_submeta_param(Sub::Meta::Param->new, {
+    is Sub::Meta::Param->new, sub_meta_param({
         type => 'Str',
     }); # => Fail test
 
@@ -132,15 +117,15 @@ This module provides testing utilities for Sub::Meta.
 
 =head2 UTILITIES
 
-=head3 test_submeta
+=head3 sub_meta
 
 Testing utility for Sub::Meta object.
 
-=head3 test_submeta_parameters
+=head3 sub_meta_parameters
 
 Testing utility for Sub::Meta::Parameters object.
 
-=head3 test_submeta_param
+=head3 sub_meta_param
 
 Testing utility for Sub::Meta::Param object.
 

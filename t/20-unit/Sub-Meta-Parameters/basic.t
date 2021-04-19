@@ -1,6 +1,6 @@
 use Test2::V0;
 
-use Sub::Meta::Test qw(test_submeta_parameters);
+use Sub::Meta::Test qw(sub_meta_parameters);
 
 use Sub::Meta::Parameters;
 use Sub::Meta::Param;
@@ -29,12 +29,12 @@ note '==== TEST args ====';
 
 subtest 'no args' => sub {
     my $meta = Sub::Meta::Parameters->new(args => []);
-    test_submeta_parameters($meta);
+    is $meta, sub_meta_parameters({});
 };
 
 subtest 'empty args: { args => [] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => []);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [],
         all_args                 => [],
         _all_positional_required => [],
@@ -49,7 +49,7 @@ subtest 'empty args: { args => [] }' => sub {
 
 subtest 'one args: { args => [$p1] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p1]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$p1],
         all_args                 => [$p1],
         _all_positional_required => [$p1],
@@ -63,7 +63,7 @@ subtest 'one args: { args => [$p1] }' => sub {
 
 subtest 'two args: { args => [$p1, $p2] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p1, $p2]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$p1, $p2],
         all_args                 => [$p1, $p2],
         _all_positional_required => [$p1, $p2],
@@ -77,7 +77,7 @@ subtest 'two args: { args => [$p1, $p2] }' => sub {
 
 subtest 'one optional args: { args => [$p_optional] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p_optional]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$p_optional],
         all_args                 => [$p_optional],
         _all_positional_required => [],
@@ -91,7 +91,7 @@ subtest 'one optional args: { args => [$p_optional] }' => sub {
 
 subtest 'required and optional args: { args => [$p1, $p_optional] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p1, $p_optional]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$p1, $p_optional],
         all_args                 => [$p1, $p_optional],
         _all_positional_required => [$p1],
@@ -105,7 +105,7 @@ subtest 'required and optional args: { args => [$p1, $p_optional] }' => sub {
 
 subtest 'optional and required args: { args => [$p_optional, $p1] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p_optional, $p1]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$p_optional, $p1],
         all_args                 => [$p_optional, $p1],
         _all_positional_required => [$p1],
@@ -119,7 +119,7 @@ subtest 'optional and required args: { args => [$p_optional, $p1] }' => sub {
 
 subtest 'one named args: { args => [$n1] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$n1]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$n1],
         all_args                 => [$n1],
         named                    => [$n1],
@@ -132,7 +132,7 @@ subtest 'one named args: { args => [$n1] }' => sub {
 
 subtest 'two named args: { args => [$n1, $n2] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$n1, $n2]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$n1, $n2],
         all_args                 => [$n1, $n2],
         named                    => [$n1, $n2],
@@ -145,7 +145,7 @@ subtest 'two named args: { args => [$n1, $n2] }' => sub {
 
 subtest 'one named optional args: { args => [$n_optional] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$n_optional]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$n_optional],
         all_args                 => [$n_optional],
         named                    => [$n_optional],
@@ -158,7 +158,7 @@ subtest 'one named optional args: { args => [$n_optional] }' => sub {
 
 subtest 'named required and named optional args: { args => [$n1, $n_optional] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$n1, $n_optional]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$n1, $n_optional],
         all_args                 => [$n1, $n_optional],
         named                    => [$n1, $n_optional],
@@ -171,7 +171,7 @@ subtest 'named required and named optional args: { args => [$n1, $n_optional] }'
 
 subtest 'named optional and named required args: { args => [$n_optional, $n1] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$n_optional, $n1]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$n_optional, $n1],
         all_args                 => [$n_optional, $n1],
         named                    => [$n_optional, $n1],
@@ -184,7 +184,7 @@ subtest 'named optional and named required args: { args => [$n_optional, $n1] }'
 
 subtest 'one positional and one named args: { args => [$p1, $n1] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p1, $n1]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$p1, $n1],
         all_args                 => [$p1, $n1],
         _all_positional_required => [$p1],
@@ -201,7 +201,7 @@ subtest 'one positional and one named args: { args => [$p1, $n1] }' => sub {
 
 subtest 'one named and one positional args: { args => [$n1, $p1] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$n1, $p1]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$n1, $p1],
         all_args                 => [$n1, $p1],
         _all_positional_required => [$p1],
@@ -218,7 +218,7 @@ subtest 'one named and one positional args: { args => [$n1, $p1] }' => sub {
 
 subtest 'two positional and one named args: { args => [$p1, $p2 $n1] }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p1, $p2, $n1]);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         args                     => [$p1, $p2, $n1],
         all_args                 => [$p1, $p2, $n1],
         _all_positional_required => [$p1, $p2],
@@ -237,7 +237,7 @@ note '==== TEST nshift, invocant ====';
 
 subtest 'set nshift: { args => [], nshift => 1 }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [], nshift => 1);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         nshift                   => 1,
         args                     => [],
         all_args                 => [$invocant],
@@ -254,7 +254,7 @@ subtest 'set nshift: { args => [], nshift => 1 }' => sub {
 
 subtest 'set nshift and args: { args => [$p1], nshift => 1 }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p1], nshift => 1);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         nshift                   => 1,
         args                     => [$p1],
         all_args                 => [$invocant, $p1],
@@ -271,7 +271,7 @@ subtest 'set nshift and args: { args => [$p1], nshift => 1 }' => sub {
 
 subtest 'set invocant: { args => [], invocant => $invocant_self }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [], invocant => $invocant_self);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         nshift                   => 1,
         args                     => [],
         all_args                 => [$invocant_self],
@@ -288,7 +288,7 @@ subtest 'set invocant: { args => [], invocant => $invocant_self }' => sub {
 
 subtest 'set invocant and args: { args => [$p1], invocant => $invocant_self }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p1], invocant => $invocant_self);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         nshift                   => 1,
         args                     => [$p1],
         all_args                 => [$invocant_self, $p1],
@@ -310,7 +310,7 @@ note '==== TEST slurpy ====';
 
 subtest 'set slurpy: { args => [], slurpy => $slurpy }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [], slurpy => $slurpy);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         slurpy                   => $slurpy,
         args                     => [],
         all_args                 => [],
@@ -321,7 +321,7 @@ subtest 'set slurpy: { args => [], slurpy => $slurpy }' => sub {
 
 subtest 'set slurpy and args: { args => [$p1], slurpy => $slurpy }' => sub {
     my $meta = Sub::Meta::Parameters->new(args => [$p1], slurpy => $slurpy);
-    test_submeta_parameters($meta, {
+    is $meta, sub_meta_parameters({
         slurpy                   => $slurpy,
         args                     => [$p1],
         all_args                 => [$p1],

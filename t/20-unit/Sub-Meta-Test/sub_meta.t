@@ -1,13 +1,13 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Sub::Meta::Test qw(test_submeta);
+use Sub::Meta::Test qw(sub_meta);
 
 subtest 'Fail: invalid subname' => sub {
 
     my $events = intercept {
         my $meta = Sub::Meta->new;
-        test_submeta($meta, {
+        is $meta, sub_meta({
             subname => 'hoge',
         });
     };

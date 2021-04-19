@@ -1,13 +1,13 @@
 use Test2::V0;
 
 use Sub::Meta::Param;
-use Sub::Meta::Test qw(test_submeta_param);
+use Sub::Meta::Test qw(sub_meta_param);
 
 subtest 'Fail: invalid type' => sub {
 
     my $events = intercept {
         my $meta = Sub::Meta::Param->new('Str');
-        test_submeta_param($meta, {
+        is $meta, sub_meta_param({
             type => 'Int',
         });
     };

@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Sub::Meta::Test qw(test_submeta);
+use Sub::Meta::Test qw(sub_meta);
 
 use Sub::Identify ();
 use Sub::Util ();
@@ -24,7 +24,7 @@ subtest 'apply_subname' => sub {
     my $meta = Sub::Meta->new(sub => \&hello_subname);
     is $meta->apply_subname('good_subname'), $meta, 'apply_subname';
 
-    test_submeta($meta, {
+    is $meta, sub_meta({
         sub         => \&hello_subname,
         subname     => 'good_subname',
         stashname   => 'main',
@@ -48,7 +48,7 @@ subtest 'apply_prototype' => sub {
     my $meta = Sub::Meta->new(sub => \&hello_prototype);
     is $meta->apply_prototype('$$'), $meta, 'apply_prototype';
 
-    test_submeta($meta, {
+    is $meta, sub_meta({
         sub         => \&hello_prototype,
         subname     => 'hello_prototype',
         stashname   => 'main',
@@ -72,7 +72,7 @@ subtest 'apply_attribute' => sub {
     my $meta = Sub::Meta->new(sub => \&hello_attribute);
     is $meta->apply_attribute('method'), $meta, 'apply_attribute';
 
-    test_submeta($meta, {
+    is $meta, sub_meta({
         sub         => \&hello_attribute,
         subname     => 'hello_attribute',
         stashname   => 'main',
@@ -102,7 +102,7 @@ subtest 'apply_meta' => sub {
 
     is $meta->apply_meta($other), $meta, 'apply_meta';
 
-    test_submeta($meta, {
+    is $meta, sub_meta({
         sub         => \&hello_meta,
         subname     => 'other_meta',
         stashname   => 'main',

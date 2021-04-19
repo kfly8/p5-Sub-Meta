@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Sub::Meta::Test qw(test_submeta);
+use Sub::Meta::Test qw(sub_meta);
 
 subtest 'set Sub::Meta::Returns' => sub {
     my $returns = Sub::Meta::Returns->new('Int');
@@ -9,7 +9,7 @@ subtest 'set Sub::Meta::Returns' => sub {
     my $meta = Sub::Meta->new;
     is $meta->set_returns($returns), $meta, 'set_returns';
 
-    test_submeta($meta, {
+    is $meta, sub_meta({
         returns => $returns,
     });
 };
@@ -21,7 +21,7 @@ subtest 'set object' => sub {
     $meta->set_returns($obj);
 
     note '$obj will be treated as type';
-    test_submeta($meta, {
+    is $meta, sub_meta({
         returns => Sub::Meta::Returns->new($obj),
     });
 };

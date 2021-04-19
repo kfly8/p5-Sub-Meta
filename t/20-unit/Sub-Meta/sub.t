@@ -1,14 +1,14 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Sub::Meta::Test qw(test_submeta);
+use Sub::Meta::Test qw(sub_meta);
 
 subtest 'empty subroutine' => sub {
     sub test1 {}
     my $meta = Sub::Meta->new;
     is $meta->set_sub(\&test1), $meta, 'set_sub';
 
-    test_submeta($meta, {
+    is $meta, sub_meta({
         sub         => \&test1,
         subname     => 'test1',
         stashname   => 'main',
@@ -25,7 +25,7 @@ subtest 'subroutine prototype && attribute' => sub {
     my $meta = Sub::Meta->new;
     is $meta->set_sub(\&test2), $meta, 'set_sub';
 
-    test_submeta($meta, {
+    is $meta, sub_meta({
         sub         => \&test2,
         subname     => 'test2',
         stashname   => 'main',
