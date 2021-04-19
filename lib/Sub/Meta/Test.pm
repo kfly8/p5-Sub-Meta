@@ -25,15 +25,16 @@ sub sub_meta {
         call returns        => $expected->{returns}     // undef;
         call is_constant    => !!$expected->{is_constant};
         call is_method      => !!$expected->{is_method};
+
         call has_sub        => !!$expected->{sub};
         call has_subname    => !!$expected->{subname};
         call has_stashname  => !!$expected->{stashname};
+        call has_file       => !!$expected->{file};
+        call has_line       => !!$expected->{line};
         call has_prototype  => !!$expected->{prototype};
         call has_attribute  => !!$expected->{attribute};
         call has_parameters => !!$expected->{parameters};
         call has_returns    => !!$expected->{returns};
-        call has_file       => !!$expected->{file};
-        call has_line       => !!$expected->{line};
     };
 };
 
