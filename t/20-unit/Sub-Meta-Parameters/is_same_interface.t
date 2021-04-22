@@ -1,153 +1,116 @@
 use Test2::V0;
 
 use Sub::Meta::Parameters;
+use Sub::Meta::Test qw(test_is_same_interface);
 
-my $slurpy = Sub::Meta::Param->new("Slurpy");
-my $p1 = Sub::Meta::Param->new("Str");
-my $p2 = Sub::Meta::Param->new("Int");
-sub param { my @args = @_; return Sub::Meta::Param->new(@args); }
+my $p1             = Sub::Meta::Param->new("Str");
+my $p2             = Sub::Meta::Param->new("Int");
+my $invocant       = Sub::Meta::Param->new(invocant => 1);
+my $invocant_self  = Sub::Meta::Param->new(invocant => 1, name => '$self');
+my $invocant_class = Sub::Meta::Param->new(invocant => 1, name => '$class');
+my $slurpy         = Sub::Meta::Param->new("Slurpy");
 
-my $obj = bless {} => 'Some';
+subtest "{ args => [], slurpy => undef, nshift => 0 }" => sub {
+    my $meta = Sub::Meta::Parameters->new({ args => [], slurpy => undef, nshift => 0 });
+    my @tests = (
+        fail => 'invalid other'  => undef,
+        fail => 'invalid obj'    => (bless {} => 'Some'),
+        fail => 'invalid args'   => { args => [$p1], slurpy => undef, nshift => 0 },
+        fail => 'invalid slurpy' => { args => [], slurpy => $slurpy, nshift => 0 },
+        fail => 'invalid nshift' => { args => [], slurpy => undef, nshift => 1 },
+        pass => 'valid'          => { args => [], slurpy => undef, nshift => 0 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-my @TEST = (
-    { args => [], slurpy => undef, nshift => 0 } => {
-    NG => [
-    undef, 'invalid other',
-    $obj, 'invalid obj',
-    { args => [$p1], slurpy => undef, nshift => 0 }, 'invalid args',
-    { args => [], slurpy => $slurpy, nshift => 0 }, 'invalid slurpy',
-    { args => [], slurpy => undef, nshift => 1 }, 'invalid nshift',
-    ],
-    OK => [
-    { args => [], slurpy => undef, nshift => 0 }, 'valid',
-    ]},
+subtest "one args: { args => [\$p1], slurpy => undef, nshift => 0 }" => sub {
+    my $meta = Sub::Meta::Parameters->new({ args => [$p1], slurpy => undef, nshift => 0 });
+    my @tests = (
+        fail => 'invalid args'  => { args => [$p2], slurpy => undef, nshift => 0 },
+        fail => 'too many args' => { args => [$p1, $p2], slurpy => undef, nshift => 0 },
+        fail => 'too few args'  => { args => [], slurpy => undef, nshift => 0 },
+        pass => 'valid'         => { args => [$p1], slurpy => undef, nshift => 0 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # one args
-    { args => [$p1], slurpy => undef, nshift => 0 } => {
-    NG => [
-    { args => [$p2], slurpy => undef, nshift => 0 }, 'invalid args',
-    { args => [$p1, $p2], slurpy => undef, nshift => 0 }, 'too many args',
-    { args => [], slurpy => undef, nshift => 0 }, 'too few args',
-    ],
-    OK => [
-    { args => [$p1], slurpy => undef, nshift => 0 }, 'valid',
-    ]},
+subtest "two args: { args => [$p1, $p2], slurpy => undef, nshift => 0 }" => sub {
+    my $meta = Sub::Meta::Parameters->new({ args => [$p1, $p2], slurpy => undef, nshift => 0 });
+    my @tests = (
+        fail => 'invalid args'  => { args => [$p2, $p1], slurpy => undef, nshift => 0 },
+        fail => 'too many args' => { args => [$p1, $p2, $p1], slurpy => undef, nshift => 0 },
+        fail => 'too few args'  => { args => [$p1], slurpy => undef, nshift => 0 },
+        pass => 'valid'         => { args => [$p1, $p2], slurpy => undef, nshift => 0 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # two args
-    { args => [$p1, $p2], slurpy => undef, nshift => 0 } => {
-    NG => [
-    { args => [$p2, $p1], slurpy => undef, nshift => 0 }, 'invalid args',
-    { args => [$p1, $p2, $p1], slurpy => undef, nshift => 0 }, 'too many args',
-    { args => [$p1], slurpy => undef, nshift => 0 }, 'too few args',
-    ],
-    OK => [
-    { args => [$p1, $p2], slurpy => undef, nshift => 0 }, 'valid',
-    ]},
+subtest "slurpy: { args => [], slurpy => $slurpy, nshift => 0 }" => sub {
+    my $meta = Sub::Meta::Parameters->new({ args => [], slurpy => $slurpy, nshift => 0 });
+    my @tests = (
+        fail => 'invalid args'   => { args => [$p1], slurpy => undef, nshift => 0 },
+        fail => 'invalid slurpy' => { args => [], slurpy => undef, nshift => 0 },
+        fail => 'invalid nshift' => { args => [], slurpy => $slurpy, nshift => 1 },
+        pass => 'valid'          => { args => [], slurpy => $slurpy, nshift => 0 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # slurpy
-    { args => [], slurpy => $slurpy, nshift => 0 } => {
-    NG => [
-    { args => [$p1], slurpy => undef, nshift => 0 }, 'invalid args',
-    { args => [], slurpy => undef, nshift => 0 }, 'invalid slurpy',
-    { args => [], slurpy => $slurpy, nshift => 1 }, 'invalid nshift',
-    ],
-    OK => [
-    { args => [], slurpy => $slurpy, nshift => 0 }, 'valid',
-    ]},
+subtest "empty slurpy: { args => [], nshift => 0 }" => sub {
+    my $meta = Sub::Meta::Parameters->new({ args => [], nshift => 0 });
+    my @tests = (
+        fail => 'invalid slurpy' => { args => [], slurpy => 'Str', nshift => 0 },
+        pass => 'valid'          => { args => [], nshift => 0 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # empty slurpy
-    { args => [], nshift => 0 } => {
-    NG => [
-    { args => [], slurpy => 'Str', nshift => 0 }, 'invalid slurpy',
-    ],
-    OK => [
-    { args => [], nshift => 0 }, 'valid',
-    ]},
+subtest "nshift: { args => [\$p1], slurpy => undef, nshift => 1 }" => sub {
+    my $meta = Sub::Meta::Parameters->new({ args => [$p1], slurpy => undef, nshift => 1 });
+    my @tests = (
+        fail => 'invalid args'   => { args => [$p2], slurpy => undef, nshift => 1 },
+        fail => 'too many args'  => { args => [$p1, $p2], slurpy => undef, nshift => 1 },
+        fail => 'invalid slurpy' => { args => [$p1], slurpy => $slurpy, nshift => 1 },
+        pass => 'valid'          => { args => [$p1], slurpy => undef, nshift => 1 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # nshift
-    { args => [$p1], slurpy => undef, nshift => 1 } => {
-    NG => [
-    { args => [$p2], slurpy => undef, nshift => 1 }, 'invalid args',
-    { args => [$p1, $p2], slurpy => undef, nshift => 1 }, 'too many args',
-    { args => [$p1], slurpy => $slurpy, nshift => 1 }, 'invalid slurpy',
-    ],
-    OK => [
-    { args => [$p1], slurpy => undef, nshift => 1 }, 'valid',
-    ]},
+subtest "slurpy & nshift: { args => [\$p1], slurpy => \$slurpy, nshift => 1 }" => sub {
 
-    # slurpy & nshift
-    { args => [$p1], slurpy => $slurpy, nshift => 1 } => {
-    NG => [
-    { args => [$p2], slurpy => $slurpy, nshift => 1 }, 'invalid args',
-    { args => [$p1, $p2], slurpy => $slurpy, nshift => 1 }, 'too many args',
-    { args => [$p1], slurpy => undef, nshift => 1 }, 'invalid slurpy',
-    { args => [$p1], slurpy => $slurpy, nshift => 0 }, 'invalid nshift',
-    { args => [$p1], slurpy => $slurpy, invocant => param(invocant => 1, name => '$self') }, 'valid',
-    ],
-    OK => [
-    { args => [$p1], slurpy => $slurpy, nshift => 1 }, 'valid',
-    { args => [$p1], slurpy => $slurpy, invocant => param(invocant => 1) }, 'valid',
-    ]},
+    my $meta = Sub::Meta::Parameters->new({ args => [$p1], slurpy => $slurpy, nshift => 1 });
+    my @tests = (
+        fail => 'invalid args'   => { args => [$p2], slurpy => $slurpy, nshift => 1 },
+        fail => 'too many args'  => { args => [$p1, $p2], slurpy => $slurpy, nshift => 1 },
+        fail => 'invalid slurpy' => { args => [$p1], slurpy => undef, nshift => 1 },
+        fail => 'invalid nshift' => { args => [$p1], slurpy => $slurpy, nshift => 0 },
+        fail => 'valid'          => { args => [$p1], slurpy => $slurpy, invocant => $invocant_self },
+        pass => 'valid'          => { args => [$p1], slurpy => $slurpy, nshift => 1 },
+        pass => 'valid'          => { args => [$p1], slurpy => $slurpy, invocant => $invocant },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # default invocant
-    { args => [], invocant => param(invocant => 1) } => {
-    NG => [
-    { args => [], invocant => param(invocant => 1, name => '$class') }, 'invalid invocant',
-    ],
-    OK => [
-    { args => [], invocant => param(invocant => 1) }, 'valid',
-    { args => [], nshift => 1 }, 'valid nshift',
-    ]},
+subtest "default invocant: { args => [], invocant => $invocant }" => sub {
+    my $meta = Sub::Meta::Parameters->new({ args => [], invocant => $invocant });
+    my @tests = (
+        fail => 'invalid invocant' => { args => [], invocant => $invocant_class },
+        pass => 'valid'            => { args => [], invocant => $invocant },
+        pass => 'valid nshift'     => { args => [], nshift => 1 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # invocant
-    { args => [], invocant => param(invocant => 1, name => '$self') } => {
-    NG => [
-    { args => [], nshift => 0 }, 'invalid nshift',
-    { args => [], nshift => 1 }, 'invalid nshift',
-    { args => [], invocant => param(invocant => 1, name => '$class') }, 'invalid invocant',
-    { args => [param(invocant => 1, name => '$self')] }, 'invalid invocant',
-    ],
-    OK => [
-    { args => [], invocant => param(invocant => 1, name => '$self') }, 'valid',
-    ]},
-);
-
-use JSON::PP;
-my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
-{
-    no warnings qw/once/; ## no critic (ProhibitNoWarnings)
-    *{Sub::Meta::Param::TO_JSON} = sub {
-        my $s = $_[0]->type;
-        $s .= ':named' if $_[0]->named;
-        $s .= ':optional' if $_[0]->optional;
-        return $s;
-    }
-}
-
-while (my ($args, $cases) = splice @TEST, 0, 2) {
-    my $meta = Sub::Meta::Parameters->new($args);
-    my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic (ProhibitStringyEval)
-
-    subtest "@{[$json->encode($args)]}" => sub {
-
-        subtest 'NG cases' => sub {
-            while (my ($other_args, $test_message) = splice @{$cases->{NG}}, 0, 2) {
-                my $is_hash = ref $other_args && ref $other_args eq 'HASH';
-                my $other = $is_hash ? Sub::Meta::Parameters->new($other_args) : $other_args;
-                ok !$meta->is_same_interface($other), $test_message;
-                ok !$is_same_interface->($other), "inlined: $test_message";
-            }
-        };
-
-        subtest 'OK cases' => sub {
-            while (my ($other_args, $test_message) = splice @{$cases->{OK}}, 0, 2) {
-                my $other = Sub::Meta::Parameters->new($other_args);
-                ok $meta->is_same_interface($other), $test_message;
-                ok $is_same_interface->($other), "inlined: $test_message";
-            }
-        };
-    };
-}
+subtest "invocant: { args => [], invocant => param(invocant => 1, name => '\$self') }" => sub {
+    my $meta = Sub::Meta::Parameters->new({ args => [], invocant => $invocant_self });
+    my @tests = (
+        fail => 'invalid nshift'    => { args => [], nshift => 0 },
+        fail => 'invalid nshift'    => { args => [], nshift => 1 },
+        fail => 'invalid invocant'  => { args => [], invocant => $invocant_class },
+        fail => 'invalid invocant'  => { args => [$invocant_self] },
+        pass => 'valid'             => { args => [], invocant => $invocant_self },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
 done_testing;

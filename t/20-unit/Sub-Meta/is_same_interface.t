@@ -1,8 +1,7 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Sub::Meta::Parameters;
-use Sub::Meta::Returns;
+use Sub::Meta::Test qw(test_is_same_interface);
 
 my $p1 = Sub::Meta::Parameters->new(args => ['Str']);
 my $p2 = Sub::Meta::Parameters->new(args => ['Int']);
@@ -12,128 +11,98 @@ my $r2 = Sub::Meta::Returns->new('Int');
 
 my $obj = bless {} => 'Some';
 
-sub test_interface {
-    my ($meta, @tests) = @_;
-
-    my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic (ProhibitStringyEval)
-
-    my $ctx = context;
-    while (@tests) {
-        my ($result, $message, $args) = splice @tests, 0, 3;
-        my $other = ref $args && ref $args eq 'HASH'
-                  ? Sub::Meta->new($args)
-                  : $args;
-
-        my $res1 = $meta->is_same_interface($other);
-        my $res2 = $is_same_interface->($other);
-
-        note "$result : $message";
-        if ($result eq 'OK') {
-            ok $res1;
-            ok $res2;
-        }
-        elsif ($result eq 'NG') {
-            ok !$res1;
-            ok !$res2;
-        }
-    }
-    $ctx->release;
-    return;
-}
+subtest "no args: {  }" => sub {
+    my $meta = Sub::Meta->new({ });
+    my @tests = (
+        fail => 'invalid subname'    => { subname => 'foo' },
+        pass => 'valid'              => {  },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
 subtest "{ subname => 'foo' }" => sub {
     my $meta = Sub::Meta->new({ subname => 'foo' });
     my @tests = (
-        NG => 'invalid other'      => undef,
-        NG => 'invalid obj'        => $obj,
-        NG => 'invalid subname'    => { subname => 'bar' },
-        NG => 'undef subname'      => { subname => undef },
-        NG => 'invalid parameters' => { subname => 'foo', parameters => $p1 }, ,
-        NG => 'invalid returns'    => { subname => 'foo', returns => $r1 }, ,
-        OK => 'valid'              => { subname => 'foo' },
-        OK => 'valid'              => { fullname => 'path::foo' },
+        fail => 'other is undef'         => undef,
+        fail => 'other is not Sub::Meta' => $obj,
+        fail => 'invalid subname'        => { subname => 'bar' },
+        fail => 'undef subname'          => { subname => undef },
+        fail => 'invalid parameters'     => { subname => 'foo', parameters => $p1 },
+        fail => 'invalid returns'        => { subname => 'foo', returns => $r1 }, ,
+        pass => 'valid'                  => { subname => 'foo' },
+        pass => 'valid w/ stashname'     => { fullname => 'path::foo' },
     );
-    test_interface($meta, @tests);
-};
-
-subtest "no args: {  }" => sub {
-    my $meta = Sub::Meta->new({ });
-    my @tests = (
-        NG => 'invalid subname'    => { subname => 'foo' },
-        OK => 'valid'              => {  },
-    );
-    test_interface($meta, @tests);
+    test_is_same_interface($meta, @tests);
 };
 
 subtest "one args: { parameters => \$p1 }" => sub {
     my $meta = Sub::Meta->new({ parameters => $p1 });
     my @tests = (
-        NG => 'invalid subname'    => { subname => 'foo' },
-        NG => 'invalid parameters' => { parameters => $p2 },
-        NG => 'no parameters'      => {  },
-        NG => 'invalid subname'    => { parameters => $p1, subname => 'foo' }, 
-        NG => 'invalid returns'    => { parameters => $p1, returns => $r1 }, 
-        OK => 'valid'              => { parameters => $p1 },
+        fail => 'invalid subname'    => { subname => 'foo' },
+        fail => 'invalid parameters' => { parameters => $p2 },
+        fail => 'no parameters'      => {  },
+        fail => 'invalid subname'    => { parameters => $p1, subname => 'foo' }, 
+        fail => 'invalid returns'    => { parameters => $p1, returns => $r1 }, 
+        pass => 'valid'              => { parameters => $p1 },
     );
-    test_interface($meta, @tests);
+    test_is_same_interface($meta, @tests);
 };
 
-subtest "one args: { returns => \$r1 }" => sub {
+subtest "returns: { returns => \$r1 }" => sub {
     my $meta = Sub::Meta->new({ returns => $r1 });
     my @tests = (
-        NG => 'invalid returns'    => { returns => $r2 },
-        NG => 'no returns'         => {  },
-        NG => 'invalid subname'    => { returns => $r1, subname => 'foo' }, 
-        NG => 'invalid parameters' => { returns => $r1, parameters => $p1 },
-        OK => 'valid'              => { returns => $r1 },
+        fail => 'invalid returns'    => { returns => $r2 },
+        fail => 'no returns'         => {  },
+        fail => 'invalid subname'    => { returns => $r1, subname => 'foo' }, 
+        fail => 'invalid parameters' => { returns => $r1, parameters => $p1 },
+        pass => 'valid'              => { returns => $r1 },
     );
-    test_interface($meta, @tests);
+    test_is_same_interface($meta, @tests);
 };
 
-subtest "full args: { subname => 'foo', parameters => \$p1, returns => \$r1 }" => sub {
+subtest "mixed case: { subname => 'foo', parameters => \$p1, returns => \$r1 }" => sub {
     my $meta = Sub::Meta->new({ subname => 'foo', parameters => $p1, returns => $r1 });
     my @tests = (
-        NG => 'invalid subname'    => { subname => 'bar', parameters => $p1, returns => $r1 }, 
-        NG => 'invalid parameters' => { subname => 'foo', parameters => $p2, returns => $r1 }, 
-        NG => 'invalid returns'    => { subname => 'foo', parameters => $p1, returns => $r2 }, 
-        OK => 'valid'              => { subname => 'foo', parameters => $p1, returns => $r1 }, 
-        OK => 'valid w/ stashname' => { subname => 'foo', parameters => $p1, returns => $r1, stashname => 'main' },
-        OK => 'valid w/ attribute' => { subname => 'foo', parameters => $p1, returns => $r1, attribute => ['method'] },
-        OK => 'valid w/ prototype' => { subname => 'foo', parameters => $p1, returns => $r1, prototype => '$' },
+        fail => 'invalid subname'    => { subname => 'bar', parameters => $p1, returns => $r1 }, 
+        fail => 'invalid parameters' => { subname => 'foo', parameters => $p2, returns => $r1 }, 
+        fail => 'invalid returns'    => { subname => 'foo', parameters => $p1, returns => $r2 }, 
+        pass => 'valid'              => { subname => 'foo', parameters => $p1, returns => $r1 }, 
+        pass => 'valid w/ stashname' => { subname => 'foo', parameters => $p1, returns => $r1, stashname => 'main' },
+        pass => 'valid w/ attribute' => { subname => 'foo', parameters => $p1, returns => $r1, attribute => ['method'] },
+        pass => 'valid w/ prototype' => { subname => 'foo', parameters => $p1, returns => $r1, prototype => '$' },
     );
-    test_interface($meta, @tests);
+    test_is_same_interface($meta, @tests);
 };
 
-subtest "method: { subname => 'foo', is_method => !!1 }" => sub {
+subtest "is_method: { subname => 'foo', is_method => !!1 }" => sub {
     my $meta = Sub::Meta->new({ subname => 'foo', is_method => !!1 });
     my @tests = (
-        NG => 'invalid method' => { subname => 'foo', is_method => !!0 },
-        NG => 'invalid method' => { subname => 'foo' }, 
-        OK => 'valid method'   => { subname => 'foo', is_method => !!1 }, 
+        fail => 'invalid method'        => { subname => 'foo', is_method => !!0 },
+        fail => 'default is not method' => { subname => 'foo' }, 
+        pass => 'valid method'          => { subname => 'foo', is_method => !!1 }, 
     );
-    test_interface($meta, @tests);
+    test_is_same_interface($meta, @tests);
 };
 
 subtest "not method: { subname => 'foo', is_method => !!0 }" => sub {
     my $meta = Sub::Meta->new({ subname => 'foo', is_method => !!0 });
     my @tests = (
-        NG => 'invalid method'  => { subname => 'foo', is_method => !!1 },
-        OK => 'valid method'    => { subname => 'foo', is_method => !!0 },
-        OK => 'valid method'    => { subname => 'foo' },
+        fail => 'invalid method'                => { subname => 'foo', is_method => !!1 },
+        pass => 'valid method'                  => { subname => 'foo', is_method => !!0 },
+        pass => 'valid method / default case'   => { subname => 'foo' },
     );
-    test_interface($meta, @tests);
+    test_is_same_interface($meta, @tests);
 };
 
-subtest "method: { subname => 'foo', is_method => !!1, parameters => $p1 }" => sub {
+subtest "method: { subname => 'foo', is_method => !!1, parameters => \$p1 }" => sub {
     my $meta = Sub::Meta->new({ subname => 'foo', is_method => !!1, parameters => $p1 });
     my @tests = (
-        NG => 'invalid method'      => { subname => 'foo', is_method => !!0, parameters => $p1 },
-        NG => 'invalid method'      => { subname => 'foo',                parameters => $p1 },
-        NG => 'invalid parameters'  => { subname => 'foo', is_method => !!1, parameters => $p2 },
-        OK => 'valid method'        => { subname => 'foo', is_method => !!1, parameters => $p1 },
+        fail => 'invalid method'      => { subname => 'foo', is_method => !!0, parameters => $p1 },
+        fail => 'invalid method'      => { subname => 'foo',                   parameters => $p1 },
+        fail => 'invalid parameters'  => { subname => 'foo', is_method => !!1, parameters => $p2 },
+        pass => 'valid method'        => { subname => 'foo', is_method => !!1, parameters => $p1 },
     );
-    test_interface($meta, @tests);
+    test_is_same_interface($meta, @tests);
 };
 
 done_testing;

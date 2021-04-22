@@ -1,136 +1,96 @@
 use Test2::V0;
 
-{
-package DummyType; ## no critic (RequireFilenameMatchesPackage)
-
-use overload
-    fallback => 1,
-    '""' => sub { 'DummyType' }
-    ;
-
-sub new { my $class = shift; return bless {}, $class }
-sub TO_JSON { my $self = shift; return ref $self }
-}
-
 use Sub::Meta::Param;
+use Sub::Meta::Test qw(test_is_same_interface DummyType);
 
-my $obj = bless {} => 'Some';
+subtest "full args : { name => '\$msg', type => 'Str', required => 1, positional => 1 }" => sub {
+    my $meta = Sub::Meta::Param->new({ name => '$msg', type => 'Str', required => 1, positional => 1 });
+    my @tests = (
+        fail => 'invalid other'      => undef,
+        fail => 'invalid object'     => (bless {} => 'Some'),
+        fail => 'invalid name'       => { name => '$gsm', type => 'Str', required => 1, positional => 1 },
+        fail => 'undef name'         => { name =>  undef, type => 'Str', required => 1, positional => 1 },
+        fail => 'invalid type'       => { name => '$msg', type => 'Srt', required => 1, positional => 1 },
+        fail => 'invalid required'   => { name => '$msg', type => 'Str', required => 0, positional => 1 },
+        fail => 'invalid positional' => { name => '$msg', type => 'Str', required => 1, positional => 0 },
+        pass => 'valid'              => { name => '$msg', type => 'Str', required => 1, positional => 1 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-my @TEST = (
-    # full args
-    { name => '$msg', type => 'Str', required => 1, positional => 1 } => {
-    NG => [
-    undef, 'invalid other',
-    $obj, 'invalid obj',
-    { name => '$mgs', type => 'Str', required => 1, positional => 1 }, 'invalid name',
-    { name =>  undef, type => 'Str', required => 1, positional => 1 }, 'undef name',
-    { name => '$msg', type => 'Srt', required => 1, positional => 1 }, 'invalid type',
-    { name => '$msg', type => 'Str', required => 0, positional => 1 }, 'invalid required',
-    { name => '$msg', type => 'Str', required => 1, positional => 0 }, 'invalid positional',
-    ],
-    OK => [
-    { name => '$msg', type => 'Str', required => 1, positional => 1 }, 'valid',
-    ]},
+subtest "no name: { type => 'Str', required => 1, positional => 1 }" => sub {
+    my $meta = Sub::Meta::Param->new({ type => 'Str', required => 1, positional => 1 });
+    my @tests = (
+        fail => 'invalid type'       => { type => 'Srt', required => 1, positional => 1 },
+        fail => 'invalid required'   => { type => 'Str', required => 0, positional => 1 },
+        fail => 'invalid positional' => { type => 'Str', required => 1, positional => 0 },
+        fail => 'not need name'      => { type => 'Str', required => 1, positional => 1, name => '$foo' },
+        pass => 'valid'              => { type => 'Str', required => 1, positional => 1 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # no name
-    { type => 'Str', required => 1, positional => 1 } => {
-    NG => [
-    { type => 'Srt', required => 1, positional => 1 }, 'invalid type',
-    { type => 'Str', required => 0, positional => 1 }, 'invalid required',
-    { type => 'Str', required => 1, positional => 0 }, 'invalid positional',
-    { type => 'Str', required => 1, positional => 1, name => '$foo' }, 'not need name',
-    ],
-    OK => [
-    { type => 'Str', required => 1, positional => 1 }, 'valid',
-    ]},
+subtest "no type: { name => '\$foo', required => 1, positional => 1 }" => sub {
+    my $meta = Sub::Meta::Param->new({ name => '$foo', required => 1, positional => 1 });
+    my @tests = (
+        fail => 'invalid name'       => { name => '$boo', required => 1, positional => 1 },
+        fail => 'invalid required'   => { name => '$foo', required => 0, positional => 1 },
+        fail => 'invalid positional' => { name => '$foo', required => 1, positional => 0 },
+        fail => 'not need type'      => { name => '$foo', required => 1, positional => 1, type => 'Str' },
+        pass => 'valid'              => { name => '$foo', required => 1, positional => 1 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # no type
-    { name => '$foo', required => 1, positional => 1 } => {
-    NG => [
-    { name => '$boo', required => 1, positional => 1 }, 'invalid name',
-    { name => '$foo', required => 0, positional => 1 }, 'invalid required',
-    { name => '$foo', required => 1, positional => 0 }, 'invalid positional',
-    { name => '$foo', required => 1, positional => 1, type => 'Str' }, 'not need type',
-    ],
-    OK => [
-    { name => '$foo', required => 1, positional => 1 }, 'valid',
-    ]},
+subtest "no name and type: { required => 1, positional => 1 }" => sub {
+    my $meta = Sub::Meta::Param->new({ required => 1, positional => 1 });
+    my @tests = (
+        fail => 'invalid required'   => { required => 0, positional => 1 },
+        fail => 'invalid positional' => { required => 1, positional => 0 },
+        fail => 'not need name'      => { required => 1, positional => 1, name => '$foo' },
+        fail => 'not need type'      => { required => 1, positional => 1, type => 'Str' },
+        pass => 'valid'              => { required => 1, positional => 1 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # no name and type
-    { required => 1, positional => 1 } => {
-    NG => [
-    { required => 0, positional => 1 }, 'invalid required',
-    { required => 1, positional => 0 }, 'invalid positional',
-    { required => 1, positional => 1, name => '$foo' }, 'not need name',
-    { required => 1, positional => 1, type => 'Str' }, 'not need type',
-    ],
-    OK => [
-    { required => 1, positional => 1 }, 'valid',
-    ]},
+subtest "undef optional: { optional => undef }" => sub {
+    my $meta = Sub::Meta::Param->new({ optional => undef });
+    my @tests = (
+        fail => 'invalid optional' => { optional => 1 },
+        pass => 'valid'            => { optional => undef },
+        pass => 'valid'            => { optional => 0 },
+        pass => 'valid'            => { required => !!1 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # undef optional 
-    { optional => undef } => {
-    NG => [
-    { optional => 1 }, 'invalid optional',
-    ],
-    OK => [
-    { optional => undef }, 'valid',
-    { optional => 0 }, 'valid',
-    { required => !!1 }, 'valid',
-    ]},
+subtest "undef named: { named => undef }" => sub {
+    my $meta = Sub::Meta::Param->new({ named => undef });
+    my @tests = (
+        fail => 'invalid named' => { named => 1 },
+        pass => 'valid'         => { named => undef },
+        pass => 'valid'         => { named => 0 },
+        pass => 'valid'         => { positional => !!1 },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
-    # undef named
-    { named => undef } => {
-    NG => [
-    { named => 1 }, 'invalid named',
-    ],
-    OK => [
-    { named => undef }, 'valid',
-    { named => 0 }, 'valid',
-    { positional => !!1 }, 'valid',
-    ]},
+subtest "blessed type { type => \$DummyType }" => sub {
+    my $DummyType = DummyType;
+    my $Some = bless {} => 'Some';
 
-    # blessed type
-    { type => DummyType->new } => {
-    NG => [
-    {  }, 'invalid type',
-    { type => undef }, 'invalid type',
-    { type => $obj }, 'invalid type',
-    { type => 'some' }, 'invalid type',
-    ],
-    OK => [
-    { type => 'DummyType' }, 'valid type',
-    { type => DummyType->new }, 'valid type',
-    ]},
-);
-
-use JSON::PP;
-my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
-
-while (my ($args, $cases) = splice @TEST, 0, 2) {
-    my $meta = Sub::Meta::Param->new($args);
-    my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic (ProhibitStringyEval)
-
-    subtest "@{[$json->encode($args)]}" => sub {
-
-        subtest 'NG cases' => sub {
-            while (my ($other_args, $test_message) = splice @{$cases->{NG}}, 0, 2) {
-                my $is_hash = ref $other_args && ref $other_args eq 'HASH';
-                my $other = $is_hash ? Sub::Meta::Param->new($other_args) : $other_args;
-                ok !$meta->is_same_interface($other), $test_message;
-                ok !$is_same_interface->($other), "inlined: $test_message";
-            }
-        };
-
-        subtest 'OK cases' => sub {
-            while (my ($other_args, $test_message) = splice @{$cases->{OK}}, 0, 2) {
-                my $other = Sub::Meta::Param->new($other_args);
-                ok $meta->is_same_interface($other), $test_message;
-                ok $is_same_interface->($other), "inlined: $test_message";
-            }
-        };
-    };
-}
+    my $meta = Sub::Meta::Param->new({ type => $DummyType });
+    my @tests = (
+        fail => 'empty type'              => {  },
+        fail => 'undef type'              => { type => undef },
+        fail => 'invalid type'            => { type => $Some },
+        fail => 'not eq type name'        => { type => 'some' },
+        pass => 'valid'                   => { type => $DummyType },
+        pass => 'valid / different ref'   => { type => DummyType },
+        pass => 'valid / eq type name'    => { type => 'DummyType' },
+    );
+    test_is_same_interface($meta, @tests);
+};
 
 done_testing;
