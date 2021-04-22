@@ -7,6 +7,7 @@ our @EXPORT_OK = qw(
     sub_meta_parameters
     sub_meta_param
     test_is_same_interface
+    test_interface_error_message
     DummyType
 );
 
@@ -125,6 +126,31 @@ sub test_is_same_interface {
     return;
 }
 
+sub test_interface_error_message {
+    my ($meta, @tests) = @_;
+
+    my $ctx = context;
+    my $meta_class = ref $meta;
+
+    while (@tests) {
+        my ($args, $expected) = splice @tests, 0, 2;
+        my $other = ref $args && ref $args eq 'HASH'
+                  ? $meta_class->new($args)
+                  : $args;
+
+        my $result = $meta->interface_error_message($other);
+
+        if (ref $expected && ref $expected eq 'Regexp') {
+            like $result, $expected;
+        }
+        else {
+            is $result, $expected;
+        }
+    }
+
+    $ctx->release;
+    return;
+}
 
 {
     package ## no critic (Modules::ProhibitMultiplePackages) # hide from PAUSE 
@@ -192,6 +218,11 @@ Testing utility for Sub::Meta::Param object.
 
 Testing utility for is_same_interface method of Sub::Meta,
 Sub::Meta::Param, Sub::Meta::Parameters and Sub::Meta::Returns.
+
+=head3 test_interface_error_message
+
+Testing utility for interface_error_message method of Sub::Meta,
+Sub::Meta::Parameters and Sub::Meta::Returns.
 
 =head3 DummyType
 
