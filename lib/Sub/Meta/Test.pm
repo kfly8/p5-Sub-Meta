@@ -2,7 +2,13 @@ package Sub::Meta::Test;
 use strict;
 use warnings;
 use parent qw(Exporter);
-our @EXPORT_OK = qw(sub_meta sub_meta_parameters sub_meta_param);
+our @EXPORT_OK = qw(
+    sub_meta
+    sub_meta_parameters
+    sub_meta_param
+    test_is_same_interface
+    DummyType
+);
 
 use Test2::V0;
 
@@ -87,6 +93,58 @@ sub sub_meta_param {
     };
 }
 
+sub test_is_same_interface {
+    my ($meta, @tests) = @_;
+
+    my $inline = $meta->is_same_interface_inlined('$_[0]');
+    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic (ProhibitStringyEval)
+
+    my $ctx = context;
+    my $meta_class = ref $meta;
+    while (@tests) {
+        my ($pass, $message, $args) = splice @tests, 0, 3;
+        my $other = ref $args && ref $args eq 'HASH'
+                  ? $meta_class->new($args)
+                  : $args;
+
+        my $result = $meta->is_same_interface($other);
+        my $result_inlined = $is_same_interface->($other);
+
+        subtest "should $pass: $message" => sub {
+            if ($pass eq 'pass') {
+                ok $result, 'is_same_interface';
+                ok $result_inlined, 'is_same_interface_inlined';
+            }
+            elsif($pass eq 'fail') {
+                ok !$result, 'is_same_interface';
+                ok !$result_inlined, 'is_same_interface_inlined';
+            }
+        };
+    }
+    $ctx->release;
+    return;
+}
+
+
+{
+    package ## no critic (Modules::ProhibitMultiplePackages) # hide from PAUSE 
+        DummyType; ## no critic (RequireFilenameMatchesPackage)
+
+    use overload
+        fallback => 1,
+        '""' => sub { 'DummyType' }
+        ;
+
+    sub new {
+        my $class = shift;
+        return bless {}, $class
+    }
+};
+
+sub DummyType {
+    return DummyType->new
+}
+
 1;
 __END__
 
@@ -129,6 +187,15 @@ Testing utility for Sub::Meta::Parameters object.
 =head3 sub_meta_param
 
 Testing utility for Sub::Meta::Param object.
+
+=head3 test_is_same_interface
+
+Testing utility for is_same_interface method of Sub::Meta,
+Sub::Meta::Param, Sub::Meta::Parameters and Sub::Meta::Returns.
+
+=head3 DummyType
+
+Return dummy type object that will return the class name when evaluated as a string.
 
 =head1 LICENSE
 

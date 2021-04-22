@@ -5,7 +5,7 @@ use Sub::Meta::Test qw(sub_meta_param);
 
 subtest 'no arg' => sub {
     my $param = Sub::Meta::Param->new;
-    is $param, sub_meta_param({});
+    is $param, sub_meta_param();
 };
 
 subtest 'arg: type => Str' => sub {
