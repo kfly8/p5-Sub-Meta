@@ -5,7 +5,7 @@ use Sub::Meta::Test qw(sub_meta);
 
 subtest 'no arguments meta' => sub {
     my $meta = Sub::Meta->new;
-    is $meta, sub_meta({});
+    is $meta, sub_meta();
 };
 
 subtest 'set_sub' => sub {

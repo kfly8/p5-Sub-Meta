@@ -29,7 +29,7 @@ note '==== TEST args ====';
 
 subtest 'no args' => sub {
     my $meta = Sub::Meta::Parameters->new(args => []);
-    is $meta, sub_meta_parameters({});
+    is $meta, sub_meta_parameters();
 };
 
 subtest 'empty args: { args => [] }' => sub {

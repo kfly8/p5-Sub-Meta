@@ -127,15 +127,18 @@ sub test_is_same_interface {
 
 
 {
-package ## no critic (Modules::ProhibitMultiplePackages) # hide from PAUSE 
-    DummyType; ## no critic (RequireFilenameMatchesPackage)
+    package ## no critic (Modules::ProhibitMultiplePackages) # hide from PAUSE 
+        DummyType; ## no critic (RequireFilenameMatchesPackage)
 
-use overload
-    fallback => 1,
-    '""' => sub { 'DummyType' }
-    ;
+    use overload
+        fallback => 1,
+        '""' => sub { 'DummyType' }
+        ;
 
-sub new { my $class = shift; return bless {}, $class }
+    sub new {
+        my $class = shift;
+        return bless {}, $class
+    }
 };
 
 sub DummyType {
@@ -184,6 +187,15 @@ Testing utility for Sub::Meta::Parameters object.
 =head3 sub_meta_param
 
 Testing utility for Sub::Meta::Param object.
+
+=head3 test_is_same_interface
+
+Testing utility for is_same_interface method of Sub::Meta,
+Sub::Meta::Param, Sub::Meta::Parameters and Sub::Meta::Returns.
+
+=head3 DummyType
+
+Return dummy type object that will return the class name when evaluated as a string.
 
 =head1 LICENSE
 
