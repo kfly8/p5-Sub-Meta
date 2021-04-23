@@ -97,8 +97,10 @@ sub sub_meta_param {
 sub test_is_same_interface {
     my ($meta, @tests) = @_;
 
-    my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic (ProhibitStringyEval)
+    ## no critic (ProhibitStringyEval)
+    my $is_same_interface = eval sprintf('sub { %s }', $meta->is_same_interface_inlined('$_[0]'));
+    my $is_child = eval sprintf('sub { %s }', $meta->is_child_inlined('$_[0]'));
+    ## use critic
 
     my $ctx = context;
     my $meta_class = ref $meta;
@@ -108,17 +110,30 @@ sub test_is_same_interface {
                   ? $meta_class->new($args)
                   : $args;
 
-        my $result = $meta->is_same_interface($other);
-        my $result_inlined = $is_same_interface->($other);
+        my $same = $meta->is_same_interface($other);
+        my $same_inlined = $is_same_interface->($other);
+
+        my $child = $meta->is_child($other);
+        my $child_inlined = $is_child->($other);
 
         subtest "should $pass: $message" => sub {
             if ($pass eq 'pass') {
-                ok $result, 'is_same_interface';
-                ok $result_inlined, 'is_same_interface_inlined';
+                ok $same, 'is_same_interface';
+                ok $same_inlined, 'is_same_interface_inlined';
+                ok $child, 'is_child';
+                ok $child_inlined, 'is_child_inlined';
+            }
+            elsif ($pass eq 'pass_child') {
+                ok !$same, 'is_same_interface';
+                ok !$same_inlined, 'is_same_interface_inlined';
+                ok $child, 'is_child';
+                ok $child_inlined, 'is_child_inlined';
             }
             elsif($pass eq 'fail') {
-                ok !$result, 'is_same_interface';
-                ok !$result_inlined, 'is_same_interface_inlined';
+                ok !$same, 'is_same_interface';
+                ok !$same_inlined, 'is_same_interface_inlined';
+                ok !$child, 'is_child';
+                ok !$child_inlined, 'is_child_inlined';
             }
         };
     }

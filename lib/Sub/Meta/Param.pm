@@ -88,6 +88,26 @@ sub is_same_interface {
     return !!1;
 }
 
+sub is_child {
+    my ($self, $child) = @_;
+
+    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Param');
+
+    if ($self->has_name) {
+        return unless $self->name eq $child->name
+    }
+
+    if ($self->has_type) {
+        return unless $self->type eq ($child->type // '');
+    }
+
+    return unless $self->optional eq $child->optional;
+
+    return unless $self->named eq $child->named;
+
+    return !!1;
+}
+
 sub is_same_interface_inlined {
     my ($self, $v) = @_;
 
@@ -99,6 +119,23 @@ sub is_same_interface_inlined {
 
     push @src => $self->has_type ? sprintf("'%s' eq (%s->type // '')", "@{[$self->type]}", $v)
                                  : sprintf('!%s->has_type', $v);
+
+    push @src => sprintf("'%s' eq %s->optional", $self->optional, $v);
+
+    push @src => sprintf("'%s' eq %s->named", $self->named, $v);
+
+    return join "\n && ", @src;
+}
+
+sub is_child_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Param')", $v, $v);
+
+    push @src => sprintf("'%s' eq %s->name", $self->name, $v) if $self->has_name;
+
+    push @src => sprintf("'%s' eq (%s->type // '')", "@{[$self->type]}", $v) if $self->has_type;
 
     push @src => sprintf("'%s' eq %s->optional", $self->optional, $v);
 

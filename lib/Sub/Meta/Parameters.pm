@@ -185,6 +185,26 @@ sub is_same_interface {
     return !!1;
 }
 
+sub is_child {
+    my ($self, $child) = @_;
+
+    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Parameters');
+
+    if ($self->has_slurpy) {
+        return unless $self->slurpy->is_same_interface($child->slurpy)
+    }
+
+    return unless $self->nshift == $child->nshift;
+
+    return unless @{$self->all_args} <= @{$child->all_args};
+
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        return unless $self->all_args->[$i]->is_child($child->all_args->[$i]);
+    }
+
+    return !!1;
+}
+
 sub is_same_interface_inlined {
     my ($self, $v) = @_;
 
@@ -205,6 +225,27 @@ sub is_same_interface_inlined {
 
     return join "\n && ", @src;
 }
+
+sub is_child_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Parameters')", $v, $v);
+
+    push @src => $self->slurpy->is_child_inlined(sprintf('%s->slurpy', $v)) if $self->has_slurpy; 
+
+    push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
+
+    push @src => sprintf('%d <= @{%s->all_args}', scalar @{$self->all_args}, $v);
+
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        push @src => $self->all_args->[$i]->is_child_inlined(sprintf('%s->all_args->[%d]', $v, $i))
+    }
+
+    return join "\n && ", @src;
+}
+
 
 sub interface_error_message {
     my ($self, $other) = @_;
@@ -236,6 +277,32 @@ sub interface_error_message {
     return '';
 }
 
+sub child_error_message {
+    my ($self, $child) = @_;
+
+    return sprintf('must be Sub::Meta::Parameters. got: %s', $child // '')
+        unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Parameters');
+
+    if ($self->has_slurpy) {
+        return sprintf('invalid slurpy. got: %s, expected: %s', $child->has_slurpy ? $child->slurpy->display : '', $self->slurpy->display)
+            unless $self->slurpy->is_same_interface($child->slurpy)
+    }
+
+    return sprintf('nshift is not equal. got: %d, expected: %d', $child->nshift, $self->nshift)
+        unless $self->nshift == $child->nshift;
+
+    return sprintf('parent args length is greator than child args. parent: %d, child: %d', scalar @{$child->all_args}, scalar @{$self->all_args})
+        unless @{$self->all_args} <= @{$child->all_args};
+
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        my $s = $self->all_args->[$i];
+        my $o = $child->all_args->[$i];
+        return sprintf('args[%d] is invalid. got: %s, expected: %s', $i, $o->display, $s->display)
+            unless $s->is_child($o);
+    }
+
+    return '';
+}
 sub display {
     my $self = shift;
 
