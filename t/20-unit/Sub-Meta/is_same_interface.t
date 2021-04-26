@@ -14,8 +14,8 @@ my $obj = bless {} => 'Some';
 subtest "no args: {  }" => sub {
     my $meta = Sub::Meta->new({ });
     my @tests = (
-        fail => 'invalid subname'    => { subname => 'foo' },
-        pass => 'valid'              => {  },
+        pass_child => 'invalid subname'    => { subname => 'foo' },
+        pass       => 'valid'              => {  },
     );
     test_is_same_interface($meta, @tests);
 };
@@ -23,14 +23,14 @@ subtest "no args: {  }" => sub {
 subtest "{ subname => 'foo' }" => sub {
     my $meta = Sub::Meta->new({ subname => 'foo' });
     my @tests = (
-        fail => 'other is undef'         => undef,
-        fail => 'other is not Sub::Meta' => $obj,
-        fail => 'invalid subname'        => { subname => 'bar' },
-        fail => 'undef subname'          => { subname => undef },
-        fail => 'invalid parameters'     => { subname => 'foo', parameters => $p1 },
-        fail => 'invalid returns'        => { subname => 'foo', returns => $r1 }, ,
-        pass => 'valid'                  => { subname => 'foo' },
-        pass => 'valid w/ stashname'     => { fullname => 'path::foo' },
+        fail       => 'other is undef'         => undef,
+        fail       => 'other is not Sub::Meta' => $obj,
+        fail       => 'invalid subname'        => { subname => 'bar' },
+        fail       => 'undef subname'          => { subname => undef },
+        pass_child => 'invalid parameters'     => { subname => 'foo', parameters => $p1 },
+        pass_child => 'invalid returns'        => { subname => 'foo', returns => $r1 }, ,
+        pass       => 'valid'                  => { subname => 'foo' },
+        pass       => 'valid w/ stashname'     => { fullname => 'path::foo' },
     );
     test_is_same_interface($meta, @tests);
 };
@@ -38,12 +38,12 @@ subtest "{ subname => 'foo' }" => sub {
 subtest "one args: { parameters => \$p1 }" => sub {
     my $meta = Sub::Meta->new({ parameters => $p1 });
     my @tests = (
-        fail => 'invalid subname'    => { subname => 'foo' },
-        fail => 'invalid parameters' => { parameters => $p2 },
-        fail => 'no parameters'      => {  },
-        fail => 'invalid subname'    => { parameters => $p1, subname => 'foo' }, 
-        fail => 'invalid returns'    => { parameters => $p1, returns => $r1 }, 
-        pass => 'valid'              => { parameters => $p1 },
+        fail       => 'invalid subname'    => { subname => 'foo' },
+        fail       => 'invalid parameters' => { parameters => $p2 },
+        fail       => 'no parameters'      => {  },
+        pass_child => 'invalid subname'    => { parameters => $p1, subname => 'foo' }, 
+        pass_child => 'invalid returns'    => { parameters => $p1, returns => $r1 }, 
+        pass       => 'valid'              => { parameters => $p1 },
     );
     test_is_same_interface($meta, @tests);
 };
@@ -51,11 +51,11 @@ subtest "one args: { parameters => \$p1 }" => sub {
 subtest "returns: { returns => \$r1 }" => sub {
     my $meta = Sub::Meta->new({ returns => $r1 });
     my @tests = (
-        fail => 'invalid returns'    => { returns => $r2 },
-        fail => 'no returns'         => {  },
-        fail => 'invalid subname'    => { returns => $r1, subname => 'foo' }, 
-        fail => 'invalid parameters' => { returns => $r1, parameters => $p1 },
-        pass => 'valid'              => { returns => $r1 },
+        fail       => 'invalid returns'    => { returns => $r2 },
+        fail       => 'no returns'         => {  },
+        pass_child => 'invalid subname'    => { returns => $r1, subname => 'foo' }, 
+        pass_child => 'invalid parameters' => { returns => $r1, parameters => $p1 },
+        pass       => 'valid'              => { returns => $r1 },
     );
     test_is_same_interface($meta, @tests);
 };

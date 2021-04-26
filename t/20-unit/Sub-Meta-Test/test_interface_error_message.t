@@ -1,34 +1,26 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Sub::Meta::Test qw(test_interface_error_message);
+use Sub::Meta::Test qw(test_error_message);
 
-subtest 'Fail: test_interface_error_message' => sub {
+subtest 'Fail: test_error_message' => sub {
     my $events = intercept {
         my $meta = Sub::Meta->new();
         my @tests = (
-            { }, '',
-            { }, qr//,
-            { }, sub {},
+            hoge => { }, qr//,
         );
-        test_interface_error_message($meta, @tests);
+        test_error_message($meta, @tests);
     };
 
     is $events, array {
-        event 'Ok';
-        event 'Ok';
-        event 'Fail';
+        event 'Subtest';
+        event 'Diag';
         end;
     };
 
-    my (undef, undef, $fail) = @$events;
-    my $table = $fail->info->[0]{table};
-    is $table->{header}, [
-        "PATH", "LNs", "GOT", "OP", "CHECK", "LNs"
-    ];
-    is $table->{rows}, [
-        [ '', D(), '', '==', D(), D() ],
-    ];
+    my ($subtest) = @$events;
+    my $summary = $subtest->subevents->[0]->summary;
+    like $summary, qr/Plan is 0 assertions/;
 };
 
 done_testing;

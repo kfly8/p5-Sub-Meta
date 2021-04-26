@@ -66,6 +66,26 @@ sub is_same_interface {
     return !!1;
 }
 
+sub is_relaxed_same_interface {
+    my ($self, $child) = @_;
+
+    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Returns');
+
+    if ($self->has_scalar) {
+        return unless _eq($self->scalar, $child->scalar)
+    }
+
+    if ($self->has_list) {
+        return unless _eq($self->list, $child->list)
+    }
+
+    if ($self->has_void) {
+        return unless _eq($self->void, $child->void)
+    }
+
+    return !!1;
+}
+
 sub is_same_interface_inlined {
     my ($self, $v) = @_;
 
@@ -81,6 +101,22 @@ sub is_same_interface_inlined {
 
     push @src => $self->has_void ? _eq_inlined($self->void, sprintf('%s->void', $v))
                                    : sprintf('!%s->has_void', $v);
+
+    return join "\n && ", @src;
+}
+
+sub is_relaxed_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Returns')", $v, $v);
+
+    push @src => _eq_inlined($self->scalar, sprintf('%s->scalar', $v)) if $self->has_scalar;
+
+    push @src => _eq_inlined($self->list, sprintf('%s->list', $v)) if $self->has_list;
+
+    push @src => _eq_inlined($self->void, sprintf('%s->void', $v)) if $self->has_void;
 
     return join "\n && ", @src;
 }
@@ -101,7 +137,7 @@ sub _eq {
     return 1;
 }
 
-sub interface_error_message {
+sub error_message {
     my ($self, $other) = @_;
 
     return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
@@ -130,6 +166,30 @@ sub interface_error_message {
     else {
         return 'should not have void return' if $other->has_void;
     }
+    return '';
+}
+
+sub relaxed_error_message {
+    my ($self, $child) = @_;
+
+    return sprintf('must be Sub::Meta::Returns. got: %s', $child // '')
+        unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Returns');
+
+    if ($self->has_scalar) {
+        return sprintf('invalid scalar return. got: %s, expected: %s', $child->scalar, $self->scalar)
+            unless _eq($self->scalar, $child->scalar);
+    }
+
+    if ($self->has_list) {
+        return sprintf('invalid list return. got: %s, expected: %s', $child->list, $self->list)
+            unless _eq($self->list, $child->list);
+    }
+
+    if ($self->has_void) {
+        return sprintf('invalid void return. got: %s, expected: %s', $child->void, $self->void)
+            unless _eq($self->void, $child->void);
+    }
+
     return '';
 }
 
@@ -305,9 +365,9 @@ Specifically, check whether C<scalar>, C<list> and C<void> are equal.
 
 Returns inlined C<is_same_interface> string.
 
-=head3 interface_error_message($other_meta)
+=head3 error_message($other_meta)
 
-    method interface_error_message(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
+    method error_message(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
 
 Return the error message when the interface does not match. If match, then return empty string.
 

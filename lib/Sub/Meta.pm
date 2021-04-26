@@ -303,12 +303,7 @@ sub is_same_interface {
         return if $other->has_subname;
     }
 
-    if ($self->is_method) {
-        return unless $other->is_method
-    }
-    else {
-        return if $other->is_method
-    }
+    return unless $self->is_method eq $other->is_method;
 
     if ($self->has_parameters) {
         return unless $self->parameters->is_same_interface($other->parameters)
@@ -327,6 +322,28 @@ sub is_same_interface {
     return !!1;
 }
 
+sub is_relaxed_same_interface {
+    my ($self, $child) = @_;
+
+    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta');
+
+    if ($self->has_subname) {
+        return unless $self->subname eq $child->subname
+    }
+
+    return unless $self->is_method eq $child->is_method;
+
+    if ($self->has_parameters) {
+        return unless $self->parameters->is_relaxed_same_interface($child->parameters)
+    }
+
+    if ($self->has_returns) {
+        return unless $self->returns->is_relaxed_same_interface($child->returns)
+    }
+
+    return !!1;
+}
+
 sub is_same_interface_inlined {
     my ($self, $v) = @_;
 
@@ -337,8 +354,7 @@ sub is_same_interface_inlined {
     push @src => $self->has_subname ? sprintf("'%s' eq %s->subname", $self->subname, $v)
                                     : sprintf('!%s->has_subname', $v);
 
-    push @src => $self->is_method ? sprintf('%s->is_method', $v)
-                                  : sprintf('!%s->is_method', $v);
+    push @src => sprintf("'%s' eq %s->is_method", $self->is_method, $v);
 
     push @src => $self->has_parameters ? $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v))
                                        : sprintf('!%s->has_parameters', $v);
@@ -349,7 +365,25 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
-sub interface_error_message {
+sub is_relaxed_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta')", $v, $v);
+
+    push @src => sprintf("'%s' eq %s->subname", $self->subname, $v) if $self->has_subname;
+
+    push @src => sprintf("'%s' eq %s->is_method", $self->is_method, $v);
+
+    push @src => $self->parameters->is_relaxed_same_interface_inlined(sprintf('%s->parameters', $v)) if $self->has_parameters;
+
+    push @src => $self->returns->is_relaxed_same_interface_inlined(sprintf('%s->returns', $v)) if $self->has_returns;
+
+    return join "\n && ", @src;
+}
+
+sub error_message {
     my ($self, $other) = @_;
 
     return sprintf('must be Sub::Meta. got: %s', $other // '')
@@ -363,15 +397,12 @@ sub interface_error_message {
         return sprintf('should not have subname. got: %s', $other->subname) if $other->has_subname;
     }
 
-    if ($self->is_method) {
-        return 'must be method' unless $other->is_method
-    }
-    else {
-        return 'should not be method' if $other->is_method;
+    if ($self->is_method ne $other->is_method) {
+        return 'invalid method';
     }
 
     if ($self->has_parameters) {
-        return $self->parameters->interface_error_message($other->parameters)
+        return "invalid parameters:" . $self->parameters->error_message($other->parameters)
             unless $self->parameters->is_same_interface($other->parameters)
     }
     else {
@@ -379,10 +410,38 @@ sub interface_error_message {
     }
 
     if ($self->has_returns) {
-        return $self->returns->interface_error_message($other->returns)
+        return "invalid returns:" . $self->returns->error_message($other->returns)
+            unless $self->returns->is_same_interface($other->returns)
     }
     else {
         return 'should not have returns' if $other->returns;
+    }
+    return '';
+}
+
+sub relaxed_error_message {
+    my ($self, $child) = @_;
+
+    return sprintf('must be Sub::Meta. got: %s', $child // '')
+        unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta');
+
+    if ($self->has_subname) {
+        return sprintf('invalid subname. got: %s, expected: %s', $child->subname, $self->subname)
+            unless $self->subname eq $child->subname
+    }
+
+    if ($self->is_method ne $child->is_method) {
+        return 'invalid method'
+    }
+
+    if ($self->has_parameters) {
+        return "invalid parameters:" . $self->parameters->relaxed_error_message($child->parameters)
+            unless $self->parameters->is_relaxed_same_interface($child->parameters)
+    }
+
+    if ($self->has_returns) {
+        return "invalid returns:" . $self->returns->relaxed_error_message($child->returns)
+            unless $self->returns->is_relaxed_same_interface($child->returns)
     }
     return '';
 }
@@ -988,9 +1047,9 @@ Returns inlined C<is_same_interface> string:
     $check->(Sub::Meta->new(subname => 'hello')); # => OK
     $check->(Sub::Meta->new(subname => 'world')); # => NG
 
-=head3 interface_error_message($other_meta)
+=head3 error_message($other_meta)
 
-    method interface_error_message(InstanceOf[Sub::Meta] $other_meta) => Str
+    method error_message(InstanceOf[Sub::Meta] $other_meta) => Str
 
 Return the error message when the interface does not match. If match, then return empty string.
 

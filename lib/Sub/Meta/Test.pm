@@ -7,7 +7,7 @@ our @EXPORT_OK = qw(
     sub_meta_parameters
     sub_meta_param
     test_is_same_interface
-    test_interface_error_message
+    test_error_message
     DummyType
 );
 
@@ -97,8 +97,10 @@ sub sub_meta_param {
 sub test_is_same_interface {
     my ($meta, @tests) = @_;
 
-    my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic (ProhibitStringyEval)
+    ## no critic (ProhibitStringyEval)
+    my $is_same_interface = eval sprintf('sub { %s }', $meta->is_same_interface_inlined('$_[0]'));
+    my $is_relaxed_same_interface = eval sprintf('sub { %s }', $meta->is_relaxed_same_interface_inlined('$_[0]'));
+    ## use critic
 
     my $ctx = context;
     my $meta_class = ref $meta;
@@ -108,17 +110,30 @@ sub test_is_same_interface {
                   ? $meta_class->new($args)
                   : $args;
 
-        my $result = $meta->is_same_interface($other);
-        my $result_inlined = $is_same_interface->($other);
+        my $same = $meta->is_same_interface($other);
+        my $same_inlined = $is_same_interface->($other);
+
+        my $child = $meta->is_relaxed_same_interface($other);
+        my $child_inlined = $is_relaxed_same_interface->($other);
 
         subtest "should $pass: $message" => sub {
             if ($pass eq 'pass') {
-                ok $result, 'is_same_interface';
-                ok $result_inlined, 'is_same_interface_inlined';
+                ok $same, 'is_same_interface';
+                ok $same_inlined, 'is_same_interface_inlined';
+                ok $child, 'is_relaxed_same_interface';
+                ok $child_inlined, 'is_relaxed_same_interface_inlined';
+            }
+            elsif ($pass eq 'pass_child') {
+                ok !$same, 'is_same_interface';
+                ok !$same_inlined, 'is_same_interface_inlined';
+                ok $child, 'is_relaxed_same_interface';
+                ok $child_inlined, 'is_relaxed_same_interface_inlined';
             }
             elsif($pass eq 'fail') {
-                ok !$result, 'is_same_interface';
-                ok !$result_inlined, 'is_same_interface_inlined';
+                ok !$same, 'is_same_interface';
+                ok !$same_inlined, 'is_same_interface_inlined';
+                ok !$child, 'is_relaxed_same_interface';
+                ok !$child_inlined, 'is_relaxed_same_interface_inlined';
             }
         };
     }
@@ -126,26 +141,35 @@ sub test_is_same_interface {
     return;
 }
 
-sub test_interface_error_message {
+sub test_error_message {
     my ($meta, @tests) = @_;
 
     my $ctx = context;
     my $meta_class = ref $meta;
 
     while (@tests) {
-        my ($args, $expected) = splice @tests, 0, 2;
+        my ($pass, $args, $expected) = splice @tests, 0, 3;
         my $other = ref $args && ref $args eq 'HASH'
                   ? $meta_class->new($args)
                   : $args;
 
-        my $result = $meta->interface_error_message($other);
+        my $got   = $meta->error_message($other);
+        my $child = $meta->relaxed_error_message($other);
 
-        if (ref $expected && ref $expected eq 'Regexp') {
-            like $result, $expected;
-        }
-        else {
-            is $result, $expected;
-        }
+        subtest "should $pass: $expected" => sub {
+            if ($pass eq 'pass') {
+                is $got, '', 'error_message';
+                is $child, '', 'relaxed_error_message';
+            }
+            elsif ($pass eq 'pass_child') {
+                like $got, $expected, 'error_message';
+                is $child, '', 'relaxed_error_message';
+            }
+            elsif ($pass eq 'fail') {
+                like $got, $expected, 'error_message';
+                like $child, $expected, 'relaxed_error_message';
+            }
+        };
     }
 
     $ctx->release;
@@ -219,9 +243,9 @@ Testing utility for Sub::Meta::Param object.
 Testing utility for is_same_interface method of Sub::Meta,
 Sub::Meta::Param, Sub::Meta::Parameters and Sub::Meta::Returns.
 
-=head3 test_interface_error_message
+=head3 test_error_message
 
-Testing utility for interface_error_message method of Sub::Meta,
+Testing utility for error_message method of Sub::Meta,
 Sub::Meta::Parameters and Sub::Meta::Returns.
 
 =head3 DummyType
