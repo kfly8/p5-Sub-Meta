@@ -16,8 +16,8 @@ subtest "{ subname => 'foo' }" => sub {
         fail       => { subname => 'bar' },                    qr/^invalid subname. got: bar, expected: foo/,
         fail       => { subname => undef },                    qr/^invalid subname. got: , expected: foo/,
         fail       => { subname => 'foo', is_method => 1 },    qr/^invalid method/,
-        pass_child => { subname => 'foo', parameters => $p1 }, qr/^should not have parameters/,
-        pass_child => { subname => 'foo', returns => $r1 },    qr/^should not have returns/,
+        relax_pass => { subname => 'foo', parameters => $p1 }, qr/^should not have parameters/,
+        relax_pass => { subname => 'foo', returns => $r1 },    qr/^should not have returns/,
         pass       => { subname => 'foo' },                    qr//, # valid
         pass       => { fullname => 'path::foo' },             qr//, # valid
     );
@@ -27,7 +27,7 @@ subtest "{ subname => 'foo' }" => sub {
 subtest "no args: {}" => sub {
     my $meta = Sub::Meta->new();
     my @tests = (
-        pass_child => { subname => 'foo' }, qr/^should not have subname. got: foo/,
+        relax_pass => { subname => 'foo' }, qr/^should not have subname. got: foo/,
         pass       => { },                  qr//, # valid
     );
     test_error_message($meta, @tests);

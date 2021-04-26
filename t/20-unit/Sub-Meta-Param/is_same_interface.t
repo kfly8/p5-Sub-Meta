@@ -24,7 +24,7 @@ subtest "no name: { type => 'Str', required => 1, positional => 1 }" => sub {
         fail       => 'invalid type'       => { type => 'Srt', required => 1, positional => 1 },
         fail       => 'invalid required'   => { type => 'Str', required => 0, positional => 1 },
         fail       => 'invalid positional' => { type => 'Str', required => 1, positional => 0 },
-        pass_child => 'not need name'      => { type => 'Str', required => 1, positional => 1, name => '$foo' },
+        relax_pass => 'not need name'      => { type => 'Str', required => 1, positional => 1, name => '$foo' },
         pass       => 'valid'              => { type => 'Str', required => 1, positional => 1 },
     );
     test_is_same_interface($meta, @tests);
@@ -36,7 +36,7 @@ subtest "no type: { name => '\$foo', required => 1, positional => 1 }" => sub {
         fail       => 'invalid name'       => { name => '$boo', required => 1, positional => 1 },
         fail       => 'invalid required'   => { name => '$foo', required => 0, positional => 1 },
         fail       => 'invalid positional' => { name => '$foo', required => 1, positional => 0 },
-        pass_child => 'not need type'      => { name => '$foo', required => 1, positional => 1, type => 'Str' },
+        relax_pass => 'not need type'      => { name => '$foo', required => 1, positional => 1, type => 'Str' },
         pass       => 'valid'              => { name => '$foo', required => 1, positional => 1 },
     );
     test_is_same_interface($meta, @tests);
@@ -47,8 +47,8 @@ subtest "no name and type: { required => 1, positional => 1 }" => sub {
     my @tests = (
         fail       => 'invalid required'    => { required => 0, positional => 1 },
         fail       => 'invalid positional'  => { required => 1, positional => 0 },
-        pass_child => 'not need name'       => { required => 1, positional => 1, name => '$foo' },
-        pass_child => 'not need type'       => { required => 1, positional => 1, type => 'Str' },
+        relax_pass => 'not need name'       => { required => 1, positional => 1, name => '$foo' },
+        relax_pass => 'not need type'       => { required => 1, positional => 1, type => 'Str' },
         pass       => 'valid'               => { required => 1, positional => 1 },
     );
     test_is_same_interface($meta, @tests);
@@ -58,7 +58,7 @@ subtest "undef optional: { optional => undef }" => sub {
     my $meta = Sub::Meta::Param->new({ optional => undef });
     my @tests = (
         fail       => 'invalid optional' => { optional => 1 },
-        pass_child => 'not need name'    => { optional => undef, name => '$opts' },
+        relax_pass => 'not need name'    => { optional => undef, name => '$opts' },
         pass       => 'valid'            => { optional => undef },
         pass       => 'valid'            => { optional => 0 },
         pass       => 'valid'            => { required => !!1 },

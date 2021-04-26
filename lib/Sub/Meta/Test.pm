@@ -123,7 +123,7 @@ sub test_is_same_interface {
                 ok $child, 'is_relaxed_same_interface';
                 ok $child_inlined, 'is_relaxed_same_interface_inlined';
             }
-            elsif ($pass eq 'pass_child') {
+            elsif ($pass eq 'relax_pass') {
                 ok !$same, 'is_same_interface';
                 ok !$same_inlined, 'is_same_interface_inlined';
                 ok $child, 'is_relaxed_same_interface';
@@ -161,7 +161,7 @@ sub test_error_message {
                 is $got, '', 'error_message';
                 is $child, '', 'relaxed_error_message';
             }
-            elsif ($pass eq 'pass_child') {
+            elsif ($pass eq 'relax_pass') {
                 like $got, $expected, 'error_message';
                 is $child, '', 'relaxed_error_message';
             }

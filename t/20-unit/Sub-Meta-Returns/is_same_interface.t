@@ -9,8 +9,8 @@ subtest "scalar: { scalar => 'Str', list => undef, void => undef }" => sub {
         fail => 'invalid other'  => undef,
         fail => 'invalid obj'    => (bless {} => 'Some'),
         fail => 'invalid scalar' => { scalar => 'Int', list => undef, void => undef },
-        pass_child => 'invalid list'   => { scalar => 'Str', list => 'Str', void => undef },
-        pass_child => 'invalid void'   => { scalar => 'Str', list => undef, void => 'Str' },
+        relax_pass => 'invalid list'   => { scalar => 'Str', list => 'Str', void => undef },
+        relax_pass => 'invalid void'   => { scalar => 'Str', list => undef, void => 'Str' },
         pass => 'valid'          => { scalar => 'Str', list => undef, void => undef },
     );
     test_is_same_interface($meta, @tests);
@@ -20,8 +20,8 @@ subtest "list: { scalar => undef, list => 'Str', void => undef }" => sub {
     my $meta = Sub::Meta::Returns->new({ scalar => undef, list => 'Str', void => undef });
     my @tests = (
         fail => 'invalid list'   => { scalar => undef, list => 'Int', void => undef },
-        pass_child => 'invalid scalar' => { scalar => 'Str', list => 'Str', void => undef },
-        pass_child => 'invalid void'   => { scalar => undef, list => 'Str', void => 'Str' },
+        relax_pass => 'invalid scalar' => { scalar => 'Str', list => 'Str', void => undef },
+        relax_pass => 'invalid void'   => { scalar => undef, list => 'Str', void => 'Str' },
         pass => 'valid'          => { scalar => undef, list => 'Str', void => undef },
     );
     test_is_same_interface($meta, @tests);
@@ -31,8 +31,8 @@ subtest "void: { scalar => undef, list => undef, void => 'Str' }" => sub {
     my $meta = Sub::Meta::Returns->new({ scalar => undef, list => undef, void => 'Str' });
     my @tests = (
         fail => 'invalid void'   => { scalar => undef, list => undef, void => 'Int' },
-        pass_child => 'invalid scalar' => { scalar => 'Str', list => undef, void => 'Str' },
-        pass_child => 'invalid list'   => { scalar => undef, list => 'Str', void => 'Str' },
+        relax_pass => 'invalid scalar' => { scalar => 'Str', list => undef, void => 'Str' },
+        relax_pass => 'invalid list'   => { scalar => undef, list => 'Str', void => 'Str' },
         pass => 'valid'          => { scalar => undef, list => undef, void => 'Str' },
     );
     test_is_same_interface($meta, @tests);

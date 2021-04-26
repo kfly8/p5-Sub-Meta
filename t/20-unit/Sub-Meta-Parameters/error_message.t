@@ -12,8 +12,8 @@ subtest "{ args => [] }" => sub {
     my @tests = (
         fail        => undef,                                        qr/^must be Sub::Meta::Parameters. got: /,
         fail        => (bless {} => 'Some'),                         qr/^must be Sub::Meta::Parameters\. got: Some/,
-        pass_child  => { args => [$Str] },                           qr/^invalid args length. got: 1, expected: 0/, 
-        pass_child  => { args => [], slurpy => $Slurpy },            qr/^should not have slurpy/, 
+        relax_pass  => { args => [$Str] },                           qr/^invalid args length. got: 1, expected: 0/, 
+        relax_pass  => { args => [], slurpy => $Slurpy },            qr/^should not have slurpy/, 
         fail        => { args => [], nshift => 1 },                  qr/^nshift is not equal. got: 1, expected: 0/, 
         pass        => { args => [] },                               qr//, # valid
         pass        => { args => [], slurpy => undef },              qr//, # valid
