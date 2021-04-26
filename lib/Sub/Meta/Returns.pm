@@ -66,7 +66,7 @@ sub is_same_interface {
     return !!1;
 }
 
-sub is_child {
+sub is_relaxed_same_interface {
     my ($self, $child) = @_;
 
     return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Returns');
@@ -105,7 +105,7 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
-sub is_child_inlined {
+sub is_relaxed_same_interface_inlined {
     my ($self, $v) = @_;
 
     my @src;
@@ -137,7 +137,7 @@ sub _eq {
     return 1;
 }
 
-sub interface_error_message {
+sub error_message {
     my ($self, $other) = @_;
 
     return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
@@ -169,7 +169,7 @@ sub interface_error_message {
     return '';
 }
 
-sub child_error_message {
+sub relaxed_error_message {
     my ($self, $child) = @_;
 
     return sprintf('must be Sub::Meta::Returns. got: %s', $child // '')
@@ -365,9 +365,9 @@ Specifically, check whether C<scalar>, C<list> and C<void> are equal.
 
 Returns inlined C<is_same_interface> string.
 
-=head3 interface_error_message($other_meta)
+=head3 error_message($other_meta)
 
-    method interface_error_message(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
+    method error_message(InstanceOf[Sub::Meta::Returns] $other_meta) => Str
 
 Return the error message when the interface does not match. If match, then return empty string.
 

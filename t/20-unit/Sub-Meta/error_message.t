@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use Sub::Meta;
-use Sub::Meta::Test qw(test_interface_error_message);
+use Sub::Meta::Test qw(test_error_message);
 
 my $p1 = Sub::Meta::Parameters->new(args => ['Str']);
 my $p2 = Sub::Meta::Parameters->new(args => ['Int']);
@@ -21,7 +21,7 @@ subtest "{ subname => 'foo' }" => sub {
         pass       => { subname => 'foo' },                    qr//, # valid
         pass       => { fullname => 'path::foo' },             qr//, # valid
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
 
 subtest "no args: {}" => sub {
@@ -30,7 +30,7 @@ subtest "no args: {}" => sub {
         pass_child => { subname => 'foo' }, qr/^should not have subname. got: foo/,
         pass       => { },                  qr//, # valid
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
 
 subtest "method: { is_method => 1 }" => sub {
@@ -39,7 +39,7 @@ subtest "method: { is_method => 1 }" => sub {
         fail => { is_method => 0 }, qr/^invalid method/,
         pass => { is_method => 1 }, qr//, # valid
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
 
 subtest "p1: { parameters => \$p1 }" => sub {
@@ -49,7 +49,7 @@ subtest "p1: { parameters => \$p1 }" => sub {
         fail => {  },                  qr/^invalid parameters:/,
         pass => { parameters => $p1 }, qr//, #valid
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
 
 subtest "{ returns => \$r1 }" => sub {
@@ -59,7 +59,7 @@ subtest "{ returns => \$r1 }" => sub {
         fail => {  },               qr/^invalid returns:/,
         pass => { returns => $r1 }, qr//, #valid
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
 
 done_testing;

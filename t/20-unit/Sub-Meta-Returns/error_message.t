@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use Sub::Meta::Returns;
-use Sub::Meta::Test qw(test_interface_error_message);
+use Sub::Meta::Test qw(test_error_message);
 
 subtest "{ scalar => 'Str' }" => sub {
     my $meta = Sub::Meta::Returns->new({ scalar => 'Str' });
@@ -14,7 +14,7 @@ subtest "{ scalar => 'Str' }" => sub {
         pass       => { scalar => 'Str' },                               qr//,
         pass       => { scalar => 'Str', list => undef, void => undef }, qr//,
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
 
 subtest "{ list => 'Str' }" => sub {
@@ -26,7 +26,7 @@ subtest "{ list => 'Str' }" => sub {
         pass       => { list => 'Str' },                                 qr//,
         pass       => { list => 'Str', scalar => undef, void => undef }, qr//,
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
 
 subtest "{ void => 'Str' }" => sub {
@@ -38,7 +38,7 @@ subtest "{ void => 'Str' }" => sub {
         pass       => { void => 'Str' },                                 qr//,
         pass       => { void => 'Str', list => undef, scalar => undef }, qr//,
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
 
 done_testing;

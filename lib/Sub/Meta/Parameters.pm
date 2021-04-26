@@ -185,7 +185,7 @@ sub is_same_interface {
     return !!1;
 }
 
-sub is_child {
+sub is_relaxed_same_interface {
     my ($self, $child) = @_;
 
     return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Parameters');
@@ -199,7 +199,7 @@ sub is_child {
     return unless @{$self->all_args} <= @{$child->all_args};
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {
-        return unless $self->all_args->[$i]->is_child($child->all_args->[$i]);
+        return unless $self->all_args->[$i]->is_relaxed_same_interface($child->all_args->[$i]);
     }
 
     return !!1;
@@ -226,28 +226,28 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
-sub is_child_inlined {
+sub is_relaxed_same_interface_inlined {
     my ($self, $v) = @_;
 
     my @src;
 
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Parameters')", $v, $v);
 
-    push @src => $self->slurpy->is_child_inlined(sprintf('%s->slurpy', $v)) if $self->has_slurpy; 
+    push @src => $self->slurpy->is_relaxed_same_interface_inlined(sprintf('%s->slurpy', $v)) if $self->has_slurpy; 
 
     push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
 
     push @src => sprintf('%d <= @{%s->all_args}', scalar @{$self->all_args}, $v);
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {
-        push @src => $self->all_args->[$i]->is_child_inlined(sprintf('%s->all_args->[%d]', $v, $i))
+        push @src => $self->all_args->[$i]->is_relaxed_same_interface_inlined(sprintf('%s->all_args->[%d]', $v, $i))
     }
 
     return join "\n && ", @src;
 }
 
 
-sub interface_error_message {
+sub error_message {
     my ($self, $other) = @_;
 
     return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
@@ -277,7 +277,7 @@ sub interface_error_message {
     return '';
 }
 
-sub child_error_message {
+sub relaxed_error_message {
     my ($self, $child) = @_;
 
     return sprintf('must be Sub::Meta::Parameters. got: %s', $child // '')
@@ -298,7 +298,7 @@ sub child_error_message {
         my $s = $self->all_args->[$i];
         my $o = $child->all_args->[$i];
         return sprintf('args[%d] is invalid. got: %s, expected: %s', $i, $o->display, $s->display)
-            unless $s->is_child($o);
+            unless $s->is_relaxed_same_interface($o);
     }
 
     return '';
@@ -561,9 +561,9 @@ Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
 
 Returns inlined C<is_same_interface> string.
 
-=head3 interface_error_message($other_meta)
+=head3 error_message($other_meta)
 
-    method interface_error_message(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+    method error_message(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
 
 Return the error message when the interface does not match.
 

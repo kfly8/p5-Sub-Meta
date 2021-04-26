@@ -88,7 +88,7 @@ sub is_same_interface {
     return !!1;
 }
 
-sub is_child {
+sub is_relaxed_same_interface {
     my ($self, $child) = @_;
 
     return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Param');
@@ -127,7 +127,7 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
-sub is_child_inlined {
+sub is_relaxed_same_interface_inlined {
     my ($self, $v) = @_;
 
     my @src;

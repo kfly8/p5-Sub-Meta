@@ -7,7 +7,7 @@ our @EXPORT_OK = qw(
     sub_meta_parameters
     sub_meta_param
     test_is_same_interface
-    test_interface_error_message
+    test_error_message
     DummyType
 );
 
@@ -99,7 +99,7 @@ sub test_is_same_interface {
 
     ## no critic (ProhibitStringyEval)
     my $is_same_interface = eval sprintf('sub { %s }', $meta->is_same_interface_inlined('$_[0]'));
-    my $is_child = eval sprintf('sub { %s }', $meta->is_child_inlined('$_[0]'));
+    my $is_relaxed_same_interface = eval sprintf('sub { %s }', $meta->is_relaxed_same_interface_inlined('$_[0]'));
     ## use critic
 
     my $ctx = context;
@@ -113,27 +113,27 @@ sub test_is_same_interface {
         my $same = $meta->is_same_interface($other);
         my $same_inlined = $is_same_interface->($other);
 
-        my $child = $meta->is_child($other);
-        my $child_inlined = $is_child->($other);
+        my $child = $meta->is_relaxed_same_interface($other);
+        my $child_inlined = $is_relaxed_same_interface->($other);
 
         subtest "should $pass: $message" => sub {
             if ($pass eq 'pass') {
                 ok $same, 'is_same_interface';
                 ok $same_inlined, 'is_same_interface_inlined';
-                ok $child, 'is_child';
-                ok $child_inlined, 'is_child_inlined';
+                ok $child, 'is_relaxed_same_interface';
+                ok $child_inlined, 'is_relaxed_same_interface_inlined';
             }
             elsif ($pass eq 'pass_child') {
                 ok !$same, 'is_same_interface';
                 ok !$same_inlined, 'is_same_interface_inlined';
-                ok $child, 'is_child';
-                ok $child_inlined, 'is_child_inlined';
+                ok $child, 'is_relaxed_same_interface';
+                ok $child_inlined, 'is_relaxed_same_interface_inlined';
             }
             elsif($pass eq 'fail') {
                 ok !$same, 'is_same_interface';
                 ok !$same_inlined, 'is_same_interface_inlined';
-                ok !$child, 'is_child';
-                ok !$child_inlined, 'is_child_inlined';
+                ok !$child, 'is_relaxed_same_interface';
+                ok !$child_inlined, 'is_relaxed_same_interface_inlined';
             }
         };
     }
@@ -141,7 +141,7 @@ sub test_is_same_interface {
     return;
 }
 
-sub test_interface_error_message {
+sub test_error_message {
     my ($meta, @tests) = @_;
 
     my $ctx = context;
@@ -153,21 +153,21 @@ sub test_interface_error_message {
                   ? $meta_class->new($args)
                   : $args;
 
-        my $got   = $meta->interface_error_message($other);
-        my $child = $meta->child_error_message($other);
+        my $got   = $meta->error_message($other);
+        my $child = $meta->relaxed_error_message($other);
 
         subtest "should $pass: $expected" => sub {
             if ($pass eq 'pass') {
-                is $got, '', 'interface_error_message';
-                is $child, '', 'child_error_message';
+                is $got, '', 'error_message';
+                is $child, '', 'relaxed_error_message';
             }
             elsif ($pass eq 'pass_child') {
-                like $got, $expected, 'interface_error_message';
-                is $child, '', 'child_error_message';
+                like $got, $expected, 'error_message';
+                is $child, '', 'relaxed_error_message';
             }
             elsif ($pass eq 'fail') {
-                like $got, $expected, 'interface_error_message';
-                like $child, $expected, 'child_error_message';
+                like $got, $expected, 'error_message';
+                like $child, $expected, 'relaxed_error_message';
             }
         };
     }
@@ -243,9 +243,9 @@ Testing utility for Sub::Meta::Param object.
 Testing utility for is_same_interface method of Sub::Meta,
 Sub::Meta::Param, Sub::Meta::Parameters and Sub::Meta::Returns.
 
-=head3 test_interface_error_message
+=head3 test_error_message
 
-Testing utility for interface_error_message method of Sub::Meta,
+Testing utility for error_message method of Sub::Meta,
 Sub::Meta::Parameters and Sub::Meta::Returns.
 
 =head3 DummyType

@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use Sub::Meta::Parameters;
-use Sub::Meta::Test qw(test_interface_error_message);
+use Sub::Meta::Test qw(test_error_message);
 
 my $Slurpy = Sub::Meta::Param->new("Slurpy");
 my $Str = Sub::Meta::Param->new("Str");
@@ -20,7 +20,7 @@ subtest "{ args => [] }" => sub {
         pass        => { args => [], nshift => 0 },                  qr//, # valid
         pass        => { args => [], slurpy => undef, nshift => 0 }, qr//, # valid
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
  
 subtest "one args: { args => [\$Str] }" => sub {
@@ -30,7 +30,7 @@ subtest "one args: { args => [\$Str] }" => sub {
         fail => { args => [$Int] }, qr/^args\[0\] is invalid. got: Int, expected: Str/,
         pass => { args => [$Str] }, qr//, # valid
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
  
 subtest "two args: { args => [\$Str, \$Int] }" => sub {
@@ -40,7 +40,7 @@ subtest "two args: { args => [\$Str, \$Int] }" => sub {
         fail => { args => [$Str, $Str] }, qr/^args\[1\] is invalid. got: Str, expected: Int/,
         pass => { args => [$Str, $Int] }, qr//, # valid
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
  
 subtest "slurpy: { args => [], slurpy => \$Str }" => sub {
@@ -50,7 +50,7 @@ subtest "slurpy: { args => [], slurpy => \$Str }" => sub {
         fail => { args => [], slurpy => $Int }, qr/^invalid slurpy. got: Int, expected: Str/,
         pass => { args => [], slurpy => $Str }, qr//, # 'valid',
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
  
 subtest "nshift: { args => [], nshift => 1 }" => sub {
@@ -60,7 +60,7 @@ subtest "nshift: { args => [], nshift => 1 }" => sub {
         fail => { args => [], nshift => 0},  qr/^nshift is not equal. got: 0, expected: 1/,
         pass => { args => [], nshift => 1 }, qr//, # 'valid',
     );
-    test_interface_error_message($meta, @tests);
+    test_error_message($meta, @tests);
 };
  
 done_testing;
