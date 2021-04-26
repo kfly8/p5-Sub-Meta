@@ -148,19 +148,28 @@ sub test_interface_error_message {
     my $meta_class = ref $meta;
 
     while (@tests) {
-        my ($args, $expected) = splice @tests, 0, 2;
+        my ($pass, $args, $expected) = splice @tests, 0, 3;
         my $other = ref $args && ref $args eq 'HASH'
                   ? $meta_class->new($args)
                   : $args;
 
-        my $result = $meta->interface_error_message($other);
+        my $got   = $meta->interface_error_message($other);
+        my $child = $meta->child_error_message($other);
 
-        if (ref $expected && ref $expected eq 'Regexp') {
-            like $result, $expected;
-        }
-        else {
-            is $result, $expected;
-        }
+        subtest "should $pass: $expected" => sub {
+            if ($pass eq 'pass') {
+                is $got, '', 'interface_error_message';
+                is $child, '', 'child_error_message';
+            }
+            elsif ($pass eq 'pass_child') {
+                like $got, $expected, 'interface_error_message';
+                is $child, '', 'child_error_message';
+            }
+            elsif ($pass eq 'fail') {
+                like $got, $expected, 'interface_error_message';
+                like $child, $expected, 'child_error_message';
+            }
+        };
     }
 
     $ctx->release;

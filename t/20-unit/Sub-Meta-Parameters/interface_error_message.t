@@ -10,15 +10,15 @@ my $Int = Sub::Meta::Param->new("Int");
 subtest "{ args => [] }" => sub {
     my $meta = Sub::Meta::Parameters->new({ args => [] });
     my @tests = (
-        undef, 'must be Sub::Meta::Parameters. got: ',
-        (bless {} => 'Some'), qr/^must be Sub::Meta::Parameters\. got: Some/,
-        { args => [$Str] }, 'args length is not equal. got: 1, expected: 0', 
-        { args => [], slurpy => $Slurpy }, 'should not have slurpy', 
-        { args => [], nshift => 1 }, 'nshift is not equal. got: 1, expected: 0', 
-        { args => [] }, '', # valid
-        { args => [], slurpy => undef }, '', # valid
-        { args => [], nshift => 0 }, '', # valid
-        { args => [], slurpy => undef, nshift => 0 }, '', # valid
+        fail        => undef,                                        qr/^must be Sub::Meta::Parameters. got: /,
+        fail        => (bless {} => 'Some'),                         qr/^must be Sub::Meta::Parameters\. got: Some/,
+        pass_child  => { args => [$Str] },                           qr/^invalid args length. got: 1, expected: 0/, 
+        pass_child  => { args => [], slurpy => $Slurpy },            qr/^should not have slurpy/, 
+        fail        => { args => [], nshift => 1 },                  qr/^nshift is not equal. got: 1, expected: 0/, 
+        pass        => { args => [] },                               qr//, # valid
+        pass        => { args => [], slurpy => undef },              qr//, # valid
+        pass        => { args => [], nshift => 0 },                  qr//, # valid
+        pass        => { args => [], slurpy => undef, nshift => 0 }, qr//, # valid
     );
     test_interface_error_message($meta, @tests);
 };
@@ -26,8 +26,9 @@ subtest "{ args => [] }" => sub {
 subtest "one args: { args => [\$Str] }" => sub {
     my $meta = Sub::Meta::Parameters->new({ args => [$Str] });
     my @tests = (
-        { args => [$Int] }, 'args[0] is invalid. got: Int, expected: Str',
-        { args => [$Str] }, '', # valid
+        fail => { args => [] },     qr/^invalid args length. got: 0, expected: 1/,
+        fail => { args => [$Int] }, qr/^args\[0\] is invalid. got: Int, expected: Str/,
+        pass => { args => [$Str] }, qr//, # valid
     );
     test_interface_error_message($meta, @tests);
 };
@@ -35,9 +36,9 @@ subtest "one args: { args => [\$Str] }" => sub {
 subtest "two args: { args => [\$Str, \$Int] }" => sub {
     my $meta = Sub::Meta::Parameters->new({ args => [$Str, $Int] });
     my @tests = (
-        { args => [$Int, $Str] }, 'args[0] is invalid. got: Int, expected: Str',
-        { args => [$Str, $Str] }, 'args[1] is invalid. got: Str, expected: Int',
-        { args => [$Str, $Int] }, '', # valid
+        fail => { args => [$Int, $Str] }, qr/^args\[0\] is invalid. got: Int, expected: Str/,
+        fail => { args => [$Str, $Str] }, qr/^args\[1\] is invalid. got: Str, expected: Int/,
+        pass => { args => [$Str, $Int] }, qr//, # valid
     );
     test_interface_error_message($meta, @tests);
 };
@@ -45,9 +46,9 @@ subtest "two args: { args => [\$Str, \$Int] }" => sub {
 subtest "slurpy: { args => [], slurpy => \$Str }" => sub {
     my $meta = Sub::Meta::Parameters->new({ args => [], slurpy => $Str });
     my @tests = (
-        { args => [] }, 'invalid slurpy. got: , expected: Str',
-        { args => [], slurpy => $Int }, 'invalid slurpy. got: Int, expected: Str',
-        { args => [], slurpy => $Str }, '', # 'valid',
+        fail => { args => [] },                 qr/^invalid slurpy. got: , expected: Str/,
+        fail => { args => [], slurpy => $Int }, qr/^invalid slurpy. got: Int, expected: Str/,
+        pass => { args => [], slurpy => $Str }, qr//, # 'valid',
     );
     test_interface_error_message($meta, @tests);
 };
@@ -55,9 +56,9 @@ subtest "slurpy: { args => [], slurpy => \$Str }" => sub {
 subtest "nshift: { args => [], nshift => 1 }" => sub {
     my $meta = Sub::Meta::Parameters->new({ args => [], nshift => 1 });
     my @tests = (
-        { args => [] }, 'nshift is not equal. got: 0, expected: 1',
-        { args => [], nshift => 0}, 'nshift is not equal. got: 0, expected: 1',
-        { args => [], nshift => 1 }, '', # 'valid',
+        fail => { args => [] },              qr/^nshift is not equal. got: 0, expected: 1/,
+        fail => { args => [], nshift => 0},  qr/^nshift is not equal. got: 0, expected: 1/,
+        pass => { args => [], nshift => 1 }, qr//, # 'valid',
     );
     test_interface_error_message($meta, @tests);
 };

@@ -6,13 +6,13 @@ use Sub::Meta::Test qw(test_interface_error_message);
 subtest "{ scalar => 'Str' }" => sub {
     my $meta = Sub::Meta::Returns->new({ scalar => 'Str' });
     my @tests = (
-        undef, 'must be Sub::Meta::Returns. got: ',
-        (bless {} => 'Some'), qr/^must be Sub::Meta::Returns\. got: Some/,
-        { scalar => 'Int' }, 'invalid scalar return. got: Int, expected: Str',
-        { scalar => 'Str', list => 'Str' }, 'should not have list return',
-        { scalar => 'Str', void => 'Str' }, 'should not have void return',
-        { scalar => 'Str' }, '', # valid
-        { scalar => 'Str', list => undef, void => undef }, '', # valid
+        fail       => undef,                                             qr/^must be Sub::Meta::Returns. got: /,
+        fail       => (bless {} => 'Some'),                              qr/^must be Sub::Meta::Returns. got: Some/,
+        fail       => { scalar => 'Int' },                               qr/^invalid scalar return. got: Int, expected: Str/,
+        pass_child => { scalar => 'Str', list => 'Str' },                qr/^should not have list return/,
+        pass_child => { scalar => 'Str', void => 'Str' },                qr/^should not have void return/,
+        pass       => { scalar => 'Str' },                               qr//,
+        pass       => { scalar => 'Str', list => undef, void => undef }, qr//,
     );
     test_interface_error_message($meta, @tests);
 };
@@ -20,11 +20,11 @@ subtest "{ scalar => 'Str' }" => sub {
 subtest "{ list => 'Str' }" => sub {
     my $meta = Sub::Meta::Returns->new({ list => 'Str' });
     my @tests = (
-        { list => 'Int' }, 'invalid list return. got: Int, expected: Str',
-        { list => 'Str', scalar => 'Str' }, 'should not have scalar return',
-        { list => 'Str', void => 'Str' }, 'should not have void return',
-        { list => 'Str' }, '', # valid
-        { list => 'Str', scalar => undef, void => undef }, '', # valid
+        fail       => { list => 'Int' },                                 qr/^invalid list return. got: Int, expected: Str/,
+        pass_child => { list => 'Str', scalar => 'Str' },                qr/^should not have scalar return/,
+        pass_child => { list => 'Str', void => 'Str' },                  qr/^should not have void return/,
+        pass       => { list => 'Str' },                                 qr//,
+        pass       => { list => 'Str', scalar => undef, void => undef }, qr//,
     );
     test_interface_error_message($meta, @tests);
 };
@@ -32,11 +32,11 @@ subtest "{ list => 'Str' }" => sub {
 subtest "{ void => 'Str' }" => sub {
     my $meta = Sub::Meta::Returns->new({ void => 'Str' });
     my @tests = (
-        { void => 'Int' }, 'invalid void return. got: Int, expected: Str',
-        { void => 'Str', scalar => 'Str' }, 'should not have scalar return',
-        { void => 'Str', list => 'Str' }, 'should not have list return',
-        { void => 'Str' }, '', # valid
-        { void => 'Str', scalar => undef, list => undef }, '', # valid
+        fail       => { void => 'Int' },                                 qr/^invalid void return. got: Int, expected: Str/,
+        pass_child => { void => 'Str', scalar => 'Str' },                qr/^should not have scalar return/,
+        pass_child => { void => 'Str', list => 'Str' },                  qr/^should not have list return/,
+        pass       => { void => 'Str' },                                 qr//,
+        pass       => { void => 'Str', list => undef, scalar => undef }, qr//,
     );
     test_interface_error_message($meta, @tests);
 };

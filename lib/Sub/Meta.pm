@@ -397,15 +397,12 @@ sub interface_error_message {
         return sprintf('should not have subname. got: %s', $other->subname) if $other->has_subname;
     }
 
-    if ($self->is_method) {
-        return 'must be method' unless $other->is_method
-    }
-    else {
-        return 'should not be method' if $other->is_method;
+    if ($self->is_method ne $other->is_method) {
+        return 'invalid method';
     }
 
     if ($self->has_parameters) {
-        return $self->parameters->interface_error_message($other->parameters)
+        return "invalid parameters:" . $self->parameters->interface_error_message($other->parameters)
             unless $self->parameters->is_same_interface($other->parameters)
     }
     else {
@@ -413,7 +410,7 @@ sub interface_error_message {
     }
 
     if ($self->has_returns) {
-        return $self->returns->interface_error_message($other->returns)
+        return "invalid returns:" . $self->returns->interface_error_message($other->returns)
             unless $self->returns->is_same_interface($other->returns)
     }
     else {
@@ -433,17 +430,17 @@ sub child_error_message {
             unless $self->subname eq $child->subname
     }
 
-    if ($self->is_method) {
-        return 'must be method' unless $child->is_method
+    if ($self->is_method ne $child->is_method) {
+        return 'invalid method'
     }
 
     if ($self->has_parameters) {
-        return $self->parameters->child_error_message($child->parameters)
+        return "invalid parameters:" . $self->parameters->child_error_message($child->parameters)
             unless $self->parameters->is_child($child->parameters)
     }
 
     if ($self->has_returns) {
-        return $self->returns->child_error_message($child->returns)
+        return "invalid returns:" . $self->returns->child_error_message($child->returns)
             unless $self->returns->is_child($child->returns)
     }
     return '';

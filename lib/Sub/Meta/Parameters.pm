@@ -264,7 +264,7 @@ sub interface_error_message {
     return sprintf('nshift is not equal. got: %d, expected: %d', $other->nshift, $self->nshift)
         unless $self->nshift == $other->nshift;
 
-    return sprintf('args length is not equal. got: %d, expected: %d', scalar @{$other->all_args}, scalar @{$self->all_args})
+    return sprintf('invalid args length. got: %d, expected: %d', scalar @{$other->all_args}, scalar @{$self->all_args})
         unless @{$self->all_args} == @{$other->all_args};
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {
@@ -291,7 +291,7 @@ sub child_error_message {
     return sprintf('nshift is not equal. got: %d, expected: %d', $child->nshift, $self->nshift)
         unless $self->nshift == $child->nshift;
 
-    return sprintf('parent args length is greator than child args. parent: %d, child: %d', scalar @{$child->all_args}, scalar @{$self->all_args})
+    return sprintf('invalid args length. got: %d, expected: %d', scalar @{$child->all_args}, scalar @{$self->all_args})
         unless @{$self->all_args} <= @{$child->all_args};
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {

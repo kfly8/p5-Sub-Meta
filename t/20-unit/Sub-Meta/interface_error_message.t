@@ -8,31 +8,18 @@ my $p2 = Sub::Meta::Parameters->new(args => ['Int']);
 my $r1 = Sub::Meta::Returns->new('Str');
 my $r2 = Sub::Meta::Returns->new('Int');
 
-{
-    no warnings qw(redefine); ## no critic (ProhibitNoWarnings)
-    *Sub::Meta::Parameters::interface_error_message = sub {
-        my ($self, $other) = @_;
-        return $self->is_same_interface($other) ? '' : 'invalid parameters';
-    };
-
-    *Sub::Meta::Returns::interface_error_message = sub {
-        my ($self, $other) = @_;
-        return $self->is_same_interface($other) ? '' : 'invalid returns';
-    };
-}
-
 subtest "{ subname => 'foo' }" => sub {
     my $meta = Sub::Meta->new({ subname => 'foo' });
     my @tests = (
-        undef, 'must be Sub::Meta. got: ',
-        (bless {} => 'Some'), qr/^must be Sub::Meta\. got: Some/,
-        { subname => 'bar' }, 'invalid subname. got: bar, expected: foo',
-        { subname => undef }, 'invalid subname. got: , expected: foo',
-        { subname => 'foo', is_method => 1 }, 'should not be method',
-        { subname => 'foo', parameters => $p1 }, 'should not have parameters',
-        { subname => 'foo', returns => $r1 }, 'should not have returns',
-        { subname => 'foo' }, '', # valid
-        { fullname => 'path::foo' }, '', # valid
+        fail       => undef,                                   qr/^must be Sub::Meta. got: /,
+        fail       => (bless {} => 'Some'),                    qr/^must be Sub::Meta\. got: Some/,
+        fail       => { subname => 'bar' },                    qr/^invalid subname. got: bar, expected: foo/,
+        fail       => { subname => undef },                    qr/^invalid subname. got: , expected: foo/,
+        fail       => { subname => 'foo', is_method => 1 },    qr/^invalid method/,
+        pass_child => { subname => 'foo', parameters => $p1 }, qr/^should not have parameters/,
+        pass_child => { subname => 'foo', returns => $r1 },    qr/^should not have returns/,
+        pass       => { subname => 'foo' },                    qr//, # valid
+        pass       => { fullname => 'path::foo' },             qr//, # valid
     );
     test_interface_error_message($meta, @tests);
 };
@@ -40,8 +27,8 @@ subtest "{ subname => 'foo' }" => sub {
 subtest "no args: {}" => sub {
     my $meta = Sub::Meta->new();
     my @tests = (
-        { subname => 'foo' }, 'should not have subname. got: foo',
-        { }, '', # valid
+        pass_child => { subname => 'foo' }, qr/^should not have subname. got: foo/,
+        pass       => { },                  qr//, # valid
     );
     test_interface_error_message($meta, @tests);
 };
@@ -49,8 +36,8 @@ subtest "no args: {}" => sub {
 subtest "method: { is_method => 1 }" => sub {
     my $meta = Sub::Meta->new({ is_method => 1 });
     my @tests = (
-        { is_method => 0 }, 'must be method',
-        { is_method => 1 }, '', # valid
+        fail => { is_method => 0 }, qr/^invalid method/,
+        pass => { is_method => 1 }, qr//, # valid
     );
     test_interface_error_message($meta, @tests);
 };
@@ -58,9 +45,9 @@ subtest "method: { is_method => 1 }" => sub {
 subtest "p1: { parameters => \$p1 }" => sub {
     my $meta = Sub::Meta->new({ parameters => $p1 });
     my @tests = (
-        { parameters => $p2 }, 'invalid parameters',
-        {  }, 'invalid parameters',
-        { parameters => $p1 }, '', #valid
+        fail => { parameters => $p2 }, qr/^invalid parameters:/,
+        fail => {  },                  qr/^invalid parameters:/,
+        pass => { parameters => $p1 }, qr//, #valid
     );
     test_interface_error_message($meta, @tests);
 };
@@ -68,9 +55,9 @@ subtest "p1: { parameters => \$p1 }" => sub {
 subtest "{ returns => \$r1 }" => sub {
     my $meta = Sub::Meta->new({ returns => $r1 });
     my @tests = (
-        { returns => $r2 }, 'invalid returns',
-        {  }, 'invalid returns',
-        { returns => $r1 }, '', #valid
+        fail => { returns => $r2 }, qr/^invalid returns:/,
+        fail => {  },               qr/^invalid returns:/,
+        pass => { returns => $r1 }, qr//, #valid
     );
     test_interface_error_message($meta, @tests);
 };
