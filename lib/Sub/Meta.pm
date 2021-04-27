@@ -323,22 +323,22 @@ sub is_same_interface {
 }
 
 sub is_relaxed_same_interface {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta');
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
-        return unless $self->subname eq $child->subname
+        return unless $self->subname eq $other->subname
     }
 
-    return unless $self->is_method eq $child->is_method;
+    return unless $self->is_method eq $other->is_method;
 
     if ($self->has_parameters) {
-        return unless $self->parameters->is_relaxed_same_interface($child->parameters)
+        return unless $self->parameters->is_relaxed_same_interface($other->parameters)
     }
 
     if ($self->has_returns) {
-        return unless $self->returns->is_relaxed_same_interface($child->returns)
+        return unless $self->returns->is_relaxed_same_interface($other->returns)
     }
 
     return !!1;
@@ -420,28 +420,28 @@ sub error_message {
 }
 
 sub relaxed_error_message {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $child // '')
-        unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta');
+    return sprintf('must be Sub::Meta. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
-        return sprintf('invalid subname. got: %s, expected: %s', $child->subname, $self->subname)
-            unless $self->subname eq $child->subname
+        return sprintf('invalid subname. got: %s, expected: %s', $other->subname, $self->subname)
+            unless $self->subname eq $other->subname
     }
 
-    if ($self->is_method ne $child->is_method) {
+    if ($self->is_method ne $other->is_method) {
         return 'invalid method'
     }
 
     if ($self->has_parameters) {
-        return "invalid parameters:" . $self->parameters->relaxed_error_message($child->parameters)
-            unless $self->parameters->is_relaxed_same_interface($child->parameters)
+        return "invalid parameters:" . $self->parameters->relaxed_error_message($other->parameters)
+            unless $self->parameters->is_relaxed_same_interface($other->parameters)
     }
 
     if ($self->has_returns) {
-        return "invalid returns:" . $self->returns->relaxed_error_message($child->returns)
-            unless $self->returns->is_relaxed_same_interface($child->returns)
+        return "invalid returns:" . $self->returns->relaxed_error_message($other->returns)
+            unless $self->returns->is_relaxed_same_interface($other->returns)
     }
     return '';
 }

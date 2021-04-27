@@ -67,20 +67,20 @@ sub is_same_interface {
 }
 
 sub is_relaxed_same_interface {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Returns');
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
     if ($self->has_scalar) {
-        return unless _eq($self->scalar, $child->scalar)
+        return unless _eq($self->scalar, $other->scalar)
     }
 
     if ($self->has_list) {
-        return unless _eq($self->list, $child->list)
+        return unless _eq($self->list, $other->list)
     }
 
     if ($self->has_void) {
-        return unless _eq($self->void, $child->void)
+        return unless _eq($self->void, $other->void)
     }
 
     return !!1;
@@ -170,24 +170,24 @@ sub error_message {
 }
 
 sub relaxed_error_message {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Returns. got: %s', $child // '')
-        unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Returns');
+    return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
     if ($self->has_scalar) {
-        return sprintf('invalid scalar return. got: %s, expected: %s', $child->scalar, $self->scalar)
-            unless _eq($self->scalar, $child->scalar);
+        return sprintf('invalid scalar return. got: %s, expected: %s', $other->scalar, $self->scalar)
+            unless _eq($self->scalar, $other->scalar);
     }
 
     if ($self->has_list) {
-        return sprintf('invalid list return. got: %s, expected: %s', $child->list, $self->list)
-            unless _eq($self->list, $child->list);
+        return sprintf('invalid list return. got: %s, expected: %s', $other->list, $self->list)
+            unless _eq($self->list, $other->list);
     }
 
     if ($self->has_void) {
-        return sprintf('invalid void return. got: %s, expected: %s', $child->void, $self->void)
-            unless _eq($self->void, $child->void);
+        return sprintf('invalid void return. got: %s, expected: %s', $other->void, $self->void)
+            unless _eq($self->void, $other->void);
     }
 
     return '';

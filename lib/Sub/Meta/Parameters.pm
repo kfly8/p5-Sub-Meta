@@ -186,20 +186,20 @@ sub is_same_interface {
 }
 
 sub is_relaxed_same_interface {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Parameters');
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
     if ($self->has_slurpy) {
-        return unless $self->slurpy->is_same_interface($child->slurpy)
+        return unless $self->slurpy->is_same_interface($other->slurpy)
     }
 
-    return unless $self->nshift == $child->nshift;
+    return unless $self->nshift == $other->nshift;
 
-    return unless @{$self->all_args} <= @{$child->all_args};
+    return unless @{$self->all_args} <= @{$other->all_args};
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {
-        return unless $self->all_args->[$i]->is_relaxed_same_interface($child->all_args->[$i]);
+        return unless $self->all_args->[$i]->is_relaxed_same_interface($other->all_args->[$i]);
     }
 
     return !!1;
@@ -278,25 +278,25 @@ sub error_message {
 }
 
 sub relaxed_error_message {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Parameters. got: %s', $child // '')
-        unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Parameters');
+    return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
     if ($self->has_slurpy) {
-        return sprintf('invalid slurpy. got: %s, expected: %s', $child->has_slurpy ? $child->slurpy->display : '', $self->slurpy->display)
-            unless $self->slurpy->is_same_interface($child->slurpy)
+        return sprintf('invalid slurpy. got: %s, expected: %s', $other->has_slurpy ? $other->slurpy->display : '', $self->slurpy->display)
+            unless $self->slurpy->is_same_interface($other->slurpy)
     }
 
-    return sprintf('nshift is not equal. got: %d, expected: %d', $child->nshift, $self->nshift)
-        unless $self->nshift == $child->nshift;
+    return sprintf('nshift is not equal. got: %d, expected: %d', $other->nshift, $self->nshift)
+        unless $self->nshift == $other->nshift;
 
-    return sprintf('invalid args length. got: %d, expected: %d', scalar @{$child->all_args}, scalar @{$self->all_args})
-        unless @{$self->all_args} <= @{$child->all_args};
+    return sprintf('invalid args length. got: %d, expected: %d', scalar @{$other->all_args}, scalar @{$self->all_args})
+        unless @{$self->all_args} <= @{$other->all_args};
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {
         my $s = $self->all_args->[$i];
-        my $o = $child->all_args->[$i];
+        my $o = $other->all_args->[$i];
         return sprintf('args[%d] is invalid. got: %s, expected: %s', $i, $o->display, $s->display)
             unless $s->is_relaxed_same_interface($o);
     }

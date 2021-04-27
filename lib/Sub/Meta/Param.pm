@@ -89,21 +89,21 @@ sub is_same_interface {
 }
 
 sub is_relaxed_same_interface {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Param');
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Param');
 
     if ($self->has_name) {
-        return unless $self->name eq $child->name
+        return unless $self->name eq $other->name
     }
 
     if ($self->has_type) {
-        return unless $self->type eq ($child->type // '');
+        return unless $self->type eq ($other->type // '');
     }
 
-    return unless $self->optional eq $child->optional;
+    return unless $self->optional eq $other->optional;
 
-    return unless $self->named eq $child->named;
+    return unless $self->named eq $other->named;
 
     return !!1;
 }
