@@ -555,17 +555,42 @@ This is computed as follows:
 A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
 Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
 
+=head3 is_relaxed_same_interface($other_meta)
+
+    method is_relaxed_same_interface(InstanceOf[Sub::Meta::Parameters] $other_meta) => Bool
+
+A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
+Specifically, check whether C<args>, C<nshift> and C<slurpy> are satisfy
+the condition of C<$self> side:
+
+    my $meta = Sub::Meta::Parameters->new(args => []);
+    my $other = Sub::Meta::Parameters->new(args => ["Str"]);
+    $meta->is_same_interface($other); # NG
+    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the elements of args.
+
 =head3 is_same_interface_inlined($other_meta_inlined)
 
     method is_same_interface_inlined(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
 
 Returns inlined C<is_same_interface> string.
 
+=head3 is_relaxed_same_interface_inlined($other_meta_inlined)
+
+    method is_relaxed_same_interface_inlined(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+
+Returns inlined C<is_relaxed_same_interface> string.
+
 =head3 error_message($other_meta)
 
     method error_message(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
 
-Return the error message when the interface does not match.
+Return the error message when the interface is not same. If same, then return empty string.
+
+=head3 relaxed_error_message($other_meta)
+
+    method relaxed_error_message(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+
+Return the error message when the interface does not satisfy the C<$self> meta. If match, then return empty string.
 
 =head3 display
 

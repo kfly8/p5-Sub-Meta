@@ -1028,6 +1028,19 @@ Apply subroutine subname, prototype and attributes of C<$other_meta>.
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> are equal.
 
+=head3 is_relaxed_same_interface($other_meta)
+
+    method is_relaxed_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
+
+A boolean value indicating whether the subroutine's interface is relaxed same or not.
+Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> satisfy
+the condition of C<$self> side:
+
+    my $meta = Sub::Meta->new;
+    my $other = Sub::Meta->new(subname => 'foo');
+    $meta->is_same_interface($other); # NG
+    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the subname.
+
 =head3 is_same_interface_inlined($other_meta_inlined)
 
     method is_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
@@ -1047,11 +1060,23 @@ Returns inlined C<is_same_interface> string:
     $check->(Sub::Meta->new(subname => 'hello')); # => OK
     $check->(Sub::Meta->new(subname => 'world')); # => NG
 
+=head3 is_relaxed_same_interface_inlined($other_meta_inlined)
+
+    method is_relaxed_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
+
+Returns inlined C<is_relaxed_same_interface> string.
+
 =head3 error_message($other_meta)
 
     method error_message(InstanceOf[Sub::Meta] $other_meta) => Str
 
-Return the error message when the interface does not match. If match, then return empty string.
+Return the error message when the interface is not same. If same, then return empty string
+
+=head3 relaxed_error_message($other_meta)
+
+    method relaxed_error_message(InstanceOf[Sub::Meta] $other_meta) => Str
+
+Return the error message when the interface does not satisfy the C<$self> meta. If match, then return empty string.
 
 =head3 display
 
