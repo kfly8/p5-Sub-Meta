@@ -113,27 +113,27 @@ sub test_is_same_interface {
         my $same = $meta->is_same_interface($other);
         my $same_inlined = $is_same_interface->($other);
 
-        my $child = $meta->is_relaxed_same_interface($other);
-        my $child_inlined = $is_relaxed_same_interface->($other);
+        my $relax = $meta->is_relaxed_same_interface($other);
+        my $relax_inlined = $is_relaxed_same_interface->($other);
 
         subtest "should $pass: $message" => sub {
             if ($pass eq 'pass') {
                 ok $same, 'is_same_interface';
                 ok $same_inlined, 'is_same_interface_inlined';
-                ok $child, 'is_relaxed_same_interface';
-                ok $child_inlined, 'is_relaxed_same_interface_inlined';
+                ok $relax, 'is_relaxed_same_interface';
+                ok $relax_inlined, 'is_relaxed_same_interface_inlined';
             }
             elsif ($pass eq 'relax_pass') {
                 ok !$same, 'is_same_interface';
                 ok !$same_inlined, 'is_same_interface_inlined';
-                ok $child, 'is_relaxed_same_interface';
-                ok $child_inlined, 'is_relaxed_same_interface_inlined';
+                ok $relax, 'is_relaxed_same_interface';
+                ok $relax_inlined, 'is_relaxed_same_interface_inlined';
             }
             elsif($pass eq 'fail') {
                 ok !$same, 'is_same_interface';
                 ok !$same_inlined, 'is_same_interface_inlined';
-                ok !$child, 'is_relaxed_same_interface';
-                ok !$child_inlined, 'is_relaxed_same_interface_inlined';
+                ok !$relax, 'is_relaxed_same_interface';
+                ok !$relax_inlined, 'is_relaxed_same_interface_inlined';
             }
         };
     }
@@ -153,21 +153,21 @@ sub test_error_message {
                   ? $meta_class->new($args)
                   : $args;
 
-        my $got   = $meta->error_message($other);
-        my $child = $meta->relaxed_error_message($other);
+        my $error_message         = $meta->error_message($other);
+        my $relaxed_error_message = $meta->relaxed_error_message($other);
 
         subtest "should $pass: $expected" => sub {
             if ($pass eq 'pass') {
-                is $got, '', 'error_message';
-                is $child, '', 'relaxed_error_message';
+                is $error_message, '', 'error_message';
+                is $relaxed_error_message, '', 'relaxed_error_message';
             }
             elsif ($pass eq 'relax_pass') {
-                like $got, $expected, 'error_message';
-                is $child, '', 'relaxed_error_message';
+                like $error_message, $expected, 'error_message';
+                is $relaxed_error_message, '', 'relaxed_error_message';
             }
             elsif ($pass eq 'fail') {
-                like $got, $expected, 'error_message';
-                like $child, $expected, 'relaxed_error_message';
+                like $error_message, $expected, 'error_message';
+                like $relaxed_error_message, $expected, 'relaxed_error_message';
             }
         };
     }

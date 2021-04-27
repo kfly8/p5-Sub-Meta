@@ -323,22 +323,22 @@ sub is_same_interface {
 }
 
 sub is_relaxed_same_interface {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta');
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
-        return unless $self->subname eq $child->subname
+        return unless $self->subname eq $other->subname
     }
 
-    return unless $self->is_method eq $child->is_method;
+    return unless $self->is_method eq $other->is_method;
 
     if ($self->has_parameters) {
-        return unless $self->parameters->is_relaxed_same_interface($child->parameters)
+        return unless $self->parameters->is_relaxed_same_interface($other->parameters)
     }
 
     if ($self->has_returns) {
-        return unless $self->returns->is_relaxed_same_interface($child->returns)
+        return unless $self->returns->is_relaxed_same_interface($other->returns)
     }
 
     return !!1;
@@ -420,28 +420,28 @@ sub error_message {
 }
 
 sub relaxed_error_message {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $child // '')
-        unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta');
+    return sprintf('must be Sub::Meta. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
-        return sprintf('invalid subname. got: %s, expected: %s', $child->subname, $self->subname)
-            unless $self->subname eq $child->subname
+        return sprintf('invalid subname. got: %s, expected: %s', $other->subname, $self->subname)
+            unless $self->subname eq $other->subname
     }
 
-    if ($self->is_method ne $child->is_method) {
+    if ($self->is_method ne $other->is_method) {
         return 'invalid method'
     }
 
     if ($self->has_parameters) {
-        return "invalid parameters:" . $self->parameters->relaxed_error_message($child->parameters)
-            unless $self->parameters->is_relaxed_same_interface($child->parameters)
+        return "invalid parameters:" . $self->parameters->relaxed_error_message($other->parameters)
+            unless $self->parameters->is_relaxed_same_interface($other->parameters)
     }
 
     if ($self->has_returns) {
-        return "invalid returns:" . $self->returns->relaxed_error_message($child->returns)
-            unless $self->returns->is_relaxed_same_interface($child->returns)
+        return "invalid returns:" . $self->returns->relaxed_error_message($other->returns)
+            unless $self->returns->is_relaxed_same_interface($other->returns)
     }
     return '';
 }
@@ -1028,6 +1028,19 @@ Apply subroutine subname, prototype and attributes of C<$other_meta>.
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> are equal.
 
+=head3 is_relaxed_same_interface($other_meta)
+
+    method is_relaxed_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
+
+A boolean value indicating whether the subroutine's interface is relaxed same or not.
+Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> satisfy
+the condition of C<$self> side:
+
+    my $meta = Sub::Meta->new;
+    my $other = Sub::Meta->new(subname => 'foo');
+    $meta->is_same_interface($other); # NG
+    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the subname.
+
 =head3 is_same_interface_inlined($other_meta_inlined)
 
     method is_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
@@ -1047,11 +1060,23 @@ Returns inlined C<is_same_interface> string:
     $check->(Sub::Meta->new(subname => 'hello')); # => OK
     $check->(Sub::Meta->new(subname => 'world')); # => NG
 
+=head3 is_relaxed_same_interface_inlined($other_meta_inlined)
+
+    method is_relaxed_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
+
+Returns inlined C<is_relaxed_same_interface> string.
+
 =head3 error_message($other_meta)
 
     method error_message(InstanceOf[Sub::Meta] $other_meta) => Str
 
-Return the error message when the interface does not match. If match, then return empty string.
+Return the error message when the interface is not same. If same, then return empty string
+
+=head3 relaxed_error_message($other_meta)
+
+    method relaxed_error_message(InstanceOf[Sub::Meta] $other_meta) => Str
+
+Return the error message when the interface does not satisfy the C<$self> meta. If match, then return empty string.
 
 =head3 display
 

@@ -89,21 +89,21 @@ sub is_same_interface {
 }
 
 sub is_relaxed_same_interface {
-    my ($self, $child) = @_;
+    my ($self, $other) = @_;
 
-    return unless Scalar::Util::blessed($child) && $child->isa('Sub::Meta::Param');
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Param');
 
     if ($self->has_name) {
-        return unless $self->name eq $child->name
+        return unless $self->name eq $other->name
     }
 
     if ($self->has_type) {
-        return unless $self->type eq ($child->type // '');
+        return unless $self->type eq ($other->type // '');
     }
 
-    return unless $self->optional eq $child->optional;
+    return unless $self->optional eq $other->optional;
 
-    return unless $self->named eq $child->named;
+    return unless $self->named eq $other->named;
 
     return !!1;
 }
@@ -356,11 +356,30 @@ Setter for C<invocant>.
 A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
 Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal.
 
+=head3 is_relaxed_same_interface($other_meta)
+
+  method is_relaxed_same_interface(InstanceOf[Sub::Meta::Param] $other_meta) => Bool
+
+A boolean value indicating whether C<Sub::Meta::Param> object is same or not.
+Specifically, check whether C<name>, C<type>, C<optional> and C<named> are satisfy
+the condition of C<$self> side:
+
+    my $meta = Sub::Meta::Param->new;
+    my $other = Sub::Meta::Param->new(name => '$a');
+    $meta->is_same_interface($other); # NG
+    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the name.
+
 =head3 is_same_interface_inlined($other_meta_inlined)
 
   method is_same_interface_inlined(InstanceOf[Sub::Meta::Param] $other_meta) => Str
 
 Returns inlined C<is_same_interface> string.
+
+=head3 is_relaxed_same_interface_inlined($other_meta_inlined)
+
+    method is_relaxed_same_interface_inlined(InstanceOf[Sub::Meta::Param] $other_meta) => Str
+
+Returns inlined C<is_relaxed_same_interface> string.
 
 =head3 display
 
