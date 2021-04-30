@@ -33,7 +33,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      
+
     - name: Setup Perl
       uses: shogo82148/actions-setup-perl@v1
       with:
@@ -41,8 +41,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cpm install -g
-        cpm install -g Module::Build::Tiny
+        cpm install -g --with-all
 
     - name: Build
       run: |
