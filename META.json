@@ -26,8 +26,8 @@
       ]
    },
    "optional_features" : {
-      "finder-function-parameters" : {
-         "description" : "finder-function-parameters",
+      "finder_function_parameters" : {
+         "description" : "finder_function_parameters",
          "prereqs" : {
             "runtime" : {
                "requires" : {
@@ -36,8 +36,8 @@
             }
          }
       },
-      "finder-sub-wrap-in-type" : {
-         "description" : "finder-sub-wrap-in-type",
+      "finder_sub_wrap_in_type" : {
+         "description" : "finder_sub_wrap_in_type",
          "prereqs" : {
             "runtime" : {
                "requires" : {

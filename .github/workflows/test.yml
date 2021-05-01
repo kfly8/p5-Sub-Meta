@@ -51,8 +51,8 @@ jobs:
     - name: Install dependencies of features
       if: ${{ !matrix.no-feature-test }}
       run: |
-        cpm install -g --feature="finder-function-parameters"
-        cpm install -g --feature="finder-sub-wrap-in-type"
+        cpm install -g --feature="finder_function_parameters"
+        cpm install -g --feature="finder_sub_wrap_in_type"
 
     - name: Build
       run: |

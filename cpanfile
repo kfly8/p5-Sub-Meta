@@ -4,11 +4,11 @@ requires 'Sub::Util', '1.50';
 requires 'Carp';
 requires 'Scalar::Util';
 
-feature 'finder-function-parameters' => sub {
+feature 'finder_function_parameters' => sub {
     requires 'Function::Parameters', '2.000003';
 };
 
-feature 'finder-sub-wrap-in-type' => sub {
+feature 'finder_sub_wrap_in_type' => sub {
     requires 'Sub::WrapInType', '0.04';
     requires 'Type::Tiny', '1.012000';
 };
