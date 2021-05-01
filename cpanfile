@@ -4,8 +4,14 @@ requires 'Sub::Util', '1.50';
 requires 'Carp';
 requires 'Scalar::Util';
 
-suggests 'Function::Parameters', '2.000003';
-suggests 'Sub::WrapInType', '0.04';
+feature 'finder-function-parameters' => sub {
+    requires 'Function::Parameters', '2.000003';
+};
+
+feature 'finder-sub-wrap-in-type' => sub {
+    requires 'Sub::WrapInType', '0.04';
+    requires 'Type::Tiny', '1.012000';
+};
 
 on configure => sub {
     requires 'Module::Build::Tiny', '0.035';
