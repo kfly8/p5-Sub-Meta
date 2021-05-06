@@ -386,7 +386,7 @@ sub is_relaxed_same_interface_inlined {
 sub error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $other // '')
+    return sprintf('other must be Sub::Meta. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
@@ -422,7 +422,7 @@ sub error_message {
 sub relaxed_error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $other // '')
+    return sprintf('other must be Sub::Meta. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
@@ -435,12 +435,12 @@ sub relaxed_error_message {
     }
 
     if ($self->has_parameters) {
-        return "invalid parameters:" . $self->parameters->relaxed_error_message($other->parameters)
+        return $self->parameters->relaxed_error_message($other->parameters)
             unless $self->parameters->is_relaxed_same_interface($other->parameters)
     }
 
     if ($self->has_returns) {
-        return "invalid returns:" . $self->returns->relaxed_error_message($other->returns)
+        return $self->returns->relaxed_error_message($other->returns)
             unless $self->returns->is_relaxed_same_interface($other->returns)
     }
     return '';

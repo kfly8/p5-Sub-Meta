@@ -250,7 +250,7 @@ sub is_relaxed_same_interface_inlined {
 sub error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
+    return sprintf('other parameters must be Sub::Meta::Parameters. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
     if ($self->has_slurpy) {
@@ -280,7 +280,7 @@ sub error_message {
 sub relaxed_error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
+    return sprintf('other parameters must be Sub::Meta::Parameters. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
     if ($self->has_slurpy) {
