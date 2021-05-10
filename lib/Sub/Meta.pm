@@ -449,24 +449,11 @@ sub relaxed_error_message {
 sub display {
     my $self = shift;
 
-    my $s = $self->keyword;
+    my $s = $self->is_method ? 'method' : 'sub';
     $s .= ' ' . $self->subname if $self->has_subname;
     $s .= '('. $self->parameters->display .')' if $self->has_parameters;
     $s .= ' => ' . $self->returns->display if $self->has_returns;
     return $s;
-}
-
-sub display_of_interface {
-    my $self = shift;
-    my $s = '';
-    $s .= '['. $self->parameters->display .']' if $self->has_parameters;
-    $s .= ' => ' . $self->returns->display if $self->has_returns;
-    return $s;
-}
-
-sub keyword {
-    my $self = shift;
-    return $self->is_method ? 'method' : 'sub'
 }
 
 1;

@@ -8,6 +8,8 @@ our $VERSION = "0.13";
 use Sub::Meta;
 use Sub::Meta::Type;
 
+sub _croak { require Carp; goto &Carp::croak }
+
 use Type::Library
     -base,
     -declare => qw(
@@ -52,7 +54,7 @@ sub _gen_type {
             return Sub::Meta::Type->new(
                 submeta      => $submeta,
                 strict       => $options{strict},
-                display_name => sprintf('%s[%s]', $options{name}, $submeta->display_of_interface),
+                display_name => sprintf('%s[%s]', $options{name}, _display_name_parameter($submeta)),
             );
         }
     }
@@ -80,8 +82,16 @@ sub _create_submeta {
         return Sub::Meta->new(%$v, is_method => $is_method);
     }
     else {
-        die "Unsupported parameters"
+        return _croak "Unsupported parameters";
     }
+}
+
+sub _display_name_parameter {
+    my $submeta = shift;
+    my $s = '';
+    $s .= '['. $submeta->parameters->display .']' if $submeta->has_parameters;
+    $s .= ' => ' . $submeta->returns->display if $submeta->has_returns;
+    return $s;
 }
 
 __PACKAGE__->meta->make_immutable;
