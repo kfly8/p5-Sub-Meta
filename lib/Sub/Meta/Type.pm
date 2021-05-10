@@ -22,8 +22,7 @@ sub find_submeta_inlined { my ($self, $var) = @_; return "Sub::Meta::CreatorFunc
 sub _croak { require Carp; goto &Carp::croak }
 
 sub new {
-    my $class = shift;
-    my @args = @_;
+    my ($class, @args) = @_;
     my %opts = ( @args == 1 ) ? %{ $args[0] } : @args;
 
     _croak "Need to supply submeta" unless exists $opts{submeta};
@@ -32,11 +31,11 @@ sub new {
     return $class->SUPER::new(%opts);
 }
 
-sub has_parent { !!1 }
+sub has_parent { return !!1 }
 
-sub parent { Callable }
+sub parent { return Callable }
 
-sub _build_constraint {
+sub _build_constraint { ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self = shift;
 
     return sub {
@@ -52,7 +51,7 @@ sub _build_constraint {
     }
 }
 
-sub can_be_inlined { !!1 }
+sub can_be_inlined { return !!1 }
 
 sub inlined {
     my $self = shift;
@@ -110,7 +109,7 @@ sub get_message {
 }
 
 # TODO: support Callable coercion
-sub _build_coercion {
+sub _build_coercion { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     my $self = shift;
 
     return Type::Coercion->new(
