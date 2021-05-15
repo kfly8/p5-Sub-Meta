@@ -5,27 +5,14 @@ use warnings;
 
 our $VERSION = "0.13";
 
-use overload ();
-use Scalar::Util ();
+use Type::Library -base;
+use Type::Utils -all;
 
-use Type::Library
-    -base,
-    -declare => qw(
-        Callable
-    );
+use Types::Standard qw(Ref Overload);
 
-__PACKAGE__->meta->add_type({
-    name => 'Callable',
-    constraint => sub {
-        my $sub = shift;
-        my $reftype = Scalar::Util::reftype($sub);
-        return ( defined $reftype && $reftype eq 'CODE' )
-            || defined overload::Method($sub, '&{}');
-    },
-});
+type 'Callable',
+    as Ref['CODE'] | Overload['&{}'];
 
 __PACKAGE__->meta->make_immutable;
-
-1;
 
 __END__

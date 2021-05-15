@@ -3,7 +3,7 @@ use Test2::V0;
 use Types::Callable -types;
 
 {
-    package Hoge;
+    package Hoge; ## no critic (ProhibitMultiplePackages)
     use overload
         '&{}' => sub {
             my $self = shift;
@@ -12,7 +12,18 @@ use Types::Callable -types;
 
     sub new {
         my ($class, $sub) = @_;
-        return { sub => $sub } => $class;
+        return bless { sub => $sub } => $class;
+    }
+}
+
+{
+    package Fuga; ## no critic (ProhibitMultiplePackages)
+    use overload
+        '@{}' => sub { };
+
+    sub new {
+        my ($class, $sub) = @_;
+        return bless { sub => $sub } => $class;
     }
 }
 
@@ -27,6 +38,9 @@ ok Callable->check($hoge), 'overload &{}';
 
 ok !Callable->check(bless {}, 'Boo'), 'boo';
 ok !Callable->check({}), 'hashref';
+ok !Callable->check([]), 'arrayref';
+ok !Callable->check(\''), 'scalarref';
 ok !Callable->check('sub { }'), 'string';
+ok !Callable->check(Fuga->new(sub {})), 'overload @{}';
 
 done_testing;
