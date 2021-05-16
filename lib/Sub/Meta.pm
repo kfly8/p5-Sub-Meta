@@ -247,7 +247,13 @@ sub set_returns {
     return $self
 }
 
-sub _build_subinfo     { my $self = shift; return $self->sub ? [ Sub::Identify::get_code_info($self->sub) ] : [] }
+sub _build_subinfo     {
+    my $self = shift;
+    return [] unless $self->has_sub;
+    my @info = Sub::Identify::get_code_info($self->sub);
+    return [ $info[0], $info[1] eq '__ANON__' ? undef : $info[1] ];
+}
+
 sub _build_file        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[0] : undef }
 sub _build_line        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[1] : undef }
 sub _build_is_constant { my $self = shift; return $self->sub ? Sub::Identify::is_sub_constant($self->sub) : undef }
