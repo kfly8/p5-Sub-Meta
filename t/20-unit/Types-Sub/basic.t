@@ -5,23 +5,40 @@ use Sub::Meta::Test qw(test_sub_meta_type);
 use Types::Sub -types;
 use Types::Standard -types;
 
-use Sub::WrapInType;
+use Sub::Meta::Library;
+
+sub register_sub {
+    my ($args, $returns, $options) = @_;
+    $options //= {};
+
+    # Not an empty code reference to generate a new code reference.
+    my $sub = sub { $options };
+
+    my $meta = Sub::Meta->new(
+        args    => $args,
+        returns => $returns,
+        sub     => $sub,
+        %$options,
+    );
+    Sub::Meta::Library->register($sub, $meta);
+    return $sub;
+}
 
 subtest '[ [Str] => Str]' => sub {
     my $case = [ [Str] => Str ];
     my @tests = (
-        fail              => sub {},                                   'empty coderef',
-        fail              => wrap_sub([] => Str, sub {}),              'wrap_sub([] => Str)',
-        fail              => wrap_sub([Int] => Str, sub {}),           'wrap_sub([Int] => Str)',
-        fail              => wrap_sub([Str] => Int, sub {}),           'wrap_sub([Str] => Int)',
-        fail              => wrap_sub([Str] => [Str, Str], sub {}),    'wrap_sub([Str] => [Str, Str])',
-        pass_StrictSub    => wrap_sub([Str] => Str, sub {}),           'wrap_sub([Str] => Str)',
-        pass_StrictSub    => wrap_sub(Str, => Str, sub {}),            'wrap_sub(Str, => Str)',
-        pass_Sub          => wrap_sub([Str,Str] => Str, sub {}),       'wrap_sub([Str,Str] => Str)',
-        pass_Sub          => wrap_sub([Str,Int] => Str, sub {}),       'wrap_sub([Str,Int] => Str)',
-        pass_StrictMethod => wrap_method([Str] => Str, sub {}),        'wrap_method([Str] => Str)',
-        pass_Method       => wrap_method([Str,Str] => Str, sub {}),    'wrap_method([Str,Str] => Str)',
-        pass_Method       => wrap_method([Str,Int] => Str, sub {}),    'wrap_method([Str,Int] => Str)',
+        fail              => sub {},                                             'empty coderef',
+        fail              => register_sub([] => Str),                            'sub() => Str',
+        fail              => register_sub([Int] => Str),                         'sub(Int) => Str',
+        fail              => register_sub([Str] => Int),                         'sub(Str) => Int',
+        fail              => register_sub([Str] => [Str, Str]),                  'sub(Str) => [Str, Str]',
+        pass_StrictSub    => register_sub([Str] => Str),                         'sub(Str) => Str',
+        pass_StrictSub    => register_sub(Str, => Str),                          'sub(Str), => Str',
+        pass_Sub          => register_sub([Str,Str] => Str),                     'sub(Str,Str) => Str',
+        pass_Sub          => register_sub([Str,Int] => Str),                     'sub(Str,Int) => Str',
+        pass_StrictMethod => register_sub([Str] => Str, { is_method => 1 }),     'method(Str) => Str',
+        pass_Method       => register_sub([Str,Str] => Str, { is_method => 1 }), 'method(Str,Str) => Str',
+        pass_Method       => register_sub([Str,Int] => Str, { is_method => 1 }), 'method(Str,Int) => Str',
     );
     test_sub_meta_type($case, @tests);
 };
