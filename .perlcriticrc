@@ -1,5 +1,6 @@
 severity = 3
 
+[-Subroutines::RequireArgUnpacking]
 [-Subroutines::ProhibitExplicitReturnUndef]
 [-ValuesAndExpressions::ProhibitConstantPragma]
 [-RegularExpressions::RequireExtendedFormatting]

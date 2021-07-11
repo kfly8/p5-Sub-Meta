@@ -8,29 +8,20 @@ our $VERSION = "0.13";
 use Scalar::Util ();
 use Sub::Meta;
 use Sub::Identify;
-use Types::Standard qw(Ref);
-use Type::Params ();
+use Types::Standard qw(InstanceOf Str Ref);
+use Type::Params qw(compile Invocant);
 
 my %INFO;
 my %INDEX;
 
-my $Callable = Type::Params::compile(Ref['CODE']);
+my $SubMeta  = InstanceOf['Sub::Meta'];
+my $Callable = Ref['CODE'];
 
 sub _croak { require Carp; goto &Carp::croak }
 
 sub register {
-    my ($class, $sub, $meta) = @_;
-    unless ($sub && $meta) {
-        _croak "arguments required coderef and submeta.";
-    }
-
-    unless ($Callable->($sub)) {
-        _croak "required coderef: $sub";
-    }
-
-    unless (Scalar::Util::blessed($meta) && $meta->isa('Sub::Meta')) {
-        _croak "required an instance of Sub::Meta: $meta";
-    }
+    state $check = compile(Invocant, $Callable, $SubMeta);
+    my ($class, $sub, $meta) = $check->(@_);
 
     my $id = Scalar::Util::refaddr $sub;
     my ($stash, $subname) = Sub::Identify::get_code_info($sub);
@@ -49,11 +40,8 @@ sub register_list {
 }
 
 sub get {
-    my ($class, $sub) = @_;
-
-    unless ($Callable->($sub)) {
-        _croak "required coderef: $sub";
-    }
+    state $check = compile(Invocant, $Callable);
+    my ($class, $sub) = $check->(@_);
 
     my $id = Scalar::Util::refaddr $sub;
     return $INFO{$id}
@@ -84,11 +72,8 @@ sub get_all_submeta_by_stash {
 }
 
 sub remove {
-    my ($class, $sub) = @_;
-
-    unless ($Callable->($sub)) {
-        _croak "required coderef: $sub";
-    }
+    state $check = compile(Invocant, $Callable);
+    my ($class, $sub) = $check->(@_);
 
     my $id = Scalar::Util::refaddr $sub;
     return delete $INFO{$id}
