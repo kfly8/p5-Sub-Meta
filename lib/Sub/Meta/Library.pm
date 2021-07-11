@@ -8,10 +8,13 @@ our $VERSION = "0.13";
 use Scalar::Util ();
 use Sub::Meta;
 use Sub::Identify;
-use Types::Callable qw(Callable);
+use Types::Standard qw(Ref);
+use Type::Params ();
 
 my %INFO;
 my %INDEX;
+
+my $Callable = Type::Params::compile(Ref['CODE']);
 
 sub _croak { require Carp; goto &Carp::croak }
 
@@ -21,7 +24,7 @@ sub register {
         _croak "arguments required coderef and submeta.";
     }
 
-    unless (Callable->check($sub)) {
+    unless ($Callable->($sub)) {
         _croak "required coderef: $sub";
     }
 
@@ -48,7 +51,7 @@ sub register_list {
 sub get {
     my ($class, $sub) = @_;
 
-    unless (Callable->check($sub)) {
+    unless ($Callable->($sub)) {
         _croak "required coderef: $sub";
     }
 
@@ -83,7 +86,7 @@ sub get_all_submeta_by_stash {
 sub remove {
     my ($class, $sub) = @_;
 
-    unless (Callable->check($sub)) {
+    unless ($Callable->($sub)) {
         _croak "required coderef: $sub";
     }
 

@@ -328,6 +328,9 @@ sub is_same_interface {
     return !!1;
 }
 
+sub is_strict_same_interface;
+*is_strict_same_interface = \&is_same_interface;
+
 sub is_relaxed_same_interface {
     my ($self, $other) = @_;
 
@@ -370,6 +373,9 @@ sub is_same_interface_inlined {
 
     return join "\n && ", @src;
 }
+
+sub is_strict_same_interface_inlined;
+*is_strict_same_interface_inlined = \&is_same_interface_inlined;
 
 sub is_relaxed_same_interface_inlined {
     my ($self, $v) = @_;

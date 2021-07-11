@@ -6,14 +6,11 @@ use warnings;
 use parent qw(Type::Tiny);
 
 use Type::Coercion;
-use Types::Callable qw(Callable);
-use Sub::Meta::CreatorFunction;
+use Types::Standard qw(Ref);
 
-sub submeta { my $self = shift; return $self->{submeta} }
-sub strict  { my $self = shift; return $self->{strict} }
-
-sub find_submeta         { my ($self, $sub) = @_; return Sub::Meta::CreatorFunction::find_submeta($sub) }
-sub find_submeta_inlined { my ($self, $var) = @_; return "Sub::Meta::CreatorFunction::find_submeta($var)" }
+sub submeta              { my $self = shift; return $self->{submeta} }
+sub submeta_strict_check { my $self = shift; return $self->{submeta_strict_check} }
+sub find_submeta         { my $self = shift; return $self->{find_submeta} }
 
 #
 # The following methods override the methods of Type::Tiny.
@@ -26,59 +23,55 @@ sub new {
     my %opts = ( @args == 1 ) ? %{ $args[0] } : @args;
 
     _croak "Need to supply submeta" unless exists $opts{submeta};
-    _croak "Need to supply strict" unless exists $opts{strict};
+    _croak "Need to supply submeta_strict_check" unless exists $opts{submeta_strict_check};
+    _croak "Need to supply find_submeta" unless exists $opts{find_submeta};
 
     return $class->SUPER::new(%opts);
 }
 
-sub has_parent { return !!1 }
-
-sub parent { return Callable }
+sub has_parent     { return !!0 }
+sub can_be_inlined { return !!1 }
+sub inlined        { my $self = shift; return $self->{inlined} ||= $self->_build_inlined }
 
 sub _build_constraint { ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self = shift;
 
-    return sub {
-        my $other_sub = shift;
-        my $other_meta = $self->find_submeta($other_sub);
-
-        if ($self->strict) {
-            $self->submeta->is_same_interface($other_meta);
+    if ($self->submeta_strict_check) {
+        return sub {
+            my $other_meta = shift;
+            $self->submeta->is_strict_same_interface($other_meta);
         }
-        else {
+    }
+    else {
+        return sub {
+            my $other_meta = shift;
             $self->submeta->is_relaxed_same_interface($other_meta);
         }
     }
 }
 
-sub can_be_inlined { return !!1 }
-
-sub inlined {
-    my $self = shift;
-    return $self->{inlined} ||= $self->_build_inlined;
-}
-
 sub _build_inlined {
     my $self = shift;
 
-    return sub {
-        my $var = $_;
-        my $code = sprintf('my $other = %s;', $self->find_submeta_inlined($var));
-
-        if ($self->strict) {
-            $code .= $self->submeta->is_same_interface_inlined('$other');
+    if ($self->submeta_strict_check) {
+        return sub {
+            my $var = $_;
+            $self->submeta->is_strict_same_interface_inlined($var);
         }
-        else {
-            $code .= $self->submeta->is_relaxed_same_interface_inlined('$other');
-        }
-        return $code;
     }
+    else {
+        return sub {
+            my $var = $_;
+            $self->submeta->is_relaxed_same_interface_inlined($var);
+        }
+    }
+
 }
 
 # TODO: Make the error message look like this.
 #
 # Reference bless( sub { "DUMMY" }, 'Sub::WrapInType' ) did not pass type constraint "Sub[[Int, Int] => Int]"
-#   Reason: invalid scalar return. got: Str, expected: Int
+#   Reason : invalid scalar return. got: Str, expected: Int
 #
 #   Expected : sub    (Int,Int) => Int
 #   Got      : method (Int,Int) => Str
@@ -86,29 +79,29 @@ sub _build_inlined {
 #
 sub get_message {
     my $self = shift;
-    my $other_sub = shift;
+    my $other_meta = shift;
 
-    my $message;
-    $message .= $self->SUPER::get_message($other_sub);
+    my $submeta = $self->submeta;
 
-    my $other_meta = $self->find_submeta($other_sub);
-    my $error_message = $self->strict ? $self->submeta->error_message($other_meta)
-                      : $self->submeta->relaxed_error_message($other_meta);
+    my $default_message = $self->SUPER::get_message($other_meta);
 
-    $message .= sprintf("\n\tReason: %s", $error_message);
+    my $error_message = $self->submeta_strict_check ? $submeta->error_message($other_meta)
+                      : $submeta->relaxed_error_message($other_meta);
 
-    my $display = $self->submeta->display;
-    my $other_display = '';
-    $other_display = $other_meta->display if $other_meta;
+    my $expected = $submeta->display;
+    my $got = $other_meta->display;
 
-    $message .= "\n";
-    $message .= "\tExpected : $display\n";
-    $message .= "\tGot      : $other_display\n";
+    my $message = <<"```";
+$default_message
+   Reason : $error_message
+
+   Expected : $expected
+   Got      : $got
+```
 
     return $message;
 }
 
-# TODO: support Callable coercion
 sub _build_coercion { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     my $self = shift;
 
@@ -116,9 +109,10 @@ sub _build_coercion { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutine
         display_name      => "to_${self}",
         type_constraint   => $self,
         type_coercion_map => [
-            #Callable() => sub {
-            #    my $sub = shift;
-            #},
+            Ref['CODE'] => sub {
+                my $sub = shift;
+                return $self->find_submeta->($sub);
+            },
         ],
     );
 }

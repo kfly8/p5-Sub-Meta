@@ -2,7 +2,7 @@ use Test2::V0;
 
 use Sub::Meta::Test qw(test_sub_meta_type);
 
-use Types::Sub -types;
+use Types::SubMeta -types;
 use Types::Standard -types;
 
 use Sub::Meta::Library;
