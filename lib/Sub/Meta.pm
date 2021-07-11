@@ -247,7 +247,13 @@ sub set_returns {
     return $self
 }
 
-sub _build_subinfo     { my $self = shift; return $self->sub ? [ Sub::Identify::get_code_info($self->sub) ] : [] }
+sub _build_subinfo     {
+    my $self = shift;
+    return [] unless $self->has_sub;
+    my @info = Sub::Identify::get_code_info($self->sub);
+    return [ $info[0], $info[1] eq '__ANON__' ? undef : $info[1] ];
+}
+
 sub _build_file        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[0] : undef }
 sub _build_line        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[1] : undef }
 sub _build_is_constant { my $self = shift; return $self->sub ? Sub::Identify::is_sub_constant($self->sub) : undef }
@@ -322,6 +328,9 @@ sub is_same_interface {
     return !!1;
 }
 
+sub is_strict_same_interface;
+*is_strict_same_interface = \&is_same_interface;
+
 sub is_relaxed_same_interface {
     my ($self, $other) = @_;
 
@@ -365,6 +374,9 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
+sub is_strict_same_interface_inlined;
+*is_strict_same_interface_inlined = \&is_same_interface_inlined;
+
 sub is_relaxed_same_interface_inlined {
     my ($self, $v) = @_;
 
@@ -386,7 +398,7 @@ sub is_relaxed_same_interface_inlined {
 sub error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $other // '')
+    return sprintf('other must be Sub::Meta. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
@@ -422,7 +434,7 @@ sub error_message {
 sub relaxed_error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $other // '')
+    return sprintf('other must be Sub::Meta. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
@@ -435,12 +447,12 @@ sub relaxed_error_message {
     }
 
     if ($self->has_parameters) {
-        return "invalid parameters:" . $self->parameters->relaxed_error_message($other->parameters)
+        return $self->parameters->relaxed_error_message($other->parameters)
             unless $self->parameters->is_relaxed_same_interface($other->parameters)
     }
 
     if ($self->has_returns) {
-        return "invalid returns:" . $self->returns->relaxed_error_message($other->returns)
+        return $self->returns->relaxed_error_message($other->returns)
             unless $self->returns->is_relaxed_same_interface($other->returns)
     }
     return '';
@@ -449,13 +461,10 @@ sub relaxed_error_message {
 sub display {
     my $self = shift;
 
-    my $keyword = $self->is_method ? 'method' : 'sub';
-    my $subname = $self->subname;
-
-    my $s = $keyword;
-    $s .= ' ' . $subname if $subname;
-    $s .= '('. $self->parameters->display .')' if $self->parameters;
-    $s .= ' => ' . $self->returns->display if $self->returns;
+    my $s = $self->is_method ? 'method' : 'sub';
+    $s .= ' ' . $self->subname if $self->has_subname;
+    $s .= '('. $self->parameters->display .')' if $self->has_parameters;
+    $s .= ' => ' . $self->returns->display if $self->has_returns;
     return $s;
 }
 

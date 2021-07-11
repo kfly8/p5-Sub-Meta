@@ -140,7 +140,7 @@ sub _eq {
 sub error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
+    return sprintf('other returns must be Sub::Meta::Returns. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
     if ($self->has_scalar) {
@@ -172,7 +172,7 @@ sub error_message {
 sub relaxed_error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
+    return sprintf('other returns must be Sub::Meta::Returns. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
     if ($self->has_scalar) {

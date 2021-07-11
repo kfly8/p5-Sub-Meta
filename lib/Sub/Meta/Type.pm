@@ -1,0 +1,128 @@
+package Sub::Meta::Type;
+use 5.010;
+use strict;
+use warnings;
+
+use parent qw(Type::Tiny);
+
+use Type::Coercion;
+use Types::Standard qw(Ref);
+
+sub submeta              { my $self = shift; return $self->{submeta} }
+sub submeta_strict_check { my $self = shift; return $self->{submeta_strict_check} }
+sub find_submeta         { my $self = shift; return $self->{find_submeta} }
+
+#
+# The following methods override the methods of Type::Tiny.
+#
+
+sub _croak { require Carp; goto &Carp::croak }
+
+sub new {
+    my ($class, @args) = @_;
+    my %opts = ( @args == 1 ) ? %{ $args[0] } : @args;
+
+    _croak "Need to supply submeta" unless exists $opts{submeta};
+    _croak "Need to supply submeta_strict_check" unless exists $opts{submeta_strict_check};
+    _croak "Need to supply find_submeta" unless exists $opts{find_submeta};
+
+    return $class->SUPER::new(%opts);
+}
+
+sub has_parent     { return !!0 }
+sub can_be_inlined { return !!1 }
+sub inlined        { my $self = shift; return $self->{inlined} ||= $self->_build_inlined }
+
+sub _build_constraint { ## no critic (ProhibitUnusedPrivateSubroutines)
+    my $self = shift;
+
+    if ($self->submeta_strict_check) {
+        return sub {
+            my $other_meta = shift;
+            $self->submeta->is_strict_same_interface($other_meta);
+        }
+    }
+    else {
+        return sub {
+            my $other_meta = shift;
+            $self->submeta->is_relaxed_same_interface($other_meta);
+        }
+    }
+}
+
+sub _build_inlined {
+    my $self = shift;
+
+    if ($self->submeta_strict_check) {
+        return sub {
+            my $var = $_;
+            $self->submeta->is_strict_same_interface_inlined($var);
+        }
+    }
+    else {
+        return sub {
+            my $var = $_;
+            $self->submeta->is_relaxed_same_interface_inlined($var);
+        }
+    }
+
+}
+
+# TODO: Make the error message look like this.
+#
+# Reference bless( sub { "DUMMY" }, 'Sub::WrapInType' ) did not pass type constraint "Sub[[Int, Int] => Int]"
+#   Reason : invalid scalar return. got: Str, expected: Int
+#
+#   Expected : sub    (Int,Int) => Int
+#   Got      : method (Int,Int) => Str
+#              ^^^^^^              ^^^
+#
+sub get_message {
+    my $self = shift;
+    my $other_meta = shift;
+
+    my $submeta = $self->submeta;
+
+    my $default_message = $self->SUPER::get_message($other_meta);
+
+    my $error_message = $self->submeta_strict_check ? $submeta->error_message($other_meta)
+                      : $submeta->relaxed_error_message($other_meta);
+
+    my $expected = $submeta->display;
+    my $got = $other_meta->display;
+
+    my $message = <<"```";
+$default_message
+   Reason : $error_message
+
+   Expected : $expected
+   Got      : $got
+```
+
+    return $message;
+}
+
+sub _build_coercion { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    my $self = shift;
+
+    return Type::Coercion->new(
+        display_name      => "to_${self}",
+        type_constraint   => $self,
+        type_coercion_map => [
+            Ref['CODE'] => sub {
+                my $sub = shift;
+                return $self->find_submeta->($sub);
+            },
+        ],
+    );
+}
+
+1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Types::Sub - subroutine type constraints
+

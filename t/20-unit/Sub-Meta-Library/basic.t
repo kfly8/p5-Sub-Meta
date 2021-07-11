@@ -15,12 +15,12 @@ sub world { }
 subtest 'register' => sub {
     my $meta = Sub::Meta->new(sub => \&hello);
 
-    like dies { Sub::Meta::Library->register }, qr/^arguments required coderef and submeta/;
-    like dies { Sub::Meta::Library->register(\&hello) }, qr/^arguments required coderef and submeta/;
-    like dies { Sub::Meta::Library->register('hello', $meta) }, qr/^required coderef/;
-    like dies { Sub::Meta::Library->register({}, $meta) }, qr/^required coderef/;
-    like dies { Sub::Meta::Library->register(\&hello, 'meta') }, qr/^required an instance of Sub::Meta/;
-    like dies { Sub::Meta::Library->register(\&hello, bless {}, 'Some') }, qr/^required an instance of Sub::Meta/;
+    ok dies { Sub::Meta::Library->register }, 'arguments required coderef and submeta';
+    ok dies { Sub::Meta::Library->register(\&hello) }, 'arguments required coderef and submeta';
+    ok dies { Sub::Meta::Library->register('hello', $meta) }, 'required coderef';
+    ok dies { Sub::Meta::Library->register({}, $meta) }, 'required coderef';
+    ok dies { Sub::Meta::Library->register(\&hello, 'meta') }, 'required an instance of Sub::Meta';
+    ok dies { Sub::Meta::Library->register(\&hello, bless {}, 'Some') }, 'required an instance of Sub::Meta';
 
     ok lives { Sub::Meta::Library->register(\&hello, $meta) }
 };
@@ -50,8 +50,8 @@ subtest 'get' => sub {
         [\&Foo::bar, $meta_bar],
     );
 
-    like dies { Sub::Meta::Library->get('hello') }, qr/^required coderef/;
-    like dies { Sub::Meta::Library->get({}) }, qr/^required coderef/;
+    ok dies { Sub::Meta::Library->get('hello') }, 'required coderef';
+    ok dies { Sub::Meta::Library->get({}) }, 'required coderef';
     is( Sub::Meta::Library->get(\&hello), $meta_hello );
     is( Sub::Meta::Library->get(\&world), $meta_world );
     is( Sub::Meta::Library->get(sub { }), undef );
@@ -77,8 +77,8 @@ subtest 'get' => sub {
 };
 
 subtest 'remove' => sub {
-    like dies { Sub::Meta::Library->remove('hello') }, qr/^required coderef/;
-    like dies { Sub::Meta::Library->remove({}) }, qr/^required coderef/;
+    ok dies { Sub::Meta::Library->remove('hello') }, 'required coderef';
+    ok dies { Sub::Meta::Library->remove({}) }, 'required coderef';
     is( Sub::Meta::Library->get(\&hello), Sub::Meta->new(sub => \&hello) );
     is( Sub::Meta::Library->remove(\&hello), Sub::Meta->new(sub => \&hello) );
     is( Sub::Meta::Library->get(\&hello), undef );

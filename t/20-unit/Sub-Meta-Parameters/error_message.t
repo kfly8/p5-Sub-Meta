@@ -10,8 +10,8 @@ my $Int = Sub::Meta::Param->new("Int");
 subtest "{ args => [] }" => sub {
     my $meta = Sub::Meta::Parameters->new({ args => [] });
     my @tests = (
-        fail        => undef,                                        qr/^must be Sub::Meta::Parameters. got: /,
-        fail        => (bless {} => 'Some'),                         qr/^must be Sub::Meta::Parameters\. got: Some/,
+        fail        => undef,                                        qr/^other parameters must be Sub::Meta::Parameters. got: Undef/,
+        fail        => (bless {} => 'Some'),                         qr/^other parameters must be Sub::Meta::Parameters\. got: Some/,
         relax_pass  => { args => [$Str] },                           qr/^invalid args length. got: 1, expected: 0/, 
         relax_pass  => { args => [], slurpy => $Slurpy },            qr/^should not have slurpy/, 
         fail        => { args => [], nshift => 1 },                  qr/^nshift is not equal. got: 1, expected: 0/, 

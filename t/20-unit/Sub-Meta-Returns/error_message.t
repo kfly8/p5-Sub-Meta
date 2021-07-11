@@ -6,8 +6,8 @@ use Sub::Meta::Test qw(test_error_message);
 subtest "{ scalar => 'Str' }" => sub {
     my $meta = Sub::Meta::Returns->new({ scalar => 'Str' });
     my @tests = (
-        fail       => undef,                                             qr/^must be Sub::Meta::Returns. got: /,
-        fail       => (bless {} => 'Some'),                              qr/^must be Sub::Meta::Returns. got: Some/,
+        fail       => undef,                                             qr/^other returns must be Sub::Meta::Returns. got: Undef/,
+        fail       => (bless {} => 'Some'),                              qr/^other returns must be Sub::Meta::Returns. got: Some/,
         fail       => { scalar => 'Int' },                               qr/^invalid scalar return. got: Int, expected: Str/,
         relax_pass => { scalar => 'Str', list => 'Str' },                qr/^should not have list return/,
         relax_pass => { scalar => 'Str', void => 'Str' },                qr/^should not have void return/,
