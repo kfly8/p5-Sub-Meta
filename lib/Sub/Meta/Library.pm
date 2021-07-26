@@ -17,8 +17,6 @@ my %INDEX;
 my $SubMeta  = InstanceOf['Sub::Meta'];
 my $Callable = Ref['CODE'];
 
-sub _croak { require Carp; goto &Carp::croak }
-
 sub register {
     state $check = compile(Invocant, $Callable, $SubMeta);
     my ($class, $sub, $meta) = $check->(@_);
