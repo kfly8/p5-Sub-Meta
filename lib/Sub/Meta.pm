@@ -31,7 +31,10 @@ sub _croak { require Carp; goto &Carp::croak }
 
 sub new {
     my ($class, @args) = @_;
-    my %args = @args == 1 ? %{$args[0]} : @args;
+
+    my %args = @args == 1 && (ref $args[0]||"") ne "HASH" ? _croak "single arg must be hashref"
+             : @args == 1 ? %{$args[0]}
+             : @args;
 
     my $self = bless \%args => $class;
 

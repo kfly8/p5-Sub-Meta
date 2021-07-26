@@ -15,7 +15,6 @@ sub find_submeta         { my $self = shift; return $self->{find_submeta} }
 #
 # The following methods override the methods of Type::Tiny.
 #
-
 sub _croak { require Carp; goto &Carp::croak }
 
 sub new {

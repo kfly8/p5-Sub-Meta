@@ -8,7 +8,6 @@ our @EXPORT_OK = qw(
     sub_meta_param
     test_is_same_interface
     test_error_message
-    test_sub_meta_type
     DummyType
 );
 
@@ -169,59 +168,6 @@ sub test_error_message {
             elsif ($pass eq 'fail') {
                 like $error_message, $expected, 'error_message';
                 like $relaxed_error_message, $expected, 'relaxed_error_message';
-            }
-        };
-    }
-
-    $ctx->release;
-    return;
-}
-
-sub test_sub_meta_type {
-    my ($case, @tests) = @_;
-
-    my $ctx = context;
-    while (@tests) {
-        my ($result, $value, $message) = splice @tests, 0, 3;
-
-        subtest  $message => sub {
-            my $Sub          = Types::Sub::Sub($case);
-            my $Method       = Types::Sub::Method($case);
-            my $StrictSub    = Types::Sub::StrictSub($case);
-            my $StrictMethod = Types::Sub::StrictMethod($case);
-
-            if ($result eq 'fail') {
-                ok(!$Sub->check($value),          "fail: Sub") or note $Sub->get_message($value);
-                ok(!$Method->check($value),       "fail: Method" ) or note $Method->get_message($value);
-                ok(!$StrictSub->check($value),    "fail: StrictSub") or note $StrictSub->get_message($value);
-                ok(!$StrictMethod->check($value), "fail: StrictMethod") or note $StrictMethod->get_message($value);
-            }
-            elsif ($result eq 'pass_Sub') {
-                ok( $Sub->check($value),          "pass: Sub") or note $Sub->get_message($value);
-                ok(!$Method->check($value),       "fail: Method" ) or note $Method->get_message($value);
-                ok(!$StrictSub->check($value),    "fail: StrictSub") or note $StrictSub->get_message($value);
-                ok(!$StrictMethod->check($value), "fail: StrictMethod") or note $StrictMethod->get_message($value);
-            }
-            elsif ($result eq 'pass_Method') {
-                ok(!$Sub->check($value),          "fail: Sub") or note $Sub->get_message($value);
-                ok( $Method->check($value),       "pass: Method" ) or note $Method->get_message($value);
-                ok(!$StrictSub->check($value),    "fail: StrictSub") or note $StrictSub->get_message($value);
-                ok(!$StrictMethod->check($value), "fail: StrictMethod") or note $StrictMethod->get_message($value);
-            }
-            elsif ($result eq 'pass_StrictSub') {
-                ok( $Sub->check($value),          "pass: Sub") or note $Sub->get_message($value);
-                ok(!$Method->check($value),       "fail: Method" ) or note $Method->get_message($value);
-                ok( $StrictSub->check($value),    "pass: StrictSub") or note $StrictSub->get_message($value);
-                ok(!$StrictMethod->check($value), "fail: StrictMethod") or note $StrictMethod->get_message($value);
-            }
-            elsif ($result eq 'pass_StrictMethod') {
-                ok(!$Sub->check($value),          "fail: Sub") or note $Sub->get_message($value);
-                ok( $Method->check($value),       "pass: Method" ) or note $Method->get_message($value);
-                ok(!$StrictSub->check($value),    "fail: StrictSub") or note $StrictSub->get_message($value);
-                ok( $StrictMethod->check($value), "pass: StrictMethod") or note $StrictMethod->get_message($value);
-            }
-            else {
-                die "unsupported result: $result";
             }
         };
     }
