@@ -15,22 +15,29 @@ sub find_submeta         { my $self = shift; return $self->{find_submeta} }
 #
 # The following methods override the methods of Type::Tiny.
 #
-sub _croak { require Carp; goto &Carp::croak }
-
 sub new {
     my ($class, @args) = @_;
     my %opts = ( @args == 1 ) ? %{ $args[0] } : @args;
 
-    _croak "Need to supply submeta" unless exists $opts{submeta};
-    _croak "Need to supply submeta_strict_check" unless exists $opts{submeta_strict_check};
-    _croak "Need to supply find_submeta" unless exists $opts{find_submeta};
+    ## no critic (Subroutines::ProtectPrivateSubs)
+    Type::Tiny::_croak "Need to supply submeta" unless exists $opts{submeta};
+    Type::Tiny::_croak "Need to supply submeta_strict_check" unless exists $opts{submeta_strict_check};
+    Type::Tiny::_croak "Need to supply find_submeta" unless exists $opts{find_submeta};
+    ## use critic
 
     return $class->SUPER::new(%opts);
 }
 
 sub has_parent     { return !!0 }
 sub can_be_inlined { return !!1 }
-sub inlined        { my $self = shift; return $self->{inlined} ||= $self->_build_inlined }
+
+sub inlined {
+    my $self = shift;
+    if (!$self->{inlined}) {
+        $self->{inlined} = $self->_build_inlined;
+    }
+    return $self->{inlined}
+}
 
 sub _build_constraint { ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self = shift;
