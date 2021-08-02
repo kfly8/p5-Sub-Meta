@@ -417,7 +417,7 @@ sub error_message {
     }
 
     if ($self->has_parameters) {
-        return "invalid parameters:" . $self->parameters->error_message($other->parameters)
+        return "invalid parameters: " . $self->parameters->error_message($other->parameters)
             unless $self->parameters->is_same_interface($other->parameters)
     }
     else {
@@ -425,7 +425,7 @@ sub error_message {
     }
 
     if ($self->has_returns) {
-        return "invalid returns:" . $self->returns->error_message($other->returns)
+        return "invalid returns: " . $self->returns->error_message($other->returns)
             unless $self->returns->is_same_interface($other->returns)
     }
     else {
@@ -450,12 +450,12 @@ sub relaxed_error_message {
     }
 
     if ($self->has_parameters) {
-        return $self->parameters->relaxed_error_message($other->parameters)
+        return "invalid parameters: " . $self->parameters->relaxed_error_message($other->parameters)
             unless $self->parameters->is_relaxed_same_interface($other->parameters)
     }
 
     if ($self->has_returns) {
-        return $self->returns->relaxed_error_message($other->returns)
+        return "invalid returns: " . $self->returns->relaxed_error_message($other->returns)
             unless $self->returns->is_relaxed_same_interface($other->returns)
     }
     return '';

@@ -6,7 +6,7 @@ use warnings;
 use parent qw(Type::Tiny);
 
 use Type::Coercion;
-use Types::Standard qw(Ref);
+use Types::Standard qw(Ref InstanceOf);
 
 sub submeta              { my $self = shift; return $self->{submeta} }
 sub submeta_strict_check { my $self = shift; return $self->{submeta_strict_check} }
@@ -64,31 +64,33 @@ sub _build_inlined {
             $self->submeta->is_relaxed_same_interface_inlined($var);
         }
     }
-
 }
 
-# TODO: Make the error message look like this.
-#
-# Reference bless( sub { "DUMMY" }, 'Sub::WrapInType' ) did not pass type constraint "Sub[[Int, Int] => Int]"
+# e.g.
+# Reference bless( sub { "DUMMY" }, 'Sub::WrapInType' ) did not pass type constraint "SubMeta"
 #   Reason : invalid scalar return. got: Str, expected: Int
 #
-#   Expected : sub    (Int,Int) => Int
-#   Got      : method (Int,Int) => Str
-#              ^^^^^^              ^^^
-#
+#   Expected : sub (Int,Int) => Int
+#   Got      : sub (Int,Int) => Str
 sub get_message {
     my $self = shift;
     my $other_meta = shift;
 
-    my $submeta = $self->submeta;
-
     my $default_message = $self->SUPER::get_message($other_meta);
 
-    my $error_message = $self->submeta_strict_check ? $submeta->error_message($other_meta)
-                      : $submeta->relaxed_error_message($other_meta);
+    state $SubMeta = InstanceOf['Sub::Meta'];
 
-    my $expected = $submeta->display;
-    my $got = $other_meta->display;
+    my ($error_message, $expected, $got);
+    if ($self->submeta_strict_check) {
+        $error_message = $self->submeta->error_message($other_meta);
+        $expected      = $self->submeta->display;
+        $got           = $SubMeta->check($other_meta) ? $other_meta->display : "";
+    }
+    else {
+        $error_message = $self->submeta->relaxed_error_message($other_meta);
+        $expected      = $self->submeta->relaxed_display;
+        $got           = $SubMeta->check($other_meta) ? $other_meta->relaxed_display : "";
+    }
 
     my $message = <<"```";
 $default_message
