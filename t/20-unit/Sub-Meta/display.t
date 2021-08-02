@@ -4,63 +4,69 @@ use Sub::Meta;
 
 sub display { my @args = @_; return Sub::Meta->new(@args)->display }
 
-is display(), 'sub';
-is display(is_method => 1), 'method';
-is display(subname => 'hello'), 'sub hello';
-is display(subname => 'hello', is_method => 1), 'method hello';
-is display(subname => 'hello', args => ['Str']), 'sub hello(Str)';
-is display(subname => 'hello', args => ['Str', 'Int']), 'sub hello(Str, Int)';
-is display(
-    subname => 'hello',
-    args => [{ type => 'Str', name => '$a' }]
-   ), 'sub hello(Str $a)';
+my @tests = (
+    Sub::Meta->new(),
+        'sub',
+        'sub *(*) => *',
 
-is display(
-    subname => 'hello',
-    args => [{ type => 'Str', name => '$a' }, { type => 'Int', name => '$i', named => !!1 }]
-   ), 'sub hello(Str $a, Int :$i)';
+    Sub::Meta->new(is_method => 1),
+        'method',
+        'method *(*) => *',
 
-is display(
-    subname => 'hello',
-    is_method => 1,
-    args => [{ type => 'Str', name => '$a' }]
-   ), 'method hello(Str $a)';
+    Sub::Meta->new(subname => 'hello', is_method => 0),
+        'sub hello',
+        'sub hello(*) => *',
 
-is display(
-    subname => 'hello',
-    invocant => { name => '$class' },
-    args => [{ type => 'Str', name => '$a' }]
-   ), 'method hello($class: Str $a)';
+    Sub::Meta->new(subname => 'hello', is_method => 1),
+        'method hello',
+        'method hello(*) => *',
 
-is display(
-    subname => 'hello',
-    slurpy => { name => '@values' },
-    args => [{ type => 'Str', name => '$a' }]
-   ), 'sub hello(Str $a, @values)';
+    Sub::Meta->new(args => ['Str']),
+        'sub(Str)',
+        'sub *(Str,*) => *',
 
+    Sub::Meta->new(args => ['Str','Int']),
+        'sub(Str, Int)',
+        'sub *(Str, Int,*) => *',
 
-is display(
-    subname => 'hello',
-    slurpy => { name => '@values' },
-    args => []
-   ), 'sub hello(@values)';
+    Sub::Meta->new(args => [{ type => 'Str', name => '$a', named => 0}]),
+        'sub(Str $a)',
+        'sub *(Str $a,*) => *',
 
-is display(
-    subname => 'hello',
-    args => [],
-    returns => 'Int',
-   ), 'sub hello() => Int';
+    Sub::Meta->new(args => [{ type => 'Str', name => '$b', named => 1}]),
+        'sub(Str :$b)',
+        'sub *(Str :$b,*) => *',
 
-is display(
-    subname => 'hello',
-    args => [],
-    returns => { scalar => 'Int', list => 'Str' },
-   ), 'sub hello() => (scalar => Int, list => Str)';
+    Sub::Meta->new(invocant => {name => '$class'}, args => [{type => 'Str', name => '$a'}]),
+        'method($class: Str $a)',
+        'method *($class: Str $a,*) => *',
 
-is display(
-    subname => 'hello',
-    args => [],
-    returns => { scalar => 'Int', list => 'Int', void => 'Str' },
-   ), 'sub hello() => (scalar => Int, list => Int, void => Str)';
+    Sub::Meta->new(invocant => {name => '$class'}, args => []),
+        'method($class: )',
+        'method *($class: ,*) => *',
+
+    # FIXME: required args ...
+    Sub::Meta->new(invocant => {name => '$class'}),
+        'sub',
+        'sub *(*) => *',
+
+    # FIXME @values,* => @values
+    Sub::Meta->new(slurpy => {name => '@values'}, args => []),
+        'sub(@values)',
+        'sub *(@values,*) => *',
+
+    Sub::Meta->new(returns => 'Int'),
+        'sub => Int',
+        'sub *(*) => Int',
+
+    Sub::Meta->new(returns => { scalar => 'Int', list => 'Str' }),
+        'sub => (scalar => Int, list => Str)',
+        'sub *(*) => (scalar => Int, list => Str)',
+);
+
+while (my ($meta, $display, $relaxed_display) = splice @tests, 0, 3) {
+    is $meta->display, $display;
+    is $meta->relaxed_display, $relaxed_display;
+}
 
 done_testing;

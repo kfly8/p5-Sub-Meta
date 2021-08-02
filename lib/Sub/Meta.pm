@@ -471,6 +471,17 @@ sub display {
     return $s;
 }
 
+sub relaxed_display {
+    my $self = shift;
+
+    my $s = $self->is_method ? 'method' : 'sub';
+    $s .= sprintf(' %s', $self->has_subname ? $self->subname : '*');
+    $s .= sprintf('(%s*)', $self->has_parameters ? $self->parameters->display . ',' : '');
+    $s .= sprintf(' => %s', $self->has_returns ? $self->returns->display : '*');
+    return $s;
+}
+
+
 1;
 __END__
 
