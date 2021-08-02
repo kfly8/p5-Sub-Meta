@@ -12,6 +12,8 @@ equivalent_modules = Test2::V0
 [TestingAndDebugging::RequireUseWarnings]
 equivalent_modules = Test2::V0
 
+[-TestingAndDebugging::ProhibitNoWarnings]
+
 [-Modules::RequireExplicitPackage]
 [-Modules::RequireEndWithOne]
 [-Variables::RequireLocalizedPunctuationVars]
