@@ -54,4 +54,9 @@ subtest 'exceptions' => sub {
     ok dies { SubMeta[ sub {} ] };
 };
 
+subtest 'coerce' => sub {
+    my $type = SubMeta[ args => [Str] ];
+    is $type->coerce(sub {}), undef;
+};
+
 done_testing;
