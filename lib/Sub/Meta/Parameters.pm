@@ -23,8 +23,6 @@ sub new {
     my ($class, @args) = @_;
     my %args = @args == 1 ? %{$args[0]} : @args;
 
-    _croak 'parameters reqruires args' unless exists $args{args};
-
     my $self = bless \%args => $class;
     $self->set_args($args{args});
 
