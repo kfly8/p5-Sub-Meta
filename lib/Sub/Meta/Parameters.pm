@@ -24,22 +24,22 @@ sub new {
     my %args = @args == 1 ? %{$args[0]} : @args;
 
     my $self = bless \%args => $class;
-    $self->set_args($args{args});
-
-    $self->set_invocant(delete $args{invocant}) if exists $args{invocant};
-    $self->set_nshift(delete $args{nshift}) if exists $args{nshift};
-    $self->set_slurpy(delete $args{slurpy}) if $args{slurpy};
+    $self->set_args($args{args}) if exists $args{args};
+    $self->set_invocant(delete $args{invocant}) if defined $args{invocant};
+    $self->set_nshift(delete $args{nshift}) if defined $args{nshift};
+    $self->set_slurpy(delete $args{slurpy}) if defined $args{slurpy};
 
     return $self;
 }
 
 sub nshift()    { my $self = shift; return $self->{nshift} // 0 }
 sub slurpy()    { my $self = shift; return $self->{slurpy} }
-sub args()      { my $self = shift; return $self->{args} }
+sub args()      { my $self = shift; return $self->{args} // [] }
 sub invocant()  { my $self = shift; return $self->{invocant} }
-sub invocants() { my $self = shift; return defined $self->{invocant} ? [ $self->{invocant} ] : [] }
+sub invocants() { my $self = shift; return $self->has_invocant ? [ $self->{invocant} ] : [] }
 sub all_args()  { my $self = shift; return [ @{$self->invocants}, @{$self->args} ] }
 
+sub has_args()     { my $self = shift; return defined $self->{args} }
 sub has_invocant() { my $self = shift; return defined $self->{invocant} }
 sub has_slurpy()   { my $self = shift; return defined $self->{slurpy} }
 
