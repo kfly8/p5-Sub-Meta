@@ -231,7 +231,7 @@ sub is_relaxed_same_interface_inlined {
 
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Parameters')", $v, $v);
 
-    push @src => $self->slurpy->is_relaxed_same_interface_inlined(sprintf('%s->slurpy', $v)) if $self->has_slurpy; 
+    push @src => $self->slurpy->is_relaxed_same_interface_inlined(sprintf('%s->slurpy', $v)) if $self->has_slurpy;
 
     push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
 
@@ -515,7 +515,7 @@ First element of invocants.
 
 Returns an arrayref of parameter objects for the variables into which initial arguments are shifted automatically. This will usually return () for normal functions and ('$self') for methods.
 
-=head3 has_invocant 
+=head3 has_invocant
 
     method has_invocant() => Bool
 

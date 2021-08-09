@@ -27,24 +27,27 @@ subtest 'args: parameters' => sub {
 };
 
 subtest 'args: args' => sub {
-    my $check = sub {
-        my ($a, $b) = @_;
+
+    my @tests = (
+        "{args => ['Str']}"                        => {args => ['Str']}                                   => {args => ['Str']},
+        "{args => ['Str'], slurpy => 1}"           => {args => ['Str'], slurpy => 1}                      => {args => ['Str'], slurpy => 1},
+        "if is_method is 1, then nshift is 1"      => {args => ['Str'], is_method => 1}                   => {args => ['Str'], nshift => 1},
+        "if is_method is 0, then nshift is 0"      => {args => ['Str'], is_method => 0}                   => {args => ['Str'], nshift => 0},
+        "nshift has priority"                      => {args => ['Str'], is_method => 0, nshift => 1}      => {args => ['Str'], nshift => 1},
+        "if invocant is set, then set nshift to 1" => {args => ['Str'], invocant => { name => '$class' }} => {args => ['Str'], nshift => 1, invocant => { name => '$class' }},
+    );
+
+    while (my ($message, $a, $b) = splice @tests, 0, 3) {
         my $meta = Sub::Meta->new($a);
         my $parameters = Sub::Meta::Parameters->new($b);
-        is $meta->parameters, $parameters;
-    };
 
-    $check->({args => ['Str']}, {args => ['Str']});
-    $check->({args => ['Str'], slurpy => 1}, {args => ['Str'], slurpy => 1});
-    $check->({args => ['Str'], nshift => 1}, {args => ['Str'], nshift => 1});
-
-    $check->({args => ['Str'], is_method => 1}, {args => ['Str'], nshift => 1},
-            'if is_method flag is set, then set nshift to 1' );
-    $check->({args => ['Str'], is_method => 0}, {args => ['Str'], nshift => 0});
-    $check->({args => ['Str'], nshift => 1, is_method => 0}, {args => ['Str'], nshift => 1}, 'nshift has priority');
-
-    $check->({args => ['Str'], invocant => { name => '$class' }}, {args => ['Str'], nshift => 1, invocant => { name => '$class' }},
-            'if invocant is set, then set nshift to 1' );
+        subtest $message => sub {
+            is $meta->args, $parameters->args, 'args';
+            is $meta->slurpy, $parameters->slurpy, 'slurpy';
+            is $meta->nshift, $parameters->nshift, 'nshift';
+            is $meta->invocant, $parameters->invocant, 'invocant';
+        };
+    }
 };
 
 done_testing;

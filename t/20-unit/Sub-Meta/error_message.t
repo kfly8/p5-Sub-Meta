@@ -16,8 +16,8 @@ subtest "{ subname => 'foo' }" => sub {
         fail       => { subname => 'bar' },                    qr/^invalid subname. got: bar, expected: foo/,
         fail       => { subname => undef },                    qr/^invalid subname. got: , expected: foo/,
         fail       => { subname => 'foo', is_method => 1 },    qr/^invalid method/,
-        relax_pass => { subname => 'foo', parameters => $p1 }, qr/^should not have parameters/,
-        relax_pass => { subname => 'foo', returns => $r1 },    qr/^should not have returns/,
+        relax_pass => { subname => 'foo', parameters => $p1 }, qr/^invalid parameters:/,
+        relax_pass => { subname => 'foo', returns => $r1 },    qr/^invalid returns:/,
         pass       => { subname => 'foo' },                    qr//, # valid
         pass       => { fullname => 'path::foo' },             qr//, # valid
     );

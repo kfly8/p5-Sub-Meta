@@ -496,7 +496,7 @@ And you can hold meta information of parameter type and return type. See also L<
 
     $meta->set_parameters(args => ['Str']));
     $meta->parameters->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
-    
+
     $meta->set_args(['Str']);
     $meta->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
 
@@ -543,7 +543,7 @@ Others are as follows:
         returns => Int,
     );
 
-    # method hello(Str) -> Str 
+    # method hello(Str) -> Str
     Sub::Meta->new(
         subname   => 'hello',
         args      => [{ message => Str }],
@@ -851,7 +851,7 @@ Accessor for attribute of subroutine reference.
     method attribute() => Maybe[ArrayRef[Str]]
 
 If the subroutine is set, it returns a attribute of subroutine, if not set, it returns undef.
-e.g. C<['method']>, C<undef> 
+e.g. C<['method']>, C<undef>
 
 =item C<< has_attribute >>
 
