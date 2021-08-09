@@ -40,17 +40,9 @@ sub new {
     $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
 
-    if (my $is_method = $self->_normalize_args_is_method(\%args)) {
-        $self->set_is_method($is_method);
-    }
-
-    if (my $parameters = $self->_normalize_args_parameters(\%args)) {
-        $self->set_parameters($parameters);
-    }
-
-    if (exists $args{returns}) {
-        $self->set_returns($args{returns})
-    }
+    $self->set_is_method($self->_normalize_args_is_method(\%args));
+    $self->set_parameters($self->_normalize_args_parameters(\%args));
+    $self->set_returns($args{returns});
 
     # cleaning
     delete $args{args};
@@ -73,9 +65,9 @@ sub _normalize_args_is_method {
                             || exists $args->{parameters}{nshift}
                             || exists $args->{parameters}{invocant};
 
-        return $is_method if $exists_is_method
+        return $is_method if $exists_is_method;
     }
-    elsif(exists $args->{args}) {
+    else {
         my $is_method = $args->{is_method}
                      || $args->{nshift}
                      || $args->{invocant};
@@ -95,19 +87,19 @@ sub _normalize_args_parameters {
     if (exists $args->{parameters}) {
         return $args->{parameters};
     }
-    elsif(exists $args->{args}) {
+    else {
         my $nshift = exists $args->{nshift}    ? $args->{nshift}
                    : $self->is_method          ? 1
                    : exists $self->{is_method} ? 0
                    : undef;
 
-        my $parameters = { args => $args->{args} };
+        my $parameters;
+        $parameters->{args}     = $args->{args}     if exists $args->{args};
         $parameters->{slurpy}   = $args->{slurpy}   if exists $args->{slurpy};
         $parameters->{invocant} = $args->{invocant} if exists $args->{invocant};
         $parameters->{nshift}   = $nshift           if defined $nshift;
         return $parameters;
     }
-    return;
 }
 
 sub sub() :method { my $self = shift; return $self->{sub} } ## no critic (ProhibitBuiltinHomonyms)
