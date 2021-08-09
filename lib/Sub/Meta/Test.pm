@@ -6,6 +6,7 @@ our @EXPORT_OK = qw(
     sub_meta
     sub_meta_parameters
     sub_meta_param
+    sub_meta_returns
     test_is_same_interface
     test_error_message
     DummyType
@@ -28,8 +29,8 @@ sub sub_meta {
         call line           => $expected->{line}        // undef;
         call prototype      => $expected->{prototype}   // undef;
         call attribute      => $expected->{attribute}   // undef;
-        call parameters     => $expected->{parameters}  // undef;
-        call returns        => $expected->{returns}     // undef;
+        call parameters     => $expected->{parameters}  // sub_meta_parameters();
+        call returns        => $expected->{returns}     // sub_meta_returns();
         call is_constant    => !!$expected->{is_constant};
         call is_method      => !!$expected->{is_method};
 
@@ -40,8 +41,8 @@ sub sub_meta {
         call has_line       => !!$expected->{line};
         call has_prototype  => !!$expected->{prototype};
         call has_attribute  => !!$expected->{attribute};
-        call has_parameters => !!$expected->{parameters};
-        call has_returns    => !!$expected->{returns};
+        #call has_parameters => !!$expected->{parameters};
+        #call has_returns    => !!$expected->{returns};
     };
 };
 
@@ -66,6 +67,7 @@ sub sub_meta_parameters {
         call invocants                => $expected->{invocants}                // [];
         call args_min                 => $expected->{args_min}                 // 0;
         call args_max                 => $expected->{args_max}                 // 0;
+        call has_args                 => $expected->{has_args}                 // !!$expected->{args};
         call has_slurpy               => !!$expected->{slurpy};
         call has_invocant             => !!$expected->{invocant};
     };
@@ -94,6 +96,25 @@ sub sub_meta_param {
     };
 }
 
+
+sub sub_meta_returns {
+    my ($expected) = @_;
+    $expected //= {};
+
+    return object {
+        prop isa => 'Sub::Meta::Returns';
+        call scalar => $expected->{scalar} // undef;
+        call list   => $expected->{list}   // undef;
+        call void   => $expected->{void}   // undef;
+        call coerce => $expected->{coerce} // undef;
+
+        call has_scalar => !!$expected->{scalar};
+        call has_list   => !!$expected->{list};
+        call has_void   => !!$expected->{void};
+        call has_coerce => !!$expected->{coerce};
+    };
+};
+
 sub test_is_same_interface {
     my ($meta, @tests) = @_;
 
@@ -115,7 +136,6 @@ sub test_is_same_interface {
 
         my $relax = $meta->is_relaxed_same_interface($other);
         my $relax_inlined = $is_relaxed_same_interface->($other);
-
         subtest "should $pass: $message" => sub {
             if ($pass eq 'pass') {
                 ok $same, 'is_same_interface';
@@ -177,7 +197,7 @@ sub test_error_message {
 }
 
 {
-    package ## no critic (Modules::ProhibitMultiplePackages) # hide from PAUSE 
+    package ## no critic (Modules::ProhibitMultiplePackages) # hide from PAUSE
         DummyType; ## no critic (RequireFilenameMatchesPackage)
 
     use overload
