@@ -305,12 +305,25 @@ sub display {
     my $self = shift;
 
     my $s = '';
-    $s .= $self->invocant->display . ': '
-        if $self->invocant && $self->invocant->display;
+    if ($self->has_invocant) {
+        my $d = $self->invocant->display;
+        $s .= "$d: " if $d;
+    }
 
-    $s .= join ', ', map { $_->display } @{$self->args};
-    $s .= ', ' if $s && $self->slurpy;
-    $s .= $self->slurpy->display if $self->slurpy;
+    if ($self->has_args) {
+        $s .= join ', ', map { $_->display } @{$self->args};
+    }
+    elsif(!$self->has_slurpy) {
+        $s .= '*';
+    }
+
+    if ($self->has_slurpy) {
+        $s .= ', ' if $s;
+
+        my $d = $self->slurpy->display;
+        $s .= $d if $d;
+    }
+
     return $s;
 }
 
