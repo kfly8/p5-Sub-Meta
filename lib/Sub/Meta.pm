@@ -56,29 +56,12 @@ sub new {
 sub _normalize_args_is_method {
     my ($self, $args) = @_;
 
-    if (exists $args->{parameters}) {
-        my $is_method = $args->{is_method}
-                     || $args->{parameters}{nshift}
-                     || $args->{parameters}{invocant};
-
-        my $exists_is_method = exists $args->{is_method}
-                            || exists $args->{parameters}{nshift}
-                            || exists $args->{parameters}{invocant};
-
-        return $is_method if $exists_is_method;
-    }
-    else {
-        my $is_method = $args->{is_method}
-                     || $args->{nshift}
-                     || $args->{invocant};
-
-        my $exists_is_method = exists $args->{is_method}
-                            || exists $args->{nshift}
-                            || exists $args->{invocant};
-
-        return $is_method if $exists_is_method;
-    }
-    return;
+    return !!$args->{invocant}             if exists $args->{invocant};
+    return !!$args->{nshift}               if exists $args->{nshift};
+    return !!$args->{parameters}{nshift}   if exists $args->{parameters} && exists $args->{parameters}{nshift};
+    return !!$args->{parameters}{invocant} if exists $args->{parameters} && exists $args->{parameters}{invocant};
+    return !!$args->{is_method}            if exists $args->{is_method};
+    return !!0;
 }
 
 sub _normalize_args_parameters {
