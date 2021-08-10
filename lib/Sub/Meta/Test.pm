@@ -41,8 +41,6 @@ sub sub_meta {
         call has_line       => !!$expected->{line};
         call has_prototype  => !!$expected->{prototype};
         call has_attribute  => !!$expected->{attribute};
-        #call has_parameters => !!$expected->{parameters};
-        #call has_returns    => !!$expected->{returns};
     };
 };
 
