@@ -211,7 +211,12 @@ sub relaxed_error_message {
     return '';
 }
 
-
+sub _all_eq {
+    my $self = shift;
+    return $self->has_scalar
+       && _eq($self->scalar, $self->list)
+       && _eq($self->scalar, $self->void);
+}
 
 sub display {
     my $self = shift;
@@ -219,7 +224,7 @@ sub display {
     if (!$self->has_scalar && !$self->has_list && !$self->has_void) {
         return '*';
     }
-    elsif (_eq($self->scalar, $self->list) && _eq($self->list, $self->void)) {
+    elsif (_all_eq($self)) {
         return $self->scalar . '';
     }
     else {

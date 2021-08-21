@@ -73,14 +73,13 @@ sub _normalize_args_parameters {
     else {
         my $nshift = exists $args->{nshift}    ? $args->{nshift}
                    : $self->is_method          ? 1
-                   : exists $self->{is_method} ? 0
-                   : undef;
+                   : 0;
 
         my $parameters;
         $parameters->{args}     = $args->{args}     if exists $args->{args};
         $parameters->{slurpy}   = $args->{slurpy}   if exists $args->{slurpy};
         $parameters->{invocant} = $args->{invocant} if exists $args->{invocant};
-        $parameters->{nshift}   = $nshift           if defined $nshift;
+        $parameters->{nshift}   = $nshift;
         return $parameters;
     }
 }

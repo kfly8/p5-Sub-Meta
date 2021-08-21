@@ -8,6 +8,7 @@ is display(), 'sub(*) => *';
 is display(is_method => 1), 'method(*) => *';
 is display(subname => 'hello'), 'sub hello(*) => *';
 is display(subname => 'hello', is_method => 1), 'method hello(*) => *';
+is display(subname => 'hello', args => []), 'sub hello() => *';
 is display(subname => 'hello', args => ['Str']), 'sub hello(Str) => *';
 is display(subname => 'hello', args => ['Str', 'Int']), 'sub hello(Str, Int) => *';
 is display(
@@ -38,7 +39,6 @@ is display(
     args => [{ type => 'Str', name => '$a' }]
    ), 'sub hello(Str $a, @values) => *';
 
-
 is display(
     subname => 'hello',
     slurpy => { name => '@values' },
@@ -47,20 +47,35 @@ is display(
 
 is display(
     subname => 'hello',
-    args => [],
-    returns => 'Int',
-   ), 'sub hello() => Int';
+    args => [Sub::Meta::Param->new],
+   ), 'sub hello() => *';
 
 is display(
     subname => 'hello',
-    args => [],
-    returns => { scalar => 'Int', list => 'Str' },
-   ), 'sub hello() => (scalar => Int, list => Str)';
+    slurpy => { name => '@values' },
+   ), 'sub hello(@values) => *';
 
-is display(
-    subname => 'hello',
-    args => [],
-    returns => { scalar => 'Int', list => 'Int', void => 'Str' },
-   ), 'sub hello() => (scalar => Int, list => Int, void => Str)';
+subtest 'returns' => sub {
+    is display(
+        returns => 'Int',
+       ), 'sub(*) => Int';
+
+    is display(
+        returns => { scalar => 'Int', list => 'Str' },
+       ), 'sub(*) => (scalar => Int, list => Str)';
+
+    is display(
+        returns => { scalar => 'Int', list => 'Int', void => 'Str' },
+       ), 'sub(*) => (scalar => Int, list => Int, void => Str)';
+
+    is display(
+        returns => { list => 'Int' },
+       ), 'sub(*) => (list => Int)';
+
+    is display(
+        returns => { void => 'Int' },
+       ), 'sub(*) => (void => Int)';
+
+};
 
 done_testing;

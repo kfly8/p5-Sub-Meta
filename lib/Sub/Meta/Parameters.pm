@@ -313,15 +313,14 @@ sub display {
     if ($self->has_args) {
         $s .= join ', ', map { $_->display } @{$self->args};
     }
-    elsif(!$self->has_slurpy) {
-        $s .= '*';
-    }
 
     if ($self->has_slurpy) {
         $s .= ', ' if $s;
+        $s .= $self->slurpy->display;
+    }
 
-        my $d = $self->slurpy->display;
-        $s .= $d if $d;
+    if(!$self->has_args && !$self->has_slurpy) {
+        $s .= '*';
     }
 
     return $s;
