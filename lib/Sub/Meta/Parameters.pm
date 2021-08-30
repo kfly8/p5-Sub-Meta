@@ -399,6 +399,12 @@ Constructor of C<Sub::Meta::Parameters>.
 
 Subroutine arguments arrayref.
 
+=head3 has_args
+
+    method has_args() => Bool
+
+Whether Sub::Meta::Parameters has args or not.
+
 =head3 set_args
 
     method set_args(ArrayRef[InstanceOf[Sub::Meta::Param]]) => $self

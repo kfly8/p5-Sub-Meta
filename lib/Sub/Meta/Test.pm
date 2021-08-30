@@ -18,6 +18,9 @@ sub sub_meta {
     my ($expected) = @_;
     $expected //= {};
 
+    my $parameters = defined $expected->{parameters} ? $expected->{parameters} : sub_meta_parameters();
+    my $returns = defined $expected->{returns} ? $expected->{returns} : sub_meta_returns();
+
     return object {
         prop isa            => 'Sub::Meta';
         call sub            => $expected->{sub}         // undef;
@@ -29,8 +32,8 @@ sub sub_meta {
         call line           => $expected->{line}        // undef;
         call prototype      => $expected->{prototype}   // undef;
         call attribute      => $expected->{attribute}   // undef;
-        call parameters     => $expected->{parameters}  // sub_meta_parameters();
-        call returns        => $expected->{returns}     // sub_meta_returns();
+        call parameters     => $parameters;
+        call returns        => $returns;
         call is_constant    => !!$expected->{is_constant};
         call is_method      => !!$expected->{is_method};
 
@@ -255,6 +258,10 @@ Testing utility for Sub::Meta::Parameters object.
 =head3 sub_meta_param
 
 Testing utility for Sub::Meta::Param object.
+
+=head3 sub_meta_returns
+
+Testing utility for Sub::Meta::Returns object.
 
 =head3 test_is_same_interface
 
