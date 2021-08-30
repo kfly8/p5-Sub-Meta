@@ -40,17 +40,9 @@ sub new {
     $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
 
-    if (my $is_method = $self->_normalize_args_is_method(\%args)) {
-        $self->set_is_method($is_method);
-    }
-
-    if (my $parameters = $self->_normalize_args_parameters(\%args)) {
-        $self->set_parameters($parameters);
-    }
-
-    if (exists $args{returns}) {
-        $self->set_returns($args{returns})
-    }
+    $self->set_is_method($self->_normalize_args_is_method(\%args));
+    $self->set_parameters($self->_normalize_args_parameters(\%args));
+    $self->set_returns($args{returns});
 
     # cleaning
     delete $args{args};
@@ -64,29 +56,12 @@ sub new {
 sub _normalize_args_is_method {
     my ($self, $args) = @_;
 
-    if (exists $args->{parameters}) {
-        my $is_method = $args->{is_method}
-                     || $args->{parameters}{nshift}
-                     || $args->{parameters}{invocant};
-
-        my $exists_is_method = exists $args->{is_method}
-                            || exists $args->{parameters}{nshift}
-                            || exists $args->{parameters}{invocant};
-
-        return $is_method if $exists_is_method
-    }
-    elsif(exists $args->{args}) {
-        my $is_method = $args->{is_method}
-                     || $args->{nshift}
-                     || $args->{invocant};
-
-        my $exists_is_method = exists $args->{is_method}
-                            || exists $args->{nshift}
-                            || exists $args->{invocant};
-
-        return $is_method if $exists_is_method;
-    }
-    return;
+    return !!$args->{invocant}             if exists $args->{invocant};
+    return !!$args->{nshift}               if exists $args->{nshift};
+    return !!$args->{parameters}{nshift}   if exists $args->{parameters} && exists $args->{parameters}{nshift};
+    return !!$args->{parameters}{invocant} if exists $args->{parameters} && exists $args->{parameters}{invocant};
+    return !!$args->{is_method}            if exists $args->{is_method};
+    return !!0;
 }
 
 sub _normalize_args_parameters {
@@ -95,19 +70,18 @@ sub _normalize_args_parameters {
     if (exists $args->{parameters}) {
         return $args->{parameters};
     }
-    elsif(exists $args->{args}) {
+    else {
         my $nshift = exists $args->{nshift}    ? $args->{nshift}
                    : $self->is_method          ? 1
-                   : exists $self->{is_method} ? 0
-                   : undef;
+                   : 0;
 
-        my $parameters = { args => $args->{args} };
+        my $parameters;
+        $parameters->{args}     = $args->{args}     if exists $args->{args};
         $parameters->{slurpy}   = $args->{slurpy}   if exists $args->{slurpy};
         $parameters->{invocant} = $args->{invocant} if exists $args->{invocant};
-        $parameters->{nshift}   = $nshift           if defined $nshift;
+        $parameters->{nshift}   = $nshift;
         return $parameters;
     }
-    return;
 }
 
 sub sub() :method { my $self = shift; return $self->{sub} } ## no critic (ProhibitBuiltinHomonyms)
@@ -149,8 +123,6 @@ sub has_subname()    { my $self = shift; return defined $self->subinfo->[1] }
 sub has_stashname()  { my $self = shift; return defined $self->subinfo->[0] }
 sub has_prototype()  { my $self = shift; return !!$self->prototype } # after build_prototype
 sub has_attribute()  { my $self = shift; return !!$self->attribute } # after build_attribute
-sub has_parameters() { my $self = shift; return defined $self->{parameters} }
-sub has_returns()    { my $self = shift; return defined $self->{returns} }
 sub has_file()       { my $self = shift; return defined $self->{file} }
 sub has_line()       { my $self = shift; return defined $self->{line} }
 
@@ -205,12 +177,7 @@ sub set_parameters {
 
 sub set_args {
     my ($self, $args) = @_;
-    if ($self->has_parameters) {
-        $self->parameters->set_args($args);
-    }
-    else {
-        $self->set_parameters($self->parameters_class->new(args => $args));
-    }
+    $self->parameters->set_args($args);
     return $self;
 }
 
@@ -305,19 +272,9 @@ sub is_same_interface {
 
     return unless $self->is_method eq $other->is_method;
 
-    if ($self->has_parameters) {
-        return unless $self->parameters->is_same_interface($other->parameters)
-    }
-    else {
-        return if $other->has_parameters;
-    }
+    return unless $self->parameters->is_same_interface($other->parameters);
 
-    if ($self->has_returns) {
-        return unless $self->returns->is_same_interface($other->returns)
-    }
-    else {
-        return if $other->has_returns;
-    }
+    return unless $self->returns->is_same_interface($other->returns);
 
     return !!1;
 }
@@ -333,13 +290,9 @@ sub is_relaxed_same_interface {
 
     return unless $self->is_method eq $other->is_method;
 
-    if ($self->has_parameters) {
-        return unless $self->parameters->is_relaxed_same_interface($other->parameters)
-    }
+    return unless $self->parameters->is_relaxed_same_interface($other->parameters);
 
-    if ($self->has_returns) {
-        return unless $self->returns->is_relaxed_same_interface($other->returns)
-    }
+    return unless $self->returns->is_relaxed_same_interface($other->returns);
 
     return !!1;
 }
@@ -356,11 +309,9 @@ sub is_same_interface_inlined {
 
     push @src => sprintf("'%s' eq %s->is_method", $self->is_method, $v);
 
-    push @src => $self->has_parameters ? $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v))
-                                       : sprintf('!%s->has_parameters', $v);
+    push @src => $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v));
 
-    push @src => $self->has_returns ? $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v))
-                                    : sprintf('!%s->has_returns', $v);
+    push @src => $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v));
 
     return join "\n && ", @src;
 }
@@ -376,9 +327,9 @@ sub is_relaxed_same_interface_inlined {
 
     push @src => sprintf("'%s' eq %s->is_method", $self->is_method, $v);
 
-    push @src => $self->parameters->is_relaxed_same_interface_inlined(sprintf('%s->parameters', $v)) if $self->has_parameters;
+    push @src => $self->parameters->is_relaxed_same_interface_inlined(sprintf('%s->parameters', $v));
 
-    push @src => $self->returns->is_relaxed_same_interface_inlined(sprintf('%s->returns', $v)) if $self->has_returns;
+    push @src => $self->returns->is_relaxed_same_interface_inlined(sprintf('%s->returns', $v));
 
     return join "\n && ", @src;
 }
@@ -397,25 +348,15 @@ sub error_message {
         return sprintf('should not have subname. got: %s', $other->subname) if $other->has_subname;
     }
 
-    if ($self->is_method ne $other->is_method) {
-        return 'invalid method';
-    }
+    return 'invalid method'
+        unless $self->is_method eq $other->is_method;
 
-    if ($self->has_parameters) {
-        return "invalid parameters:" . $self->parameters->error_message($other->parameters)
-            unless $self->parameters->is_same_interface($other->parameters)
-    }
-    else {
-        return 'should not have parameters' if $other->parameters;
-    }
+    return "invalid parameters:" . $self->parameters->error_message($other->parameters)
+        unless $self->parameters->is_same_interface($other->parameters);
 
-    if ($self->has_returns) {
-        return "invalid returns:" . $self->returns->error_message($other->returns)
-            unless $self->returns->is_same_interface($other->returns)
-    }
-    else {
-        return 'should not have returns' if $other->returns;
-    }
+    return "invalid returns:" . $self->returns->error_message($other->returns)
+        unless $self->returns->is_same_interface($other->returns);
+
     return '';
 }
 
@@ -430,19 +371,15 @@ sub relaxed_error_message {
             unless $self->subname eq $other->subname
     }
 
-    if ($self->is_method ne $other->is_method) {
-        return 'invalid method'
-    }
+    return 'invalid method'
+        unless $self->is_method eq $other->is_method;
 
-    if ($self->has_parameters) {
-        return "invalid parameters:" . $self->parameters->relaxed_error_message($other->parameters)
-            unless $self->parameters->is_relaxed_same_interface($other->parameters)
-    }
+    return "invalid parameters:" . $self->parameters->relaxed_error_message($other->parameters)
+        unless $self->parameters->is_relaxed_same_interface($other->parameters);
 
-    if ($self->has_returns) {
-        return "invalid returns:" . $self->returns->relaxed_error_message($other->returns)
-            unless $self->returns->is_relaxed_same_interface($other->returns)
-    }
+    return "invalid returns:" . $self->returns->relaxed_error_message($other->returns)
+        unless $self->returns->is_relaxed_same_interface($other->returns);
+
     return '';
 }
 
@@ -454,8 +391,8 @@ sub display {
 
     my $s = $keyword;
     $s .= ' ' . $subname if $subname;
-    $s .= '('. $self->parameters->display .')' if $self->parameters;
-    $s .= ' => ' . $self->returns->display if $self->returns;
+    $s .= '('. $self->parameters->display .')';
+    $s .= ' => ' . $self->returns->display;
     return $s;
 }
 
@@ -504,7 +441,7 @@ And you can hold meta information of parameter type and return type. See also L<
 
     $meta->set_parameters(args => ['Str']));
     $meta->parameters->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
-    
+
     $meta->set_args(['Str']);
     $meta->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
 
@@ -551,7 +488,7 @@ Others are as follows:
         returns => Int,
     );
 
-    # method hello(Str) -> Str 
+    # method hello(Str) -> Str
     Sub::Meta->new(
         subname   => 'hello',
         args      => [{ message => Str }],
@@ -859,7 +796,7 @@ Accessor for attribute of subroutine reference.
     method attribute() => Maybe[ArrayRef[Str]]
 
 If the subroutine is set, it returns a attribute of subroutine, if not set, it returns undef.
-e.g. C<['method']>, C<undef> 
+e.g. C<['method']>, C<undef>
 
 =item C<< has_attribute >>
 
@@ -907,15 +844,9 @@ Accessor for parameters object of L<Sub::Meta::Parameters>
 
 =item C<< parameters >>
 
-    method parameters() => Maybe[InstanceOf[Sub::Meta]]
+    method parameters() => InstanceOf[Sub::Meta::Parameters]
 
 If the parameters is set, it returns the parameters object.
-
-=item C<< has_parameters >>
-
-    method has_parameters() => Bool
-
-Whether Sub::Meta has parameters or not.
 
 =item C<< set_parameters($parameters) >>
 
@@ -986,15 +917,9 @@ Accessor for returns object of L<Sub::Meta::Returns>
 
 =item C<< returns >>
 
-    method returns() => Maybe[InstanceOf[Sub::Meta]]
+    method returns() => InstanceOf[Sub::Meta::Returns]
 
 If the returns is set, it returns the returns object.
-
-=item C<< has_returns >>
-
-    method has_returns() => Bool
-
-Whether Sub::Meta has returns or not.
 
 =item C<< set_returns($returns) >>
 
