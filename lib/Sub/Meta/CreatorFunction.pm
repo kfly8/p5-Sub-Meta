@@ -35,3 +35,49 @@ sub finders {
 }
 
 1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Sub::Meta::CreatorFunction - utilities to create Sub::Meta
+
+=head1 SYNOPSIS
+
+    use Sub::Meta::CreatorFunction;
+
+    sub hello { }
+    my $meta = Sub::Meta::CreatorFunction::find_submeta(\&hello);
+
+=head1 DESCRIPTION
+
+This module tries to create Sub::Meta from a subroutine
+in the way it is under Sub::Meta::Finder, or from Sub::Meta::Library.
+
+=head1 FUNCTIONS
+
+=head2 find_submeta($sub)
+
+    find_submeta(CodeRef $sub) => Maybe[Sub::Meta]
+
+Return submeta of subroutine.
+
+=head2 finders
+
+    finders() => ArrayRef[ClassName]
+
+Return ClassName of C<Sub::Meta::Finder::*>.
+
+=head1 LICENSE
+
+Copyright (C) kfly8.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+kfly8 E<lt>kfly@cpan.orgE<gt>
+
+=cut

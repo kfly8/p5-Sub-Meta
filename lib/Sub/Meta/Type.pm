@@ -132,5 +132,44 @@ __END__
 
 =head1 NAME
 
-Types::Sub - subroutine type constraints
+Sub::Meta::Type - subroutine type constraints
 
+=head1 SYNOPSIS
+
+    use Sub::Meta::CreatorFunction;
+
+    my $submeta = Sub::Meta->new();
+    my $type = Sub::Meta::Type->new(
+        submeta              => $submeta,
+        submeta_strict_check => !!0,
+        find_submeta         => \&Sub::Meta::CreatorFunction::find_submeta,
+    );
+
+=head1 DESCRIPTION
+
+This module provides types for Sub::Meta.
+
+=head1 METHODS
+
+=head2 submeta => InstanceOf[Sub::Meta]
+
+=head2 submeta_strict_check => Bool
+
+=head2 find_submeta => CodeRef
+
+=head1 SEE ALSO
+
+L<Types::SubMeta>
+
+=head1 LICENSE
+
+Copyright (C) kfly8.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+kfly8 E<lt>kfly@cpan.orgE<gt>
+
+=cut
