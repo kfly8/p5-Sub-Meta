@@ -95,8 +95,8 @@ sub get_message {
     }
     else {
         $error_message = $self->submeta->relaxed_error_message($other_meta);
-        $expected      = $self->submeta->relaxed_display;
-        $got           = $SubMeta->check($other_meta) ? $other_meta->relaxed_display : "";
+        $expected      = $self->submeta->display;
+        $got           = $SubMeta->check($other_meta) ? $other_meta->display : "";
     }
 
     my $message = <<"```";
