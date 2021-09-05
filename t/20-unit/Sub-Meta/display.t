@@ -76,6 +76,9 @@ subtest 'returns' => sub {
         returns => { void => 'Int' },
        ), 'sub(*) => (void => Int)';
 
+    is display(
+        returns => { scalar => ['Int','Str'] },
+       ), 'sub(*) => (scalar => [Int,Str])';
 };
 
 done_testing;

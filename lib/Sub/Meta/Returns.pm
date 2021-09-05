@@ -218,6 +218,17 @@ sub _all_eq {
        && _eq($self->scalar, $self->void);
 }
 
+sub _display {
+    my $type = shift;
+
+    if (ref $type && ref $type eq "ARRAY") {
+        return sprintf('[%s]', join ",", map { $_ . '' } @$type);
+    }
+    else {
+        return $type . '';
+    }
+}
+
 sub display {
     my $self = shift;
 
@@ -225,13 +236,13 @@ sub display {
         return '*';
     }
     elsif (_all_eq($self)) {
-        return $self->scalar . '';
+        return _display($self->scalar);
     }
     else {
         my @r;
         for my $key (qw(scalar list void)) {
             my $has = "has_$key";
-            push @r => "$key => @{[$self->$key]}" if $self->$has;
+            push @r => "$key => @{[_display($self->$key)]}" if $self->$has;
         }
         return "(@{[join ', ', @r]})";
     }
