@@ -110,6 +110,8 @@ $default_message
     return $message;
 }
 
+sub has_coercion { !!1 }
+
 sub _build_coercion { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     my $self = shift;
 
