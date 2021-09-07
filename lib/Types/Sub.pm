@@ -50,12 +50,18 @@ sub _gen_constraint_generator {
             parent       => $CodeRef,
             display_name => $SubMeta->display_name,
             constraint => sub {
-                my $v = $SubMeta->coerce($_);
-                return $SubMeta->check($v);
+                my $meta = $SubMeta->coerce($_);
+                return $SubMeta->check($meta);
             },
             message => sub {
-                my $v = $SubMeta->coerce($_);
-                return $SubMeta->get_message($v);
+                my $meta    = $SubMeta->coerce($_);
+                my $message = $SubMeta->get_message($meta);
+
+                ## no critic (Subroutines::ProtectPrivateSubs);
+                my $default = $SubMeta->_default_message->($_);
+                my $s       = Type::Tiny::_dd($_);
+                my $m       = Type::Tiny::_dd($meta);
+                return "$default\n\tSub::Meta of `$s` is $m\n\t$message";
             }
         )
     }
