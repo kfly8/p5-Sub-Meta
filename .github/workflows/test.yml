@@ -54,6 +54,13 @@ jobs:
         cpm install -g --feature="finder_function_parameters"
         cpm install -g --feature="finder_sub_wrap_in_type"
 
+    - name: Install dependencies for better test coverage
+      if: ${{ !matrix.no-feature-test }}
+      run: |
+        cpm install -g Function::Parameters
+        cpm install -g Function::Return
+        cpm install -g Sub::WrapInType
+
     - name: Build
       run: |
         perl Build.PL
