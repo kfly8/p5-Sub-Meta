@@ -109,7 +109,6 @@ Types::Sub - type constraints for subroutines and Sub::Meta
 =head1 SYNOPSIS
 
     use Test2::V0;
-
     use Types::Sub -types;
     use Types::Standard -types;
 
@@ -118,47 +117,95 @@ Types::Sub - type constraints for subroutines and Sub::Meta
         returns => Int
     ];
 
-    subtest 'Sub::WrapInType' => sub {
-        use Sub::WrapInType;
+    use Function::Parameters;
+    use Function::Return;
 
-        my $add = wrap_sub([Int,Int] => Int, sub {
-            my ($a, $b) = @_;
-            return $a + $b;
-        });
+    fun add(Int $a, Int $b) :Return(Int) {
+        return $a + $b
+    }
 
-        ok $Sub->check($add);
-    };
-
-    subtest 'F/Parameters,Return' => sub {
-        use Function::Parameters;
-        use Function::Return;
-
-        fun add(Int $a, Int $b) :Return(Int) {
-            return $a + $b
-        }
-
-        ok $Sub->check(\&add);
-    };
+    ok $Sub->check(\&add);
+    ok !$Sub->check(sub {});
 
     done_testing;
 
 =head1 DESCRIPTION
 
-C<Types::Sub> is a type constraint library suitable for use with Moo/Moose attributes.
+C<Types::Sub> is type library for subroutines and Sub::Meta. This library can be used with Moo/Mo(o|u)se, etc.
 
 =head1 Types
 
-=head2 Sub
+=head2 Sub[`a]
 
-Check by C<is_relaxed_same_interface> method
+    Sub[
+        args    => [Int, Int],
+        returns => Int
+    ]
 
-=head2 StrictSub
+A value where C<Ref['CODE']> and check by C<Sub::Meta#is_relaxed_same_interface>.
 
-Check by C<is_strict_same_interface> (= C<is_same_interface>) method
+    use Types::Sub -types;
+    use Types::Standard -types;
+    use Sub::Meta;
+
+    use Function::Parameters;
+    use Function::Return;
+
+    fun distance(Num :$lat, Num :$lng) :Return(Num) { }
+
+    #
+    # Sub[`a] is ...
+    #
+    my $Sub = Sub[
+        subname => 'distance',
+        args    => { '$lat' => Num, '$lng' => Num },
+        returns => Num
+    ];
+
+    ok $Sub->check(\&distance);
+
+    #
+    # almost equivalent to the following
+    #
+    my $submeta = Sub::Meta->new(
+        subname => 'distance',
+        args    => { '$lat' => Num, '$lng' => Num },
+        returns => Num
+    );
+
+    my $meta = Sub::Meta::CreatorFunction::find_submeta(\&distance);
+    ok $submeta->is_relaxed_same_interface($meta);
+
+    done_testing;
+
+If no argument is given, it matches Ref['CODE']. C<Sub[] == Ref['CODE']>.
+This helps to keep writing simple when choosing whether or not to use stricter type checking depending on the environment.
+
+    use Devel::StrictMode;
+
+    has callback => (
+        is  => 'ro',
+        isa => STRICT ? Sub[
+            args    => [Int],
+            returns => [Int],
+        ] : Sub[]
+    );
+
+=head2 StrictSub[`a]
+
+A value where C<Ref['CODE']> and check by C<Sub::Meta#is_strict_same_interface>.
+
+=head2 SubMeta[`a]
+
+A value where checking by C<Sub::Meta#is_relaxed_same_interface>.
+
+=head2 StrictSubMeta[`a]
+
+A value where checking by C<Sub::Meta#is_strict_same_interface>.
 
 =head1 SEE ALSO
 
-L<Sub::Meta>, L<Types::Sub>
+L<Sub::Meta::Type>
 
 =head1 LICENSE
 
