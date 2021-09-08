@@ -161,7 +161,7 @@ This module provides types for Sub::Meta.
 
 =head1 SEE ALSO
 
-L<Types::SubMeta>
+L<Types::Sub>
 
 =head1 LICENSE
 

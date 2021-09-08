@@ -5,12 +5,15 @@ use Types::Standard -types;
 
 subtest 'no arguments' => sub {
     ok Sub[] == Ref['CODE'];
+    ok StrictSub[] == Ref['CODE'];
 };
 
 subtest 'check validation' => sub {
     my $case = { args => [Str], returns => Str };
-    my $Sub = Sub[$case];
-    my $StrictSub = StrictSub[$case];
+    my $Sub           = Sub[$case];
+    my $StrictSub     = StrictSub[$case];
+    my $SubMeta       = SubMeta[$case];
+    my $StrictSubMeta = StrictSubMeta[$case];
 
     subtest 'fail cases' => sub {
         my @tests = (
@@ -26,6 +29,8 @@ subtest 'check validation' => sub {
             Sub::Meta::Library->register($v, $meta);
             ok(!$Sub->check($v), "fail: Sub - $message");
             ok(!$StrictSub->check($v), "fail: StrictSub - $message");
+            ok(!$SubMeta->check($meta), "fail: SubMeta - $message");
+            ok(!$StrictSubMeta->check($meta), "fail: StrictSubMeta - $message");
         }
     };
 
@@ -39,6 +44,8 @@ subtest 'check validation' => sub {
             Sub::Meta::Library->register($v, $meta);
             ok($Sub->check($v), "pass: Sub - $message");
             ok($StrictSub->check($v), "pass: StrictSub - $message");
+            ok($SubMeta->check($meta), "pass: SubMeta - $message");
+            ok($StrictSubMeta->check($meta), "pass: StrictSubMeta - $message");
         }
     };
 
@@ -53,11 +60,13 @@ subtest 'check validation' => sub {
             Sub::Meta::Library->register($v, $meta);
             ok($Sub->check($v), "pass: Sub - $message");
             ok(!$StrictSub->check($v), "fail: StrictSub - $message");
+            ok($SubMeta->check($meta), "pass: SubMeta - $message");
+            ok(!$StrictSubMeta->check($meta), "fail: StrictSubMeta - $message");
         }
     };
 };
 
-subtest 'message' => sub {
+subtest 'Sub/message' => sub {
     my $Sub = Sub[
         args    => [Int,Int],
         returns => Int
@@ -70,4 +79,15 @@ subtest 'message' => sub {
     like $message, qr/Got/;
 };
 
+subtest 'SubMeta/exceptions' => sub {
+    ok dies { SubMeta[ [Str] ] };
+    ok dies { SubMeta[ '' ] };
+    ok dies { SubMeta[ \''] };
+    ok dies { SubMeta[ sub {} ] };
+};
+
+subtest 'SubMeta/coerce' => sub {
+    my $type = SubMeta[ args => [Str] ];
+    is $type->coerce(sub {}), undef;
+};
 done_testing;

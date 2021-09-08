@@ -15,19 +15,31 @@ use Type::Library
     -declare => qw(
         Sub
         StrictSub
+        SubMeta
+        StrictSubMeta
     );
 
 __PACKAGE__->meta->add_type(
     name   => 'Sub',
-    constraint_generator => _gen_constraint_generator('Sub', strict => 0),
+    constraint_generator => _gen_sub_constraint_generator('Sub', strict => 0),
 );
 
 __PACKAGE__->meta->add_type(
     name   => 'StrictSub',
-    constraint_generator => _gen_constraint_generator('StrictSub', strict => 1),
+    constraint_generator => _gen_sub_constraint_generator('StrictSub', strict => 1),
 );
 
-sub _gen_constraint_generator {
+__PACKAGE__->meta->add_type(
+    name => 'SubMeta',
+    constraint_generator => _gen_submeta_constraint_generator('SubMeta', strict => 0),
+);
+
+__PACKAGE__->meta->add_type(
+    name => 'StrictSubMeta',
+    constraint_generator => _gen_submeta_constraint_generator('StrictSubMeta', strict => 1),
+);
+
+sub _gen_sub_constraint_generator {
     my ($name, %options) = @_;
     my $strict = $options{strict};
 
@@ -67,6 +79,24 @@ sub _gen_constraint_generator {
     }
 }
 
+sub _gen_submeta_constraint_generator {
+    my ($name, %options) = @_;
+    my $strict = $options{strict};
+
+    return sub {
+        my $submeta = Sub::Meta->new(@_);
+        my $display_name = sprintf('%s[%s]', $name, $submeta->display);
+
+        return Sub::Meta::Type->new(
+            submeta              => $submeta,
+            submeta_strict_check => $strict,
+            find_submeta         => \&Sub::Meta::CreatorFunction::find_submeta,
+            display_name         => $display_name,
+        );
+    }
+}
+
+
 1;
 __END__
 
@@ -74,7 +104,7 @@ __END__
 
 =head1 NAME
 
-Types::Sub - type constraints for subroutines
+Types::Sub - type constraints for subroutines and Sub::Meta
 
 =head1 SYNOPSIS
 
@@ -128,7 +158,7 @@ Check by C<is_strict_same_interface> (= C<is_same_interface>) method
 
 =head1 SEE ALSO
 
-L<Sub::Meta>, L<Types::SubMeta>
+L<Sub::Meta>, L<Types::Sub>
 
 =head1 LICENSE
 
