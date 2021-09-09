@@ -7,6 +7,7 @@ our $VERSION = "0.13";
 
 use Sub::Meta;
 use Sub::Meta::Type;
+use Sub::Meta::TypeSub;
 use Sub::Meta::CreatorFunction;
 
 use Types::Standard qw(Ref);
@@ -58,23 +59,9 @@ sub _gen_sub_constraint_generator {
             display_name         => $display_name,
         );
 
-        return Type::Tiny->new(
+        return Sub::Meta::TypeSub->new(
             parent       => $CodeRef,
-            display_name => $SubMeta->display_name,
-            constraint => sub {
-                my $meta = $SubMeta->coerce($_);
-                return $SubMeta->check($meta);
-            },
-            message => sub {
-                my $meta    = $SubMeta->coerce($_);
-                my $message = $SubMeta->get_message($meta);
-
-                ## no critic (Subroutines::ProtectPrivateSubs);
-                my $default = $SubMeta->_default_message->($_);
-                my $s       = Type::Tiny::_dd($_);
-                my $m       = Type::Tiny::_dd($meta);
-                return "$default\n\tSub::Meta of `$s` is $m\n\t$message";
-            }
+            submeta_type => $SubMeta
         )
     }
 }

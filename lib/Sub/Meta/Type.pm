@@ -16,16 +16,16 @@ sub find_submeta         { my $self = shift; return $self->{find_submeta} }
 # The following methods override the methods of Type::Tiny.
 #
 sub new {
-    my ($class, @args) = @_;
-    my %opts = ( @args == 1 ) ? %{ $args[0] } : @args;
+    my $class  = shift;
+    my %params = ( @_ == 1 ) ? %{ $_[0] } : @_;
 
     ## no critic (Subroutines::ProtectPrivateSubs)
-    Type::Tiny::_croak "Need to supply submeta" unless exists $opts{submeta};
-    Type::Tiny::_croak "Need to supply submeta_strict_check" unless exists $opts{submeta_strict_check};
-    Type::Tiny::_croak "Need to supply find_submeta" unless exists $opts{find_submeta};
+    Type::Tiny::_croak "Need to supply submeta" unless exists $params{submeta};
+    Type::Tiny::_croak "Need to supply submeta_strict_check" unless exists $params{submeta_strict_check};
+    Type::Tiny::_croak "Need to supply find_submeta" unless exists $params{find_submeta};
     ## use critic
 
-    return $class->SUPER::new(%opts);
+    return $class->SUPER::new(%params);
 }
 
 sub has_parent     { return !!0 }
@@ -134,7 +134,7 @@ __END__
 
 =head1 NAME
 
-Sub::Meta::Type - subroutine type constraints
+Sub::Meta::Type - type constraints for Sub::Meta
 
 =head1 SYNOPSIS
 
