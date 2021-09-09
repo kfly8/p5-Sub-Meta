@@ -26,7 +26,7 @@ subtest 'not inlined check' => sub {
         find_submeta => sub { },
     );
 
-    no warnings qw(redefine); ## no critic (TestingAndDebugging::ProhibitNoWarnings)
+    no warnings qw(redefine);
     local *Sub::Meta::Type::can_be_inlined = sub { return 0 };
     ok $SubMeta->check($submeta);
     ok $StrictSubMeta->check($submeta);
