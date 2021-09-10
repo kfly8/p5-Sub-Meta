@@ -46,8 +46,8 @@ sub get_message {
 
     return <<"```";
 $default
-    Sub::Meta of `$s` is $m
-    $message
+  Sub::Meta of `$s` is $m
+  $message
 ```
 }
 

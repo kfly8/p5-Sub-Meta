@@ -101,10 +101,10 @@ sub get_message {
 
     my $message = <<"```";
 $default_message
-   Reason : $error_message
+    Reason : $error_message
 
-   Expected : $expected
-   Got      : $got
+    Expected : $expected
+    Got      : $got
 ```
 
     return $message;

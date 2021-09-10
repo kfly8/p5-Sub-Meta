@@ -61,6 +61,7 @@ sub _gen_sub_constraint_generator {
 
         return Sub::Meta::TypeSub->new(
             parent       => $CodeRef,
+            display_name => $display_name,
             submeta_type => $SubMeta
         )
     }
