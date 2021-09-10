@@ -119,7 +119,7 @@ Types::Sub - type constraints for subroutines and Sub::Meta
 
 =head1 DESCRIPTION
 
-C<Types::Sub> is type library for subroutines and Sub::Meta. This library can be used with Moo/Mo(o|u)se, etc.
+C<Types::Sub> is type library for subroutines and Sub::Meta. This library can be used with Moo/Moose/Mouse, etc.
 
 =head1 Types
 
@@ -190,6 +190,63 @@ A value where checking by C<Sub::Meta#is_relaxed_same_interface>.
 =head2 StrictSubMeta[`a]
 
 A value where checking by C<Sub::Meta#is_strict_same_interface>.
+
+=head1 EXAMPLES
+
+=head2 Function::Parameters
+
+    use Function::Parameters;
+    use Types::Standard -types;
+    use Types::Sub -types;
+
+    my $Sub = Sub[
+        args => [Int, Int],
+    ];
+
+    fun add(Int $a, Int $b) { return $a + $b }
+
+    fun double(Int $a) { return $a * 2 }
+
+    ok $Sub->check(\&add);
+    ok !$Sub->check(\&double);
+
+=head2 Sub::WrapInType
+
+    use Sub::WrapInType;
+    use Types::Standard -types;
+    use Types::Sub -types;
+
+    my $Sub = Sub[
+        args    => [Int, Int],
+        returns => Int,
+    ];
+
+    ok $Sub->check(wrap_sub([Int,Int] => Int, sub {}));
+    ok !$Sub->check(wrap_sub([Int] => Int, sub {}));
+
+=head2 Sub::WrapInType::Attribute
+
+    use Sub::WrapInType::Attribute;
+    use Types::Standard -types;
+    use Types::Sub -types;
+
+    my $Sub = Sub[
+        args    => [Int, Int],
+        returns => Int,
+    ];
+
+    sub add :WrapSub([Int,Int] => Int) {
+        my ($a, $b) = @_;
+        return $a + $b
+    }
+
+    sub double :WrapSub([Int] => Int) {
+        my $a = shift;
+        return $a * 2
+    }
+
+    ok $Sub->check(\&add);
+    ok !$Sub->check(\&double);
 
 =head1 SEE ALSO
 

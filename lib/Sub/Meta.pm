@@ -978,12 +978,32 @@ Alias for C<is_same_interface>
 
 A boolean value indicating whether the subroutine's interface is relaxed same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> satisfy
-the condition of C<$self> side:
+the condition of C<$self> side.
 
-    my $meta = Sub::Meta->new;
-    my $other = Sub::Meta->new(subname => 'foo');
-    $meta->is_same_interface($other); # NG
-    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the subname.
+=head4 Difference between C<strict> and C<relaxed>
+
+If it is C<is_relaxed_same_interface> method, the conditions can be many.
+For example, the number of arguments can be many.
+The following code is a test to show the difference between strict and relaxed.
+
+    my @tests = (
+        {},                { subname => 'foo' },
+        {},                { args => [Int] },
+        { args => [Int] }, { args => [Int, Str] },
+        { args => [Int] }, { args => [Int], slurpy => Str },
+        { args => [Int] }, { args => [{ type => Int, name => '$a' }] },
+        {},                { returns => Int },
+        { returns => { scalar => Int } }, { returns => { scalar => Int, list => Int } },
+    );
+
+    while (@tests) {
+        my ($a, $b) = splice @tests, 0, 2;
+        my $meta = Sub::Meta->new($a);
+        my $other = Sub::Meta->new($b);
+
+        ok !$meta->is_strict_same_interface($other);
+        ok $meta->is_relaxed_same_interface($other);
+    }
 
 =head3 is_same_interface_inlined($other_meta_inlined)
 
