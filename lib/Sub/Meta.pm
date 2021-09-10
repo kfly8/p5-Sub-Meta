@@ -968,6 +968,10 @@ Apply subroutine subname, prototype and attributes of C<$other_meta>.
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> are equal.
 
+=head3 is_strict_same_interface($other_meta)
+
+Alias for C<is_same_interface>
+
 =head3 is_relaxed_same_interface($other_meta)
 
     method is_relaxed_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
@@ -984,6 +988,10 @@ the condition of C<$self> side:
 =head3 is_same_interface_inlined($other_meta_inlined)
 
     method is_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
+
+=head3 is_strict_same_interface_inlined($other_meta)
+
+Alias for C<is_same_interface_inlined>
 
 Returns inlined C<is_same_interface> string:
 
