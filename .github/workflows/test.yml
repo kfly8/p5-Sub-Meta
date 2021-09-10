@@ -60,6 +60,7 @@ jobs:
         cpm install -g Function::Parameters
         cpm install -g Function::Return
         cpm install -g Sub::WrapInType
+        cpm install -g Sub::WrapInType::Attribute
 
     - name: Build
       run: |
