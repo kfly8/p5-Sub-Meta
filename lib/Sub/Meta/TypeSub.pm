@@ -62,25 +62,12 @@ Sub::Meta::TypeSub - type constraints for subroutines
 
 =head1 SYNOPSIS
 
-    use Sub::Meta::TypeSub;
-    use Sub::Meta::Type;
-    use Sub::Meta;
-
-    my $submeta = Sub::Meta->new(
-        args    => [Int,Int],
-        returns => Int,
-    );
-
-    my $SubMeta = Sub::Meta::Type->new(
-        submeta              => $submeta,
-        submeta_strict_check => $strict,
-        find_submeta         => \&Sub::Meta::CreatorFunction::find_submeta,
-        display_name         => $display_name,
-    );
-
     my $type = Sub::Meta::TypeSub->new(
-        submeta_type => $SubMeta,
+        parent       => Ref['CODE'],
+        display_name => 'Sub[Int,Int]=>Int',
+        submeta_type => $SubMeta, # InstanceOf[Sub::Meta::Type]
     );
+
     $type->check(sub {})
 
 =head1 DESCRIPTION
@@ -89,11 +76,15 @@ This module provides types for subroutines.
 
 =head1 METHODS
 
-=head2 submeta_type => InstanceOf[Sub::Meta::Type]
+=head2 submeta_type
+
+    method submeta_type() => InstanceOf[Sub::Meta::Type]
+
+Accessor for Sub::Meta::Type.
 
 =head1 SEE ALSO
 
-L<Types::Sub>
+L<Types::Sub>, L<Sub::Meta::Type>
 
 =head1 LICENSE
 

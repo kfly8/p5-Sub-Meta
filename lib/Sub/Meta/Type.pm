@@ -153,15 +153,28 @@ This module provides types for Sub::Meta.
 
 =head1 METHODS
 
-=head2 submeta => InstanceOf[Sub::Meta]
+=head2 submeta
 
-=head2 submeta_strict_check => Bool
+    method submeta() => InstanceOf[Sub::Meta]
 
-=head2 find_submeta => CodeRef
+Accessor for Sub::Meta.
+
+=head2 submeta_strict_check
+
+    method submeta_strict_check() => Bool
+
+Whether Sub::Meta::Type check by C<is_strict_same_interface> or not.
+If false, then check by C<is_relaxed_same_interface>.
+
+=head2 find_submeta
+
+     method find_submeta() => CodeRef[ Ref['CODE'] => Maybe[InstanceOf[Sub::Meta]] ]
+
+Code reference for finding Sub::Meta from a subroutine like C<Sub::Meta::CreatorFunction::find_submeta>
 
 =head1 SEE ALSO
 
-L<Types::Sub>
+L<Types::Sub>, L<Sub::Meta::TypeSub>
 
 =head1 LICENSE
 
