@@ -75,8 +75,8 @@ subtest 'Sub/message' => sub {
     my $message = $Sub->get_message(sub {});
 
     ## no critic qw(RegularExpressions::ProhibitComplexRegexes)
-    like $message, qr/^Undef did not pass type constraint "Sub\[sub\(Int, Int\) => Int\]"/m;
-    like $message, qr/^  Sub::Meta of `Undef` is Undef/m;
+    like $message, qr/^Reference sub \{ "DUMMY" \} did not pass type constraint "Sub\[sub\(Int, Int\) => Int\]"/m;
+    like $message, qr/^  Sub::Meta of `Reference sub \{ "DUMMY" \}` is Undef/m;
     like $message, qr/^  Undef did not pass type constraint "Sub\[sub\(Int, Int\) => Int\]"/m;
     like $message, qr/^    Reason/m;
     like $message, qr/^    Expected/m;

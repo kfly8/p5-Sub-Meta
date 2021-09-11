@@ -39,8 +39,8 @@ sub get_message {
     my $message = $self->submeta_type->get_message($meta);
 
     ## no critic (Subroutines::ProtectPrivateSubs);
-    my $default = $self->SUPER::_default_message->($_);
-    my $s       = Type::Tiny::_dd($_);
+    my $default = $self->SUPER::_default_message->($sub);
+    my $s       = Type::Tiny::_dd($sub);
     my $m       = Type::Tiny::_dd($meta);
     ## use critic
 
