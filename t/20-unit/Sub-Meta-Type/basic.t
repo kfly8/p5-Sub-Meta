@@ -11,6 +11,24 @@ subtest 'exceptions' => sub {
     like dies { Sub::Meta::Type->new(submeta => '', submeta_strict_check => 1) }, qr/^Need to supply find_submeta/;
 };
 
+subtest 'attributes' => sub {
+    my $submeta = Sub::Meta->new(
+        args    => ['Int'],
+        returns => 'Int',
+    );
+    my $find_submeta = sub { };
+
+    my $SubMeta = Sub::Meta::Type->new(
+        submeta              => $submeta,
+        submeta_strict_check => 0,
+        find_submeta         => $find_submeta,
+    );
+
+    is $SubMeta->submeta, $submeta;
+    is $SubMeta->submeta_strict_check, 0;
+    is $SubMeta->find_submeta, $find_submeta;
+};
+
 subtest 'not inlined check' => sub {
     my $submeta = Sub::Meta->new(args => [Str]);
 
