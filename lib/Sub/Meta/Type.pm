@@ -39,6 +39,11 @@ sub inlined {
     return $self->{inlined}
 }
 
+sub _build_display_name { ## no critic (ProhibitUnusedPrivateSubroutines)
+    my $self = shift;
+    return sprintf('%s[%s]', $self->name, $self->submeta->display);
+}
+
 sub _build_constraint { ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self = shift;
 

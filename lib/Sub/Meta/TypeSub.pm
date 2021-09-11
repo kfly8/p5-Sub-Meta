@@ -21,6 +21,11 @@ sub new {
 
 sub can_be_inlined { return !!0 }
 
+sub _build_display_name { ## no critic (ProhibitUnusedPrivateSubroutines)
+    my $self = shift;
+    return sprintf('%s[%s]', $self->name, $self->submeta_type->submeta->display);
+}
+
 sub _build_constraint { ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self = shift;
 

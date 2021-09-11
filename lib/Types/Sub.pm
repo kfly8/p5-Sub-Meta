@@ -49,19 +49,11 @@ sub _gen_sub_constraint_generator {
     return sub {
         return $CodeRef unless @_;
 
-        my $submeta = Sub::Meta->new(@_);
-        my $display_name = sprintf('%s[%s]', $name, $submeta->display);
-
-        my $SubMeta = Sub::Meta::Type->new(
-            submeta              => $submeta,
-            submeta_strict_check => $strict,
-            find_submeta         => \&Sub::Meta::CreatorFunction::find_submeta,
-            display_name         => $display_name,
-        );
+        my $SubMeta = $strict ? StrictSubMeta[@_] : SubMeta[@_];
 
         return Sub::Meta::TypeSub->new(
+            name         => $name,
             parent       => $CodeRef,
-            display_name => $display_name,
             submeta_type => $SubMeta
         )
     }
@@ -73,13 +65,12 @@ sub _gen_submeta_constraint_generator {
 
     return sub {
         my $submeta = Sub::Meta->new(@_);
-        my $display_name = sprintf('%s[%s]', $name, $submeta->display);
 
         return Sub::Meta::Type->new(
+            name                 => $name,
             submeta              => $submeta,
             submeta_strict_check => $strict,
             find_submeta         => \&Sub::Meta::CreatorFunction::find_submeta,
-            display_name         => $display_name,
         );
     }
 }
