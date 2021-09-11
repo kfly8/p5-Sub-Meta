@@ -25,57 +25,21 @@ sub new {
     Type::Tiny::_croak "Need to supply find_submeta" unless exists $params{find_submeta};
     ## use critic
 
+    $params{inlined} = $params{submeta_strict_check}
+                     ? sub { my ($self, $var) = @_; $self->submeta->is_strict_same_interface_inlined($var) }
+                     : sub { my ($self, $var) = @_; $self->submeta->is_relaxed_same_interface_inlined($var) };
+
     return $class->SUPER::new(%params);
 }
 
-sub has_parent     { return !!0 }
-sub can_be_inlined { return !!1 }
-
-sub inlined {
-    my $self = shift;
-    if (!$self->{inlined}) {
-        $self->{inlined} = $self->_build_inlined;
-    }
-    return $self->{inlined}
-}
+sub has_parent          { return !!0 }
+sub can_be_inlined      { return !!1 }
+sub has_coercion        { return !!1 }
+sub _is_null_constraint { return !!0 } ## no critic (ProhibitUnusedPrivateSubroutines)
 
 sub _build_display_name { ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self = shift;
     return sprintf('%s[%s]', $self->name, $self->submeta->display);
-}
-
-sub _build_constraint { ## no critic (ProhibitUnusedPrivateSubroutines)
-    my $self = shift;
-
-    if ($self->submeta_strict_check) {
-        return sub {
-            my $other_meta = shift;
-            $self->submeta->is_strict_same_interface($other_meta);
-        }
-    }
-    else {
-        return sub {
-            my $other_meta = shift;
-            $self->submeta->is_relaxed_same_interface($other_meta);
-        }
-    }
-}
-
-sub _build_inlined {
-    my $self = shift;
-
-    if ($self->submeta_strict_check) {
-        return sub {
-            my $var = $_;
-            $self->submeta->is_strict_same_interface_inlined($var);
-        }
-    }
-    else {
-        return sub {
-            my $var = $_;
-            $self->submeta->is_relaxed_same_interface_inlined($var);
-        }
-    }
 }
 
 # e.g.
@@ -114,8 +78,6 @@ $default_message
 
     return $message;
 }
-
-sub has_coercion { return !!1 }
 
 sub _build_coercion { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     my $self = shift;

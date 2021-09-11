@@ -29,25 +29,4 @@ subtest 'attributes' => sub {
     is $SubMeta->find_submeta, $find_submeta;
 };
 
-subtest 'not inlined check' => sub {
-    my $submeta = Sub::Meta->new(args => [Str]);
-
-    my $SubMeta = Sub::Meta::Type->new(
-        submeta => $submeta,
-        submeta_strict_check => 0,
-        find_submeta => sub { },
-    );
-
-    my $StrictSubMeta = Sub::Meta::Type->new(
-        submeta => $submeta,
-        submeta_strict_check => 1,
-        find_submeta => sub { },
-    );
-
-    no warnings qw(redefine);
-    local *Sub::Meta::Type::can_be_inlined = sub { return 0 };
-    ok $SubMeta->check($submeta);
-    ok $StrictSubMeta->check($submeta);
-};
-
 done_testing;
