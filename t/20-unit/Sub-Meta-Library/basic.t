@@ -50,8 +50,8 @@ subtest 'get' => sub {
         [\&Foo::bar, $meta_bar],
     );
 
-    ok dies { Sub::Meta::Library->get('hello') }, 'required coderef';
-    ok dies { Sub::Meta::Library->get({}) }, 'required coderef';
+    is( Sub::Meta::Library->get('hello'), undef, 'required coderef' );
+    is( Sub::Meta::Library->get({}), undef, 'required coderef' );
     is( Sub::Meta::Library->get(\&hello), $meta_hello );
     is( Sub::Meta::Library->get(\&world), $meta_world );
     is( Sub::Meta::Library->get(sub { }), undef );

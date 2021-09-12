@@ -3,11 +3,16 @@ use 5.010;
 use strict;
 use warnings;
 
-use Module::Find ();
 use Class::Load ();
 
 use Sub::Meta::Library;
 use Sub::Meta::Creator;
+
+our @FINDER_CLASSES = (
+    'Sub::Meta::Finder::FunctionParameters',
+    'Sub::Meta::Finder::SubWrapInType',
+    'Sub::Meta::Finder::Default',
+);
 
 sub find_submeta {
     my $sub = shift;
@@ -24,9 +29,8 @@ sub find_submeta {
 }
 
 sub finders {
-    my @finder_class = Module::Find::findsubmod('Sub::Meta::Finder');
     my @finders;
-    for my $finder_class (@finder_class) {
+    for my $finder_class (@FINDER_CLASSES) {
         if (Class::Load::try_load_class($finder_class)) {
             push @finders => $finder_class->can('find_materials');
         }
@@ -65,9 +69,9 @@ Return submeta of subroutine.
 
 =head2 finders
 
-    finders() => ArrayRef[ClassName]
+    finders() => ArrayRef[CodeRef]
 
-Return ClassName of C<Sub::Meta::Finder::*>.
+Return arrayref of C<Sub::Meta::Finder::*::find_materials>.
 
 =head1 LICENSE
 

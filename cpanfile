@@ -5,7 +5,6 @@ requires 'Carp';
 requires 'Scalar::Util';
 requires 'Type::Tiny', '1.012000';
 requires 'Class::Load';
-requires 'Module::Find';
 
 feature 'finder_function_parameters' => sub {
     requires 'Function::Parameters', '2.000003';

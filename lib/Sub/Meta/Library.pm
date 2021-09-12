@@ -38,8 +38,8 @@ sub register_list {
 }
 
 sub get {
-    state $check = compile(Invocant, $Callable);
-    my ($class, $sub) = $check->(@_);
+    my ($class, $sub) = @_;
+    return unless $Callable->check($sub);
 
     my $id = Scalar::Util::refaddr $sub;
     return $INFO{$id}
