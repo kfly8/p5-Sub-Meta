@@ -72,15 +72,26 @@ subtest 'Sub/message' => sub {
         returns => Int
     ];
 
-    my $message = $Sub->get_message(sub {});
-
     ## no critic qw(RegularExpressions::ProhibitComplexRegexes)
-    like $message, qr/^Reference sub \{ "DUMMY" \} did not pass type constraint "Sub\[sub\(Int, Int\) => Int\]"/m;
-    like $message, qr/^  Sub::Meta of `Reference sub \{ "DUMMY" \}` is Undef/m;
-    like $message, qr/^  Undef did not pass type constraint "SubMeta\[sub\(Int, Int\) => Int\]"/m;
-    like $message, qr/^    Reason/m;
-    like $message, qr/^    Expected/m;
-    like $message, qr/^    Got/m;
+    subtest 'case: sub {}' => sub {
+        my $message = $Sub->get_message(sub {});
+        my @m = split /\n/, $message;
+
+        is @m, 4;
+        like $m[0], qr/^Reference sub \{ "DUMMY" \} did not pass type constraint "Sub\[sub\(Int, Int\) => Int\]"/;
+        like $m[1], qr/^    Reason/;
+        like $m[2], qr/^    Expected/;
+        like $m[3], qr/^    Got/;
+    };
+
+    subtest 'case: undef' => sub {
+        my $message = $Sub->get_message(undef);
+        my @m = split /\n/, $message;
+
+        is @m, 2;
+        like $m[0], qr/^Undef did not pass type constraint "Sub\[sub\(Int, Int\) => Int\]"/;
+        like $m[1], qr/^    Cannot find submeta of `Undef`/;
+    };
 };
 
 subtest 'SubMeta/exceptions' => sub {

@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use parent qw(Type::Tiny);
 
+use Types::Standard qw(InstanceOf);
+
 sub submeta_type { my $self = shift; return $self->{submeta_type} }
 
 #
@@ -44,20 +46,20 @@ sub get_message {
     my $self = shift;
     my $sub = shift;
 
+    my $default = $self->SUPER::get_message($sub);
     my $meta    = $self->submeta_type->coerce($sub);
-    my $message = $self->submeta_type->get_message($meta);
 
-    ## no critic (Subroutines::ProtectPrivateSubs);
-    my $default = $self->SUPER::_default_message->($sub);
-    my $s       = Type::Tiny::_dd($sub);
-    my $m       = Type::Tiny::_dd($meta);
-    ## use critic
+    state $SubMeta = InstanceOf['Sub::Meta'];
 
-    return <<"```";
-$default
-  Sub::Meta of `$s` is $m
-  $message
-```
+    my $message = "$default\n";
+    if ($SubMeta->check($meta)) {
+        $message .= $self->submeta_type->get_detail_message($meta);
+    }
+    else {
+        my $s = Type::Tiny::_dd($sub); ## no critic (Subroutines::ProtectPrivateSubs)
+        $message .= "    Cannot find submeta of `$s`";
+    }
+    return $message;
 }
 
 1;

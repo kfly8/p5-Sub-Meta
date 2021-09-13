@@ -12,6 +12,33 @@ sub submeta              { my $self = shift; return $self->{submeta} }
 sub submeta_strict_check { my $self = shift; return $self->{submeta_strict_check} }
 sub find_submeta         { my $self = shift; return $self->{find_submeta} }
 
+sub get_detail_message {
+    my $self = shift;
+    my $other_meta = shift;
+
+    state $SubMeta = InstanceOf['Sub::Meta'];
+
+    my ($error_message, $expected, $got);
+    if ($self->submeta_strict_check) {
+        $error_message = $self->submeta->error_message($other_meta);
+        $expected      = $self->submeta->display;
+        $got           = $SubMeta->check($other_meta) ? $other_meta->display : "";
+    }
+    else {
+        $error_message = $self->submeta->relaxed_error_message($other_meta);
+        $expected      = $self->submeta->display;
+        $got           = $SubMeta->check($other_meta) ? $other_meta->display : "";
+    }
+
+    my $message = <<"```";
+    Reason : $error_message
+    Expected : $expected
+    Got      : $got
+```
+
+    return $message;
+}
+
 #
 # The following methods override the methods of Type::Tiny.
 #
@@ -57,27 +84,11 @@ sub get_message {
     my $other_meta = shift;
 
     my $default_message = $self->SUPER::get_message($other_meta);
-
-    state $SubMeta = InstanceOf['Sub::Meta'];
-
-    my ($error_message, $expected, $got);
-    if ($self->submeta_strict_check) {
-        $error_message = $self->submeta->error_message($other_meta);
-        $expected      = $self->submeta->display;
-        $got           = $SubMeta->check($other_meta) ? $other_meta->display : "";
-    }
-    else {
-        $error_message = $self->submeta->relaxed_error_message($other_meta);
-        $expected      = $self->submeta->display;
-        $got           = $SubMeta->check($other_meta) ? $other_meta->display : "";
-    }
+    my $detail_message  = $self->get_detail_message($other_meta);
 
     my $message = <<"```";
 $default_message
-    Reason : $error_message
-
-    Expected : $expected
-    Got      : $got
+$detail_message
 ```
 
     return $message;
