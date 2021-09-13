@@ -232,6 +232,26 @@ A value where checking by C<Sub::Meta#is_strict_same_interface>.
     ok $Sub->check(\&add);
     ok !$Sub->check(\&double);
 
+=head2 Sub::Meta::Library
+
+    use Sub::Meta::Library;
+    use Types::Standard -types;
+    use Types::Sub -types;
+
+    my $Sub = Sub[
+        args    => [Int, Int],
+        returns => Int,
+    ];
+
+    sub add {}
+    my $meta = Sub::Meta->new(
+        args    => [Int, Int],
+        returns => Int,
+    );
+    Sub::Meta::Library->register(\&add, $meta);
+
+    ok $Sub->check(\&add);
+
 =head1 SEE ALSO
 
 L<Sub::Meta::Type>
