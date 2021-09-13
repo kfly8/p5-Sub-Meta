@@ -92,6 +92,8 @@ subtest 'SubMeta/exceptions' => sub {
 
 subtest 'SubMeta/coerce' => sub {
     my $type = SubMeta[ args => [Str] ];
-    is $type->coerce(sub {}), undef;
+    is $type->coerce('hello'), 'hello';
+    my $sub = sub {};
+    is $type->coerce($sub), Sub::Meta->new(sub => $sub);
 };
 done_testing;

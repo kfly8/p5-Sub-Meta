@@ -2,11 +2,30 @@ use Test2::V0;
 
 use Sub::Meta::CreatorFunction;
 
-sub hello { }
-my $meta = Sub::Meta->new;
+sub hello {}
 
-is Sub::Meta::CreatorFunction::find_submeta(\&hello), undef;
-Sub::Meta::Library->register(\&hello, $meta);
-is Sub::Meta::CreatorFunction::find_submeta(\&hello), $meta;
+subtest 'not coderef' => sub {
+    my $meta = Sub::Meta::CreatorFunction::find_submeta('hello');
+    is $meta, undef;
+};
+
+subtest 'CodeRef' => sub {
+    my $meta = Sub::Meta::CreatorFunction::find_submeta(\&hello);
+    isa_ok $meta, 'Sub::Meta';
+    is $meta->sub, \&hello;
+    is $meta->args, [];
+};
+
+subtest 'from Library' => sub {
+    Sub::Meta::Library->register(\&hello, Sub::Meta->new(
+        sub  => \&hello,
+        args => ['Int'],
+    ));
+
+    my $meta = Sub::Meta::CreatorFunction::find_submeta(\&hello);
+    isa_ok $meta, 'Sub::Meta';
+    is $meta->sub, \&hello;
+    is $meta->args, [Sub::Meta::Param->new('Int')];
+};
 
 done_testing;
