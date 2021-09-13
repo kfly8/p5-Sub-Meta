@@ -25,6 +25,10 @@ sub new {
     Type::Tiny::_croak "Need to supply find_submeta" unless exists $params{find_submeta};
     ## use critic
 
+    $params{name}  ||= $params{submeta_strict_check}
+                     ? 'StrictSubMeta'
+                     : 'SubMeta';
+
     $params{inlined} = $params{submeta_strict_check}
                      ? sub { my ($self, $var) = @_; $self->submeta->is_strict_same_interface_inlined($var) }
                      : sub { my ($self, $var) = @_; $self->submeta->is_relaxed_same_interface_inlined($var) };
@@ -105,14 +109,19 @@ Sub::Meta::Type - type constraints for Sub::Meta
 
 =head1 SYNOPSIS
 
-    use Sub::Meta::CreatorFunction;
+    my $submeta = Sub::Meta->new(
+        subname => 'hello',
+    );
 
-    my $submeta = Sub::Meta->new();
     my $type = Sub::Meta::Type->new(
         submeta              => $submeta,
         submeta_strict_check => !!0,
         find_submeta         => \&Sub::Meta::CreatorFunction::find_submeta,
     );
+
+    sub hello {}
+    my $meta = $type->coerce(\&hello);
+    $type->check($meta)
 
 =head1 DESCRIPTION
 

@@ -22,26 +22,26 @@ use Type::Library
 
 __PACKAGE__->meta->add_type(
     name   => 'Sub',
-    constraint_generator => _gen_sub_constraint_generator('Sub', strict => 0),
+    constraint_generator => _gen_sub_constraint_generator(strict => 0),
 );
 
 __PACKAGE__->meta->add_type(
     name   => 'StrictSub',
-    constraint_generator => _gen_sub_constraint_generator('StrictSub', strict => 1),
+    constraint_generator => _gen_sub_constraint_generator(strict => 1),
 );
 
 __PACKAGE__->meta->add_type(
     name => 'SubMeta',
-    constraint_generator => _gen_submeta_constraint_generator('SubMeta', strict => 0),
+    constraint_generator => _gen_submeta_constraint_generator(strict => 0),
 );
 
 __PACKAGE__->meta->add_type(
     name => 'StrictSubMeta',
-    constraint_generator => _gen_submeta_constraint_generator('StrictSubMeta', strict => 1),
+    constraint_generator => _gen_submeta_constraint_generator(strict => 1),
 );
 
 sub _gen_sub_constraint_generator {
-    my ($name, %options) = @_;
+    my (%options) = @_;
     my $strict = $options{strict};
 
     my $CodeRef = Ref['CODE'];
@@ -52,7 +52,6 @@ sub _gen_sub_constraint_generator {
         my $SubMeta = $strict ? StrictSubMeta[@_] : SubMeta[@_];
 
         return Sub::Meta::TypeSub->new(
-            name         => $name,
             parent       => $CodeRef,
             submeta_type => $SubMeta
         )
@@ -60,14 +59,13 @@ sub _gen_sub_constraint_generator {
 }
 
 sub _gen_submeta_constraint_generator {
-    my ($name, %options) = @_;
+    my (%options) = @_;
     my $strict = $options{strict};
 
     return sub {
         my $submeta = Sub::Meta->new(@_);
 
         return Sub::Meta::Type->new(
-            name                 => $name,
             submeta              => $submeta,
             submeta_strict_check => $strict,
             find_submeta         => \&Sub::Meta::CreatorFunction::find_submeta,
@@ -115,11 +113,6 @@ C<Types::Sub> is type library for subroutines and Sub::Meta. This library can be
 =head1 Types
 
 =head2 Sub[`a]
-
-    Sub[
-        args    => [Int, Int],
-        returns => Int
-    ]
 
 A value where C<Ref['CODE']> and check by C<Sub::Meta#is_relaxed_same_interface>.
 

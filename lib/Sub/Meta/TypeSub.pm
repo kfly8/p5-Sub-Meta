@@ -16,6 +16,10 @@ sub new {
     ## no critic (Subroutines::ProtectPrivateSubs)
     Type::Tiny::_croak "Need to supply submeta_type" unless exists $params{submeta_type};
 
+    $params{name} ||= $params{submeta_type}->submeta_strict_check
+                    ? 'StrictSub'
+                    : 'Sub';
+
     return $class->SUPER::new(%params);
 }
 
@@ -69,7 +73,6 @@ Sub::Meta::TypeSub - type constraints for subroutines
 
     my $type = Sub::Meta::TypeSub->new(
         parent       => Ref['CODE'],
-        display_name => 'Sub[Int,Int]=>Int',
         submeta_type => $SubMeta, # InstanceOf[Sub::Meta::Type]
     );
 
