@@ -8,9 +8,7 @@ use Types::Standard qw(InstanceOf);
 
 sub submeta_type { my $self = shift; return $self->{submeta_type} }
 
-#
-# The following methods override the methods of Type::Tiny.
-#
+## override
 sub new {
     my $class  = shift;
     my %params = ( @_ == 1 ) ? %{ $_[0] } : @_;
@@ -25,13 +23,16 @@ sub new {
     return $class->SUPER::new(%params);
 }
 
+## override
 sub can_be_inlined { return !!0 }
 
+## override
 sub _build_display_name { ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self = shift;
     return sprintf('%s[%s]', $self->name, $self->submeta_type->submeta->display);
 }
 
+## override
 sub _build_constraint { ## no critic (ProhibitUnusedPrivateSubroutines)
     my $self = shift;
 
@@ -42,6 +43,7 @@ sub _build_constraint { ## no critic (ProhibitUnusedPrivateSubroutines)
     }
 }
 
+## override
 sub get_message {
     my $self = shift;
     my $sub = shift;
@@ -84,7 +86,7 @@ Sub::Meta::TypeSub - type constraints for subroutines
 
 This module provides types for subroutines.
 
-=head1 METHODS
+=head1 ATTRIBUTES
 
 =head2 submeta_type
 
