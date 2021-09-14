@@ -41,8 +41,7 @@
          "prereqs" : {
             "runtime" : {
                "requires" : {
-                  "Sub::WrapInType" : "0.04",
-                  "Type::Tiny" : "1.012000"
+                  "Sub::WrapInType" : "0.04"
                }
             }
          }
@@ -66,9 +65,12 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Class::Load" : "0",
+            "Module::Find" : "0",
             "Scalar::Util" : "0",
             "Sub::Identify" : "0.14",
             "Sub::Util" : "1.50",
+            "Type::Tiny" : "1.012000",
             "perl" : "5.010001"
          }
       },

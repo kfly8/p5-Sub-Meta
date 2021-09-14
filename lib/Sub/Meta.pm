@@ -31,7 +31,10 @@ sub _croak { require Carp; goto &Carp::croak }
 
 sub new {
     my ($class, @args) = @_;
-    my %args = @args == 1 ? %{$args[0]} : @args;
+
+    my %args = @args == 1 && (ref $args[0]||"") ne "HASH" ? _croak "single arg must be hashref"
+             : @args == 1 ? %{$args[0]}
+             : @args;
 
     my $self = bless \%args => $class;
 
@@ -214,7 +217,13 @@ sub set_returns {
     return $self
 }
 
-sub _build_subinfo     { my $self = shift; return $self->sub ? [ Sub::Identify::get_code_info($self->sub) ] : [] }
+sub _build_subinfo     {
+    my $self = shift;
+    return [] unless $self->has_sub;
+    my @info = Sub::Identify::get_code_info($self->sub);
+    return [ $info[0], $info[1] eq '__ANON__' ? undef : $info[1] ];
+}
+
 sub _build_file        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[0] : undef }
 sub _build_line        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[1] : undef }
 sub _build_is_constant { my $self = shift; return $self->sub ? Sub::Identify::is_sub_constant($self->sub) : undef }
@@ -279,6 +288,9 @@ sub is_same_interface {
     return !!1;
 }
 
+sub is_strict_same_interface;
+*is_strict_same_interface = \&is_same_interface;
+
 sub is_relaxed_same_interface {
     my ($self, $other) = @_;
 
@@ -316,6 +328,9 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
+sub is_strict_same_interface_inlined;
+*is_strict_same_interface_inlined = \&is_same_interface_inlined;
+
 sub is_relaxed_same_interface_inlined {
     my ($self, $v) = @_;
 
@@ -337,7 +352,7 @@ sub is_relaxed_same_interface_inlined {
 sub error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $other // '')
+    return sprintf('other must be Sub::Meta. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
@@ -351,10 +366,10 @@ sub error_message {
     return 'invalid method'
         unless $self->is_method eq $other->is_method;
 
-    return "invalid parameters:" . $self->parameters->error_message($other->parameters)
+    return "invalid parameters: " . $self->parameters->error_message($other->parameters)
         unless $self->parameters->is_same_interface($other->parameters);
 
-    return "invalid returns:" . $self->returns->error_message($other->returns)
+    return "invalid returns: " . $self->returns->error_message($other->returns)
         unless $self->returns->is_same_interface($other->returns);
 
     return '';
@@ -363,7 +378,7 @@ sub error_message {
 sub relaxed_error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta. got: %s', $other // '')
+    return sprintf('other must be Sub::Meta. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->has_subname) {
@@ -374,10 +389,10 @@ sub relaxed_error_message {
     return 'invalid method'
         unless $self->is_method eq $other->is_method;
 
-    return "invalid parameters:" . $self->parameters->relaxed_error_message($other->parameters)
+    return "invalid parameters: " . $self->parameters->relaxed_error_message($other->parameters)
         unless $self->parameters->is_relaxed_same_interface($other->parameters);
 
-    return "invalid returns:" . $self->returns->relaxed_error_message($other->returns)
+    return "invalid returns: " . $self->returns->relaxed_error_message($other->returns)
         unless $self->returns->is_relaxed_same_interface($other->returns);
 
     return '';
@@ -953,22 +968,50 @@ Apply subroutine subname, prototype and attributes of C<$other_meta>.
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> are equal.
 
+=head3 is_strict_same_interface($other_meta)
+
+Alias for C<is_same_interface>
+
 =head3 is_relaxed_same_interface($other_meta)
 
     method is_relaxed_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
 
 A boolean value indicating whether the subroutine's interface is relaxed same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> satisfy
-the condition of C<$self> side:
+the condition of C<$self> side.
 
-    my $meta = Sub::Meta->new;
-    my $other = Sub::Meta->new(subname => 'foo');
-    $meta->is_same_interface($other); # NG
-    $meta->is_relaxed_same_interface($other); # OK. The reason is that $meta does not specify the subname.
+=head4 Difference between C<strict> and C<relaxed>
+
+If it is C<is_relaxed_same_interface> method, the conditions can be many.
+For example, the number of arguments can be many.
+The following code is a test to show the difference between strict and relaxed.
+
+    my @tests = (
+        {},                { subname => 'foo' },
+        {},                { args => [Int] },
+        { args => [Int] }, { args => [Int, Str] },
+        { args => [Int] }, { args => [Int], slurpy => Str },
+        { args => [Int] }, { args => [{ type => Int, name => '$a' }] },
+        {},                { returns => Int },
+        { returns => { scalar => Int } }, { returns => { scalar => Int, list => Int } },
+    );
+
+    while (@tests) {
+        my ($a, $b) = splice @tests, 0, 2;
+        my $meta = Sub::Meta->new($a);
+        my $other = Sub::Meta->new($b);
+
+        ok !$meta->is_strict_same_interface($other);
+        ok $meta->is_relaxed_same_interface($other);
+    }
 
 =head3 is_same_interface_inlined($other_meta_inlined)
 
     method is_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
+
+=head3 is_strict_same_interface_inlined($other_meta)
+
+Alias for C<is_same_interface_inlined>
 
 Returns inlined C<is_same_interface> string:
 

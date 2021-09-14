@@ -158,7 +158,7 @@ sub _eq_inlined {
 sub error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
+    return sprintf('other returns must be Sub::Meta::Returns. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
     if ($self->has_scalar) {
@@ -190,7 +190,7 @@ sub error_message {
 sub relaxed_error_message {
     my ($self, $other) = @_;
 
-    return sprintf('must be Sub::Meta::Returns. got: %s', $other // '')
+    return sprintf('other returns must be Sub::Meta::Returns. got: %s', $other // 'Undef')
         unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
     if ($self->has_scalar) {
@@ -218,6 +218,17 @@ sub _all_eq {
        && _eq($self->scalar, $self->void);
 }
 
+sub _display {
+    my $type = shift;
+
+    if (ref $type && ref $type eq "ARRAY") {
+        return sprintf('[%s]', join ",", map { $_ . '' } @$type);
+    }
+    else {
+        return $type . '';
+    }
+}
+
 sub display {
     my $self = shift;
 
@@ -225,13 +236,13 @@ sub display {
         return '*';
     }
     elsif (_all_eq($self)) {
-        return $self->scalar . '';
+        return _display($self->scalar);
     }
     else {
         my @r;
         for my $key (qw(scalar list void)) {
             my $has = "has_$key";
-            push @r => "$key => @{[$self->$key]}" if $self->$has;
+            push @r => "$key => @{[_display($self->$key)]}" if $self->$has;
         }
         return "(@{[join ', ', @r]})";
     }

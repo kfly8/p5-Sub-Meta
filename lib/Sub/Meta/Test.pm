@@ -216,6 +216,7 @@ sub DummyType {
     return DummyType->new
 }
 
+
 1;
 __END__
 

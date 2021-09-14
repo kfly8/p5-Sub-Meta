@@ -1,5 +1,6 @@
 severity = 3
 
+[-Subroutines::RequireArgUnpacking]
 [-Subroutines::ProhibitExplicitReturnUndef]
 [-ValuesAndExpressions::ProhibitConstantPragma]
 [-RegularExpressions::RequireExtendedFormatting]
@@ -10,6 +11,8 @@ equivalent_modules = Test2::V0
 
 [TestingAndDebugging::RequireUseWarnings]
 equivalent_modules = Test2::V0
+
+[-TestingAndDebugging::ProhibitNoWarnings]
 
 [-Modules::RequireExplicitPackage]
 [-Modules::RequireEndWithOne]
