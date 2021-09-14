@@ -18,9 +18,9 @@ sub new {
     ## no critic (Subroutines::ProtectPrivateSubs)
     Type::Tiny::_croak "Need to supply submeta_type" unless exists $params{submeta_type};
 
-    $params{name} ||= $params{submeta_type}->submeta_strict_check
-                    ? 'StrictSub'
-                    : 'Sub';
+    if (!exists $params{name}) {
+        $params{name} = $params{submeta_type}->submeta_strict_check ? 'StrictSub' : 'Sub';
+    }
 
     return $class->SUPER::new(%params);
 }

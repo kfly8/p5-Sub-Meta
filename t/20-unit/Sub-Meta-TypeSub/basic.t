@@ -27,6 +27,15 @@ subtest 'attributes' => sub {
     );
 
     is $Sub->submeta_type, $SubMeta;
+
+    subtest 'customize name' => sub {
+        my $type = Sub::Meta::TypeSub->new(
+            submeta_type => $SubMeta,
+            name         => 'MySub',
+        );
+
+        is $type->name, 'MySub';
+    };
 };
 
 done_testing;

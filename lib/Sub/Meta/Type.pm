@@ -52,9 +52,9 @@ sub new {
     Type::Tiny::_croak "Need to supply find_submeta" unless exists $params{find_submeta};
     ## use critic
 
-    $params{name}  ||= $params{submeta_strict_check}
-                     ? 'StrictSubMeta'
-                     : 'SubMeta';
+    if (!exists $params{name}) {
+        $params{name} = $params{submeta_strict_check} ? 'StrictSubMeta' : 'SubMeta';
+    }
 
     $params{inlined} = $params{submeta_strict_check}
                      ? sub { my ($self, $var) = @_; $self->submeta->is_strict_same_interface_inlined($var) }

@@ -29,4 +29,15 @@ subtest 'attributes' => sub {
     is $SubMeta->find_submeta, $find_submeta;
 };
 
+subtest 'customize name' => sub {
+    my $SubMeta = Sub::Meta::Type->new(
+        submeta              => Sub::Meta->new,
+        submeta_strict_check => 0,
+        find_submeta         => sub {},
+        name                 => 'MySubMeta',
+    );
+
+    is $SubMeta->name, 'MySubMeta';
+};
+
 done_testing;
