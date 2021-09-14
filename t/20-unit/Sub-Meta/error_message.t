@@ -45,8 +45,8 @@ subtest "method: { is_method => 1 }" => sub {
 subtest "p1: { parameters => \$p1 }" => sub {
     my $meta = Sub::Meta->new({ parameters => $p1 });
     my @tests = (
-        fail => { parameters => $p2 }, qr/^./,
-        fail => {  },                  qr/^./,
+        fail => { parameters => $p2 }, qr/^invalid parameters/,
+        fail => {  },                  qr/^invalid parameters/,
         pass => { parameters => $p1 }, qr//, #valid
     );
     test_error_message($meta, @tests);
@@ -55,8 +55,8 @@ subtest "p1: { parameters => \$p1 }" => sub {
 subtest "{ returns => \$r1 }" => sub {
     my $meta = Sub::Meta->new({ returns => $r1 });
     my @tests = (
-        fail => { returns => $r2 }, qr/^./,
-        fail => {  },               qr/^./,
+        fail => { returns => $r2 }, qr/^invalid returns/,
+        fail => {  },               qr/^invalid returns/,
         pass => { returns => $r1 }, qr//, #valid
     );
     test_error_message($meta, @tests);
