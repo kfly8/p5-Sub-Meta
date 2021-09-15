@@ -6,7 +6,6 @@ use warnings;
 our $VERSION = "0.13";
 
 use Scalar::Util ();
-use Sub::Meta;
 use Sub::Identify;
 use Types::Standard qw(InstanceOf Str Ref);
 use Type::Params qw(compile Invocant);
@@ -25,6 +24,8 @@ sub register {
     my ($stash, $subname) = Sub::Identify::get_code_info($sub);
     $INDEX{$stash}{$subname} = $id;
     $INFO{$id} = $meta;
+    Scalar::Util::weaken($INFO{$id});
+    $meta->set_sub($sub);
     return;
 }
 
@@ -74,6 +75,8 @@ sub remove {
     my ($class, $sub) = $check->(@_);
 
     my $id = Scalar::Util::refaddr $sub;
+    my ($stash, $subname) = Sub::Identify::get_code_info($sub);
+    delete $INDEX{$stash}{$subname};
     return delete $INFO{$id}
 }
 
