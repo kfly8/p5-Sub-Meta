@@ -13,7 +13,7 @@ sub hello { }
 sub world { }
 
 subtest 'register' => sub {
-    my $meta = Sub::Meta->new;
+    my $meta = Sub::Meta->new(sub => \&hello);
 
     ok dies { Sub::Meta::Library->register }, 'arguments required coderef and submeta';
     ok dies { Sub::Meta::Library->register(\&hello) }, 'arguments required coderef and submeta';
@@ -21,6 +21,7 @@ subtest 'register' => sub {
     ok dies { Sub::Meta::Library->register({}, $meta) }, 'required coderef';
     ok dies { Sub::Meta::Library->register(\&hello, 'meta') }, 'required an instance of Sub::Meta';
     ok dies { Sub::Meta::Library->register(\&hello, bless {}, 'Some') }, 'required an instance of Sub::Meta';
+
     ok lives { Sub::Meta::Library->register(\&hello, $meta) };
 };
 
