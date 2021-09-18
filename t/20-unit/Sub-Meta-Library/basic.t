@@ -86,4 +86,9 @@ subtest 'remove' => sub {
     is( Sub::Meta::Library->get(\&hello), undef );
 };
 
+subtest 'package variable' => sub {
+    ok %Sub::Meta::Library::INFO;
+    ok %Sub::Meta::Library::INDEX;
+};
+
 done_testing;

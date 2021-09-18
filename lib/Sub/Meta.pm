@@ -13,7 +13,6 @@ use attributes ();
 
 use Sub::Meta::Parameters;
 use Sub::Meta::Returns;
-use Sub::Meta::Library;
 
 BEGIN {
     # for Pure Perl
@@ -411,16 +410,6 @@ sub display {
     $s .= '('. $self->parameters->display .')';
     $s .= ' => ' . $self->returns->display;
     return $s;
-}
-
-sub DESTROY {
-    my $self = shift;
-
-    if ($self->has_sub) {
-        Sub::Meta::Library->remove($self->sub);
-    }
-
-    return;
 }
 
 1;

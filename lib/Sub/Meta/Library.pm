@@ -10,8 +10,8 @@ use Sub::Identify;
 use Types::Standard qw(InstanceOf Str Ref);
 use Type::Params qw(compile Invocant);
 
-my %INFO;
-my %INDEX;
+our %INFO;
+our %INDEX;
 
 my $SubMeta  = InstanceOf['Sub::Meta'];
 my $Callable = Ref['CODE'];
@@ -23,9 +23,9 @@ sub register {
     my $id = Scalar::Util::refaddr $sub;
     my ($stash, $subname) = Sub::Identify::get_code_info($sub);
     $INDEX{$stash}{$subname} = $id;
-    $INFO{$id} = $meta;
-    Scalar::Util::weaken($INFO{$id});
+
     $meta->set_sub($sub);
+    $INFO{$id} = $meta;
     return;
 }
 
