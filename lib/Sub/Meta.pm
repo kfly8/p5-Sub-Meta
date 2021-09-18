@@ -132,6 +132,7 @@ sub has_line()       { my $self = shift; return defined $self->{line} }
 sub set_sub {
     my ($self, $v) = @_;
     $self->{sub} = $v;
+    Scalar::Util::weaken($self->{sub});
 
     # rebuild
     for (qw/subinfo file line prototype attribute is_constant/) {

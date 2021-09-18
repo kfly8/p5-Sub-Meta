@@ -22,7 +22,7 @@ subtest 'register' => sub {
     ok dies { Sub::Meta::Library->register(\&hello, 'meta') }, 'required an instance of Sub::Meta';
     ok dies { Sub::Meta::Library->register(\&hello, bless {}, 'Some') }, 'required an instance of Sub::Meta';
 
-    ok lives { Sub::Meta::Library->register(\&hello, $meta) }
+    ok lives { Sub::Meta::Library->register(\&hello, $meta) };
 };
 
 subtest 'register_list' => sub {
@@ -82,6 +82,11 @@ subtest 'remove' => sub {
     is( Sub::Meta::Library->get(\&hello), Sub::Meta->new(sub => \&hello) );
     is( Sub::Meta::Library->remove(\&hello), Sub::Meta->new(sub => \&hello) );
     is( Sub::Meta::Library->get(\&hello), undef );
+};
+
+subtest 'package variable' => sub {
+    ok %Sub::Meta::Library::INFO;
+    ok %Sub::Meta::Library::INDEX;
 };
 
 done_testing;

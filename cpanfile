@@ -20,4 +20,6 @@ on configure => sub {
 
 on 'test' => sub {
     requires 'Test2::V0', '0.000135';
+    requires 'Test::LeakTrace';
+    requires 'Devel::Refcount';
 };
