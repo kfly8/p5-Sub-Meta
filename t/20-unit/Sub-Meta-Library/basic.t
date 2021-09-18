@@ -21,10 +21,7 @@ subtest 'register' => sub {
     ok dies { Sub::Meta::Library->register({}, $meta) }, 'required coderef';
     ok dies { Sub::Meta::Library->register(\&hello, 'meta') }, 'required an instance of Sub::Meta';
     ok dies { Sub::Meta::Library->register(\&hello, bless {}, 'Some') }, 'required an instance of Sub::Meta';
-
-    is $meta->sub, undef;
     ok lives { Sub::Meta::Library->register(\&hello, $meta) };
-    is $meta->sub, \&hello;
 };
 
 subtest 'register_list' => sub {

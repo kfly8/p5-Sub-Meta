@@ -23,8 +23,6 @@ sub register {
     my $id = Scalar::Util::refaddr $sub;
     my ($stash, $subname) = Sub::Identify::get_code_info($sub);
     $INDEX{$stash}{$subname} = $id;
-
-    $meta->set_sub($sub);
     $INFO{$id} = $meta;
     return;
 }
