@@ -1,4 +1,5 @@
 use Test2::V0;
+use lib 't/lib';
 
 use Sub::Meta::CreatorFunction;
 
@@ -33,9 +34,10 @@ subtest 'finders' => sub {
     $finders = Sub::Meta::CreatorFunction::finders();
     ok @$finders > 0;
 
-    local @Sub::Meta::CreatorFunction::FINDER_CLASSES = qw(Foo Bar);
+    local @Sub::Meta::CreatorFunction::FINDER_CLASSES = qw(Foo MySubMeta::Finder);
     $finders = Sub::Meta::CreatorFunction::finders();
-    is @$finders, 0;
+    is @$finders, 1;
+    is $finders->[0], \&MySubMeta::Finder::find_materials;
 };
 
 done_testing;

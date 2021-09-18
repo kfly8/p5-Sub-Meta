@@ -73,6 +73,17 @@ Return submeta of subroutine.
 
 Return arrayref of C<Sub::Meta::Finder::*::find_materials>.
 
+=head1 CUSTOMIZE
+
+=head2 @FINDER_CLASSES
+
+You can change @FINDER_CLASSES:
+
+    local @Sub::Meta::CreatorFunction::FINDER_CLASSES = qw(MySubMeta::Finder);
+    my $meta = Sub::Meta::CreatorFunction::find_submeta(\&hello); # find by MySubMeta::Finder
+
+Note that once find_submeta is called, the finders will be fixed by C<state>.
+
 =head1 LICENSE
 
 Copyright (C) kfly8.
